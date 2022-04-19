@@ -1,0 +1,40 @@
+import { Clock } from "three";
+
+/**
+ * 公共方法
+ */
+export default abstract class BaseThree {
+
+  // 创建一个时钟对象Clock
+  private clock: Clock = new Clock();
+
+  /**
+   * 每帧时间
+   */
+  public deltaTime: number = this.clock.getDelta();
+  /**
+   * 初始化完毕后调用该方法，保证start和update函数可以正常执行
+   */
+  public enable() {
+    this.start();
+    this.ani();
+  }
+
+  /**
+   * 类可用时调用该方法
+   */
+  abstract start(): void;
+
+  private ani() {
+    // 每帧调用
+    requestAnimationFrame(this.ani.bind(this));
+    // 更新每帧时间
+    this.deltaTime = this.clock.getDelta();
+    // update主方法
+    this.update();
+  }
+  /**
+   * 每帧都会调用该方法
+   */
+  abstract update(): void;
+}
