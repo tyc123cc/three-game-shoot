@@ -8,6 +8,12 @@ export default class MapBuilder extends BaseThree {
 
   public map: Map;
 
+  public wallColor:number = 0x0099FF;
+
+  public wallHeight:number = 10;
+
+  public wallOpacity:number = 0.4;
+
   constructor(map: Map, sceneRender: SceneRender) {
     super();
     this.map = map;
@@ -48,45 +54,57 @@ export default class MapBuilder extends BaseThree {
    */
   createLimitWalls() {
     // 上边缘墙壁
-    var geometry = new THREE.PlaneGeometry(this.map.width, 20);
+    var geometry = new THREE.PlaneGeometry(this.map.width, this.wallHeight);
     var material = new THREE.MeshLambertMaterial({
-      color: 0x421ae6,
+      color: this.wallColor,
       side: THREE.DoubleSide,
+      transparent:true,
+      opacity:this.wallOpacity
     });
     var walls = new THREE.Mesh(geometry, material);
     walls.position.z -= this.map.height / 2;
+    walls.position.y += this.wallHeight / 2;
     this.sceneRender.scene?.add(walls);
 
     // 下边缘墙壁
-    var geometry = new THREE.PlaneGeometry(this.map.width, 20);
+    var geometry = new THREE.PlaneGeometry(this.map.width, this.wallHeight);
     var material = new THREE.MeshLambertMaterial({
-      color: 0x421ae6,
+      color: this.wallColor,
       side: THREE.DoubleSide,
+      transparent:true,
+      opacity:this.wallOpacity
     });
     var walls = new THREE.Mesh(geometry, material);
     walls.position.z += this.map.height / 2;
+    walls.position.y += this.wallHeight / 2;
     this.sceneRender.scene?.add(walls);
 
     // 左边缘墙壁
-    var geometry = new THREE.PlaneGeometry(this.map.height, 20);
+    var geometry = new THREE.PlaneGeometry(this.map.height, this.wallHeight);
     var material = new THREE.MeshLambertMaterial({
-      color: 0x421ae6,
+      color: this.wallColor,
       side: THREE.DoubleSide,
+      transparent:true,
+      opacity:this.wallOpacity
     });
     var walls = new THREE.Mesh(geometry, material);
     walls.rotateY((-90 / 180) * Math.PI);
     walls.position.x -= this.map.width / 2;
+    walls.position.y += this.wallHeight / 2;
     this.sceneRender.scene?.add(walls);
 
       // 右边缘墙壁
-      var geometry = new THREE.PlaneGeometry(this.map.height, 20);
+      var geometry = new THREE.PlaneGeometry(this.map.height, this.wallHeight);
       var material = new THREE.MeshLambertMaterial({
-        color: 0x421ae6,
+        color: this.wallColor,
         side: THREE.DoubleSide,
+        transparent:true,
+        opacity:this.wallOpacity
       });
       var walls = new THREE.Mesh(geometry, material);
       walls.rotateY((-90 / 180) * Math.PI);
       walls.position.x += this.map.width / 2;
+      walls.position.y += this.wallHeight / 2;
       this.sceneRender.scene?.add(walls);
   }
   update(): void {}

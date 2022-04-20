@@ -45,7 +45,7 @@ export default class ThreeJs extends BaseThree {
     );
     this.camera.position.z = 5;
     this.camera.position.set(11, 28, 37.5)
-    this.ambientLight = new THREE.AmbientLight(0x444444); // 环境光
+    this.ambientLight = new THREE.AmbientLight(0xaaaaaa); // 环境光
     this.sceneRender = new SceneRender(this.camera, this.ambientLight, true, 'threeCanvas')
     let light = new THREE.DirectionalLight(0xffffff)
     light.position.set(10,10,10)
