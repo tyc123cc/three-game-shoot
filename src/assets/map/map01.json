@@ -1,28 +1,30 @@
 {
-    "width":100,
-    "height":50,
-    "walls":[{
-        "position":{
-            "x":10,
-            "y":5      
-        },
-        "width":2,
-        "height":10
+  "width": 100,
+  "height": 50,
+  "walls": [
+    {
+      "position": {
+        "x": -20,
+        "y": -7.5
+      },
+      "width": 2,
+      "height": 35
     },
     {
-        "position":{
-            "x":40,
-            "y":35      
-        },
-        "width":2,
-        "height":10
+      "position": {
+        "x": 10,
+        "y": 7.5
+      },
+      "width": 2,
+      "height": 35
     },
     {
-        "position":{
-            "x":60,
-            "y":5      
-        },
-        "width":2,
-        "height":10
-    }]
+      "position": {
+        "x": 35,
+        "y": -7.5
+      },
+      "width": 2,
+      "height": 35
+    }
+  ]
 }
