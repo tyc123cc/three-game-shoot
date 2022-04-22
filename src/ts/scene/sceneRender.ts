@@ -8,6 +8,7 @@ export default class SceneRender extends BaseThree {
   public renderer: THREE.WebGLRenderer | null = null;
   public ambientLight: THREE.AmbientLight = new THREE.AmbientLight(0x000000);
   public controls: OrbitControls | null = null;
+  
 
   /**
    * 是否允许使用control
