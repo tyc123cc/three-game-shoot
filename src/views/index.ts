@@ -5,6 +5,9 @@ import BaseThree from "@/ts/common/baseThree";
 import SceneRender from "@/ts/scene/sceneRender";
 import MapBuilder from "@/ts/gameBuilder/mapBuilder";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import CharacterBuilder from "@/ts/gameBuilder/characterBuilder";
+import AnimationInput from "@/ts/apis/animationInput";
+import { AniEffectScope } from "@/ts/apis/enum";
 
 export default class ThreeJs extends BaseThree {
   start(): void {
@@ -68,8 +71,27 @@ export default class ThreeJs extends BaseThree {
     }
     let loader = new FBXLoader();
     // var path:string = require("../../public/character/Player.fbx")
+    let aniInputs: Array<AnimationInput> = new Array<AnimationInput>()
+    aniInputs.push(new AnimationInput("character/animate/Run Forward.fbx",0,"run",10,AniEffectScope.Lower))
+    aniInputs.push(new AnimationInput("character/animate/hit reaction.fbx",0,"hit",20,AniEffectScope.Upper))
+
+
+    let player = new CharacterBuilder("character/Player.fbx",aniInputs,2,this.sceneRender.scene as THREE.Scene,(object)=>{
+      player.character?.group?.position.set(5,0,0)
+      player.character?.group?.scale.set(0.05,0.05,0.05)
+      player.character?.play("run",true)
+      console.log("player",object)
+      console.log("loadedPlayer",player)
+    })
+
+    document.addEventListener('keydown',(ev)=>{
+      if(ev.key == 'd'){
+        player.character?.play("hit",false)
+        console.log(player)
+      }
+    })
+    //player.character?.group?.scale.set(0.05,0.05,0.05)
     loader.load("character/animate/Run Forward.fbx",(ani2)=>{
-      console.log("ani2",ani2)
     loader.load("character/animate/hit reaction.fbx",(ani)=>{
      ani.animations[0].tracks.splice(45);
      ani.animations[0].tracks.push(...ani2.animations[0].tracks.splice(45))
@@ -79,7 +101,6 @@ export default class ThreeJs extends BaseThree {
     // ani.animations[0].tracks[4] = ani2.animations[0].tracks[4]
     //console.log(ani2.animations[0].tracks.splice(45))
       loader.load("character/Player.fbx", (object) =>{
-        console.log(object)
           object.scale.set(0.05,0.05,0.05)
           object.position.set(1,0,0)
         this.sceneRender?.scene?.add(object)
@@ -90,13 +111,11 @@ export default class ThreeJs extends BaseThree {
     // 查看骨骼网格模型的帧动画数据
     // console.log(SkinnedMesh.geometry.animations)
     // 解析跑步状态对应剪辑对象clip中的关键帧数据
-    console.log("ani", ani.animations[0])
     var AnimationAction = this.mixer.clipAction(ani.animations[0]);
     // 解析步行状态对应剪辑对象clip中的关键帧数据
     // var AnimationAction = mixer.clipAction(SkinnedMesh.geometry.animations[3]);
     AnimationAction.play();
       },(event)=>{
-        console.log("总共:" + event.loaded + "，已加载：" + event.total)
       });
     })
   })
