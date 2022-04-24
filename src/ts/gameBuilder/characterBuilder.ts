@@ -53,7 +53,7 @@ export default class CharacterBuilder extends BaseThree {
     this.loadCharacter(0);
   }
 
-  update(): void {}
+  update(): void { }
 
   loadCharacter(animationIndex: number) {
     if (animationIndex < this.animationsInput.length) {
@@ -63,6 +63,7 @@ export default class CharacterBuilder extends BaseThree {
         animationInput.name,
         animationInput.aniIndex,
         animationInput.effectScope,
+        animationInput.loop,
         animationInput.weight,
         (object) => {
           if (animationInput.onLoad) {
@@ -87,7 +88,7 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-  onAnimationSuccess(object: Group) {}
+  onAnimationSuccess(object: Group) { }
 
-  onCharacterSuccess(object: Group) {}
+  onCharacterSuccess(object: Group) { }
 }

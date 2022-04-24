@@ -11,7 +11,7 @@ export default class Animation {
    */
   public url: string;
 
-  public name:string;
+  public name: string;
 
   /**
    * 需要播放的动画的索引
@@ -26,13 +26,15 @@ export default class Animation {
   /**
    * 动画的权重
    */
-  public weight:number;
+  public weight: number;
 
   /**
    * 动画clip
    */
-  public animationClip: THREE.AnimationClip|null = null;
-  
+  public animationClip: THREE.AnimationClip | null = null;
+
+  public loop: THREE.AnimationActionLoopStyles;
+
 
   /**
    *
@@ -40,6 +42,7 @@ export default class Animation {
    * @param name 动画的名称
    * @param aniIndex 需要播放的动画的索引
    * @param effectScope 动画影响范围
+   * @param loop 动画的循环方式
    * @param weight 动画的权重
    * @param onLoad 加载完毕调用函数
    * @param onProgress 加载中调用函数
@@ -47,10 +50,11 @@ export default class Animation {
    */
   constructor(
     url: string,
-    name:string,
+    name: string,
     aniIndex: number,
     effectScope: AniEffectScope,
-    weight:number,
+    loop: THREE.AnimationActionLoopStyles,
+    weight: number,
     onLoad: (object: Group) => void,
     onProgress?: (event: ProgressEvent) => void,
     onError?: (event: ErrorEvent) => void
@@ -59,6 +63,7 @@ export default class Animation {
     this.aniIndex = aniIndex;
     this.effectScope = effectScope;
     this.name = name;
+    this.loop = loop;
     this.weight = weight;
     let loader = new FBXLoader();
     loader.load(

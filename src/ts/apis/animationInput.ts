@@ -26,6 +26,11 @@ export default class AnimationInput {
   public effectScope: AniEffectScope;
 
   /**
+   * 动画的循环方式
+   */
+  public loop: THREE.AnimationActionLoopStyles;
+
+  /**
    * 动画的权重
    */
   public weight: number;
@@ -40,6 +45,7 @@ export default class AnimationInput {
     name: string,
     effectScope: AniEffectScope,
     weight: number,
+    loop: THREE.AnimationActionLoopStyles,
     onLoad?: (object: Group) => void,
     onProgress?: (event: ProgressEvent) => void,
     onError?: (event: ErrorEvent) => void
@@ -49,7 +55,7 @@ export default class AnimationInput {
     this.aniIndex = aniIndex;
     this.effectScope = effectScope;
     this.weight = weight;
-
+    this.loop = loop;
     this.onLoad = onLoad;
     this.onProgress = onProgress;
     this.onError = onError;
