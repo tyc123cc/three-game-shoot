@@ -73,21 +73,26 @@ export default class ThreeJs extends BaseThree {
     let loader = new FBXLoader();
     // var path:string = require("../../public/character/Player.fbx")
     let aniInputs: Array<AnimationInput> = new Array<AnimationInput>()
+  
     aniInputs.push(new AnimationInput("character/animate/Run Forward.fbx", 0, "run", AniEffectScope.Lower, 10, THREE.LoopRepeat))
     aniInputs.push(new AnimationInput("character/animate/hit reaction.fbx", 0, "hit", AniEffectScope.Upper, 20, THREE.LoopOnce))
-
+    aniInputs.push(new AnimationInput("character/animate/rifle aiming idle.fbx", 0, "idle", AniEffectScope.All, 1, THREE.LoopRepeat))
 
     let player = new CharacterBuilder("character/Player.fbx", aniInputs, 2, this.sceneRender.scene as THREE.Scene, (object) => {
       player.character?.group?.position.set(5, 0, 0)
       player.character?.group?.scale.set(0.05, 0.05, 0.05)
       player.character?.play("run")
-      console.log("player", object)
-      console.log("loadedPlayer", player)
+      // console.log("player", object)
+      // console.log("loadedPlayer", player)
     })
 
     document.addEventListener('keydown', (ev) => {
       if (ev.key == 'd') {
         player.character?.play("hit")
+        console.log(player)
+      }
+      if (ev.key == 's') {
+        player.character?.play("idle")
         console.log(player)
       }
 
