@@ -73,7 +73,7 @@ export default class ThreeJs extends BaseThree {
     let loader = new FBXLoader();
     // var path:string = require("../../public/character/Player.fbx")
     let aniInputs: Array<AnimationInput> = new Array<AnimationInput>()
-  
+
     aniInputs.push(new AnimationInput("character/animate/Run Forward.fbx", 0, "run", AniEffectScope.Lower, 10, THREE.LoopRepeat))
     aniInputs.push(new AnimationInput("character/animate/hit reaction.fbx", 0, "hit", AniEffectScope.Upper, 20, THREE.LoopOnce))
     aniInputs.push(new AnimationInput("character/animate/rifle aiming idle.fbx", 0, "idle", AniEffectScope.All, 1, THREE.LoopRepeat))
@@ -88,17 +88,19 @@ export default class ThreeJs extends BaseThree {
 
     document.addEventListener('keydown', (ev) => {
       if (ev.key == 'd') {
+        console.log("按下d")
         player.character?.play("hit")
-        console.log(player)
       }
       if (ev.key == 's') {
+        console.log("按下s")
         player.character?.play("idle")
-        console.log(player)
+        //console.log(player)
       }
 
       if (ev.key == 'w') {
+        console.log("按下w")
         player.character?.play("run")
-        console.log(player)
+        //  console.log(player)
       }
     })
     //player.character?.group?.scale.set(0.05,0.05,0.05)
