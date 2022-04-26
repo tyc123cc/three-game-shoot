@@ -11,7 +11,7 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import BaseThree from "../common/baseThree";
 import { Heap } from "../common/heap";
 import Animation from "./animation";
-import { AniEffectScope } from "./enum";
+import { AniEffectScope, AniStatus } from "./enum";
 
 /**
  * 角色类
@@ -53,15 +53,19 @@ export default class Character extends BaseThree {
   public animationAction: AnimationAction | null = null;
 
   /**
-  * 角色在执行上半身动画结束后的AnimationAction
-  */
-  public nextAnimationAction: Animation | null = null;
-
+   * 角色在执行上半身动画结束后的AnimationAction
+   */
+  public nextAnimation: Animation | null = null;
 
   /**
    * 该角色的后补动画Set
    */
   public animationSet: Set<Animation>;
+
+  /**
+   * 当前动画播放状态
+   */
+  public AnimationStatus: AniStatus = AniStatus.Null;
 
   constructor(
     url: string,
@@ -75,7 +79,7 @@ export default class Character extends BaseThree {
     this.url = url;
     this.animations = animations;
     this.skinMeshIndex = skinMeshIndex;
-    this.animationSet = new Set()
+    this.animationSet = new Set();
     let loader = new FBXLoader();
     loader.load(
       url,
@@ -91,33 +95,48 @@ export default class Character extends BaseThree {
     this.enable();
   }
 
-  start(): void { }
+  start(): void {}
 
   update(): void {
     //clock.getDelta()方法获得两帧的时间间隔
-    // 更新混合器相关的时间
-    this.mixer?.update(this.deltaTime);
     if (!this.animationAction) {
       return;
     }
     // 上半身动画停止
-    if (this.animationAction.time >= (this.playingAnimation?.animationClip?.duration as number) && this.playingAnimation?.effectScope == AniEffectScope.Upper) {
+    // this.animationAction.time >= (this.playingAnimation?.animationClip?.duration as number)
+    if (
+      !this.animationAction.isRunning() &&
+      this.playingAnimation?.effectScope == AniEffectScope.Upper
+    ) {
       // 重置当前播放动画
-      this.playingAnimation = null;
-      if (this.nextAnimationAction) {
+      if (this.nextAnimation) {
+        let action = this.mixer?.clipAction(
+          this.nextAnimation.animationClip as AnimationClip
+        ) as AnimationAction;
+        action.stop().play();
+        this.animationAction.stop();
+        this.animationAction = action;
+        this.playingAnimation = this.nextAnimation;
+        this.AnimationStatus = Animation.changeAnimationEffectScopeToStatus(
+          this.nextAnimation.effectScope
+        );
+        this.nextAnimation = null;
         // 播放上半身停止后动画
-        this.play(this.nextAnimationAction.name)
-        this.animationSet.forEach(ani => {
+        //this.play(this.nextAnimation.name);
+        console.log("播放完毕");
+        this.animationSet.forEach((ani) => {
           if (ani.name != this.playingAnimation?.name) {
             // 停止其他动画 防止出现攻击-移动-静止时依旧播放移动动画的情况
             this.mixer?.clipAction(ani.animationClip as AnimationClip).stop();
+            console.log("已删除" + ani.name);
           }
         });
         this.animationSet.clear();
       }
-      this.nextAnimationAction = null;
-
+      this.nextAnimation = null;
     }
+    // 更新混合器相关的时间
+    this.mixer?.update(this.deltaTime);
   }
 
   /**
@@ -129,143 +148,168 @@ export default class Character extends BaseThree {
     let animation = this.animations.filter((value) => value.name == name)[0];
     let clip = animation.animationClip;
     if (clip) {
+      let animationAction: AnimationAction | null = null;
       // 混合器中不存在该clip，需要设置初始属性
       if (!this.mixer?.existingAction(clip)) {
-        this.animationAction = this.mixer?.clipAction(clip) as AnimationAction;
-        this.animationAction.loop = animation.loop;
-        this.animationAction.weight = animation.weight;
+        animationAction = this.mixer?.clipAction(clip) as AnimationAction;
+        animationAction.loop = animation.loop;
+        animationAction.weight = animation.weight;
       } else {
-        this.animationAction = this.mixer?.clipAction(clip) as AnimationAction;
+        animationAction = this.mixer?.clipAction(clip) as AnimationAction;
       }
+      this.playMixAnimation(animation, animationAction);
     }
-    this.playMixAnimation(animation);
   }
 
   /**
    * 播放混合动画
    */
-  private playMixAnimation(animation: Animation) {
+  private playMixAnimation(animation: Animation, action: AnimationAction) {
     // 当前未在播放动画，直接播放当前动画
-    if (this.playingAnimation == null) {
-      this.animationAction?.stop().play();
+    if (this.AnimationStatus == AniStatus.Null) {
+      console.log("直接播放动画 " + animation.name);
+      action.stop().play();
+      this.animationAction = action;
       this.playingAnimation = animation;
+      this.AnimationStatus = Animation.changeAnimationEffectScopeToStatus(
+        animation.effectScope
+      );
       return;
     }
     // 当前正在播放下半身动画，且需要播放上半身动画时（或相反情况），进行动画融合操作
     if (
       animation.effectScope == AniEffectScope.Upper &&
-      this.playingAnimation.effectScope == AniEffectScope.Lower
+      this.AnimationStatus == AniStatus.Lower
     ) {
-      console.log("正在执行播放下半身时播放上半身:" + animation.name)
+      console.log("正在执行播放下半身时播放上半身:" + animation.name);
       // 不停止下半身动画，直接播放上半身动画进行动画融合
+      // 克隆出该上半身动画数据，进行骨骼点裁剪，再将新动画与正在播放的下半身动画融合
       let animationClipTemp = animation.animationClip?.clone() as AnimationClip;
       // 上半身动画只保留上半身骨骼动画
       animationClipTemp.tracks.splice(45);
       animationClipTemp.tracks[1] = (
-        this.playingAnimation.animationClip as AnimationClip
+        this.playingAnimation?.animationClip as AnimationClip
       ).tracks[1];
-      this.animationAction = this.mixer?.clipAction(
+      // 裁剪完毕，生成新的Action
+      let newAnimationAction = this.mixer?.clipAction(
         animationClipTemp
       ) as AnimationAction;
-      this.animationAction.loop = animation.loop;
-      this.animationAction.weight = animation.weight;
-      this.animationAction?.stop().play();
-      this.nextAnimationAction = this.playingAnimation;
-      if (!this.animationSet.has(this.playingAnimation)) {
-        this.animationSet.add(this.playingAnimation)
+      // 配置初始值
+      newAnimationAction.loop = animation.loop;
+      newAnimationAction.weight = animation.weight;
+      // 播放裁剪后的上半身动作
+      newAnimationAction.stop().play();
+      // 设置当前Action为裁剪过的动作Action
+      this.animationAction = newAnimationAction;
+      // 设置结束后的动作为当前的下半身动作
+      this.nextAnimation = this.playingAnimation;
+      // 将当前动画放在set中，待上半身动画结束后进行统一播放/停止
+      if (!this.animationSet.has(this.playingAnimation as Animation)) {
+        this.animationSet.add(this.playingAnimation as Animation);
       }
+      // 设置当前播放动画
       this.playingAnimation = animation;
-    } else if (
-      animation.effectScope != AniEffectScope.Upper &&
-      this.playingAnimation.effectScope == AniEffectScope.Upper
+      // 当前正在播放上下半身融合动画
+      this.AnimationStatus = AniStatus.UpperAndLower;
+    }
+    // 当前正在播放上半身动画时，插入下半身动画，进行动画融合
+    else if (
+      animation.effectScope == AniEffectScope.Lower &&
+      this.AnimationStatus == AniStatus.Upper
     ) {
-      console.log('正在执行上半身动作时插入别的动画' + animation.name)
+      console.log("正在执行上半身动作时插入别的动画" + animation.name);
       // 不停止上半身动画，直接播放下半身动画进行动画融合
 
-      // let playingAnimationAction = this.mixer?.clipAction(this.playingAnimation.animationClip as AnimationClip) as AnimationAction;
-      // let newUpperAnimationAction = this.mixer?.clipAction(animationClipTemp) as AnimationAction;
-      // newUpperAnimationAction.syncWith(playingAnimationAction)
-      //playingAnimationAction.stop();
-      this.animationAction?.play();
-      this.animationAction = this.mixer?.clipAction(this.playingAnimation.animationClip as AnimationClip) as AnimationAction;
+      // 播放当前动画
+      action.stop().play();
+      // 裁剪当前播放的上半身动画
 
+      // 裁剪当前播放的上半身动画的克隆
       let animationClipTemp =
-        this.playingAnimation.animationClip?.clone() as AnimationClip;
-      // // 上半身动画只保留上半身骨骼动画
+        this.playingAnimation?.animationClip?.clone() as AnimationClip;
+      // 上半身动画只保留上半身骨骼动画
       animationClipTemp.tracks.splice(45);
       animationClipTemp.tracks[1] = (
         animation.animationClip as AnimationClip
       ).tracks[1];
+      // 正在播放的上半身动画action
       let oldAnimationAction = this.animationAction as AnimationAction;
+      // 生成裁剪后的action
       this.animationAction = this.mixer?.clipAction(
         animationClipTemp
       ) as AnimationAction;
+      // 配置初始值
       this.animationAction.loop = oldAnimationAction.loop;
       this.animationAction.weight = oldAnimationAction.weight;
-      this.animationAction.syncWith(oldAnimationAction)
+      // 将裁剪后的动画时间与与当前播放的上半身动画同步
+      this.animationAction.syncWith(oldAnimationAction);
+      // 播放裁剪后的上半身动画
       this.animationAction.play();
-      oldAnimationAction.stop()
-      //newUpperAnimationAction.play();
-      //this.playingAnimation = animation;
-      // 如果是全身动画，还需要把其他动画关掉
+      // 正在播放的上半身动画停止
+      oldAnimationAction.stop();
 
+      // 此时正在播放播放动画还是原先的上半身动画，不修改playingAnimation
 
-      // 此时播放动画以上半身动画为准
+      // 将下半身动作放入set中
       if (!this.animationSet.has(animation)) {
-        this.animationSet.add(animation)
-        console.log("添加set:" + animation.name)
+        this.animationSet.add(animation);
+        console.log("添加set:" + animation.name);
       }
-      this.nextAnimationAction = animation;
-      // if (animation.effectScope == AniEffectScope.All) {
-      //   // 重置当前播放动画
-      //   this.playingAnimation = null;
-      //   if (this.nextAnimationAction) {
-      //     // 播放上半身停止后动画
-      //     this.play(this.nextAnimationAction.name)
-      //     this.animationSet.forEach(ani => {
-      //       if (ani.name != this.playingAnimation?.name) {
-      //         // 停止其他动画 防止出现攻击-移动-静止时依旧播放移动动画的情况
-      //         this.mixer?.clipAction(ani.animationClip as AnimationClip).stop();
-      //       }
-      //     });
-      //     this.animationSet.clear();
-      //   }
-      //   this.nextAnimationAction = null;
+      // 设置上半身动画结束后的动画
+      this.nextAnimation = animation;
+      // 当前动画播放状态为上下半身动画融合
+      this.AnimationStatus = AniStatus.UpperAndLower;
+
       // }
-    }
-    else if (
-      animation.name == this.playingAnimation.name &&
+    } else if (
+      animation.name == this.playingAnimation?.name &&
       animation.effectScope != AniEffectScope.Upper
     ) {
       // 非上半身重复播放，不执行
-      console.log("正在执行非上半身动作重复播放:" + animation.name)
-    }
-    else if (
-      animation.effectScope != AniEffectScope.Upper &&
-      this.playingAnimation.effectScope == AniEffectScope.Upper
+      console.log("正在执行非上半身动作重复播放:" + animation.name);
+    } else if (
+      animation.effectScope == AniEffectScope.All &&
+      this.playingAnimation?.effectScope == AniEffectScope.Upper
     ) {
-      // 上半身动作无法被其他动作覆盖，该
-      console.log("正在执行上半身动作无法被其他动作覆盖:" + animation.name)
-    } else {
-      console.log("正在执行其他情况:" + animation.name)
-      // 其他情况直接播放动画
-      // 获取正在播放的action
-      let playingAnimationAction = this.mixer?.clipAction(
-        this.playingAnimation.animationClip as AnimationClip
-      ) as AnimationAction;
-      this.animationAction?.stop().play();
-      if (animation.effectScope != AniEffectScope.Upper) {
-        // 非上半身动作，需要停止当前动作
-        playingAnimationAction.stop();
+      // 上半身动作无法被全身动作覆盖，将该动作放入set和next中
+      console.log("正在执行上半身动作无法被全身动作覆盖:" + animation.name);
+      this.nextAnimation = animation;
+      // 将当前动画放在set中，待上半身动画结束后进行统一播放/停止
+      if (!this.animationSet.has(this.playingAnimation as Animation)) {
+        this.animationSet.add(this.playingAnimation as Animation);
       }
-      else {
-        // 播放上半身动作，记录当前动作
-        this.nextAnimationAction = this.playingAnimation
-        if (!this.animationSet.has(this.playingAnimation)) {
-          this.animationSet.add(this.playingAnimation)
+    } else {
+      console.log("正在执行其他情况:" + animation.name);
+      // 其他情况直接播放动画
+      // 播放当前动画
+      action.stop().play();
+
+      // 当前播放上半身动画，需要存储当前动作
+      if (
+        animation.effectScope == AniEffectScope.Upper &&
+        this.AnimationStatus != AniStatus.Upper
+      ) {
+        // 设置上半身动画结束后的动画
+        this.nextAnimation = this.playingAnimation;
+        // 将当前动作放入set中
+        if (!this.animationSet.has(this.playingAnimation as Animation)) {
+          this.animationSet.add(this.playingAnimation as Animation);
+          console.log("添加set:" + this.playingAnimation?.name);
         }
       }
+      // 直接播放上半身动作时，不停止当前动画
+      // 当前播放上半身动画时，需要重置动画，同样不停止
+      else if (this.AnimationStatus != AniStatus.Upper) {
+        // 需要停止当前动作
+        this.animationAction?.stop();
+      }
+
+      // 设置当前播放动画和action
+      this.animationAction = action;
       this.playingAnimation = animation;
+      this.AnimationStatus = Animation.changeAnimationEffectScopeToStatus(
+        animation.effectScope
+      );
     }
   }
 }

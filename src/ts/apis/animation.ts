@@ -1,4 +1,4 @@
-import { AniEffectScope } from "./enum";
+import { AniEffectScope, AniStatus } from "./enum";
 import { AnimationClip, Group } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
@@ -35,7 +35,6 @@ export default class Animation {
 
   public loop: THREE.AnimationActionLoopStyles;
 
-
   /**
    *
    * @param url  动画的地址
@@ -70,11 +69,35 @@ export default class Animation {
       url,
       (object) => {
         // 设置动画clip
-        this.animationClip = object.animations[aniIndex]
+        this.animationClip = object.animations[aniIndex];
         onLoad(object);
       },
       onProgress,
       onError
     );
+  }
+
+  /**
+   * 将动画影响范围枚举转变为动画状态
+   * @param scope 动画影响范围
+   * @returns 动画状态
+   */
+  public static changeAnimationEffectScopeToStatus(
+    scope: AniEffectScope
+  ): AniStatus {
+    switch (scope) {
+      // 全身
+      case AniEffectScope.All:
+        return AniStatus.All;
+      // 下半身
+      case AniEffectScope.Lower:
+        return AniStatus.Lower;
+      // 上半身
+      case AniEffectScope.Upper:
+        return AniStatus.Upper;
+
+      default:
+        return AniStatus.Null;
+    }
   }
 }

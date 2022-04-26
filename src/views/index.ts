@@ -77,6 +77,7 @@ export default class ThreeJs extends BaseThree {
     aniInputs.push(new AnimationInput("character/animate/Run Forward.fbx", 0, "run", AniEffectScope.Lower, 10, THREE.LoopRepeat))
     aniInputs.push(new AnimationInput("character/animate/hit reaction.fbx", 0, "hit", AniEffectScope.Upper, 20, THREE.LoopOnce))
     aniInputs.push(new AnimationInput("character/animate/rifle aiming idle.fbx", 0, "idle", AniEffectScope.All, 1, THREE.LoopRepeat))
+    aniInputs.push(new AnimationInput("character/animate/Walk Backward.fbx", 0, "back", AniEffectScope.Lower, 10, THREE.LoopRepeat))
 
     let player = new CharacterBuilder("character/Player.fbx", aniInputs, 2, this.sceneRender.scene as THREE.Scene, (object) => {
       player.character?.group?.position.set(5, 0, 0)
@@ -100,6 +101,13 @@ export default class ThreeJs extends BaseThree {
       if (ev.key == 'w') {
         console.log("按下w")
         player.character?.play("run")
+        //  console.log(player)
+      }
+
+      
+      if (ev.key == 'a') {
+        console.log("按下a")
+        player.character?.play("back")
         //  console.log(player)
       }
     })
