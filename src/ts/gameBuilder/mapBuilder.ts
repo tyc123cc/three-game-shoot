@@ -39,7 +39,7 @@ export default class MapBuilder extends BaseThree {
     var groud = new THREE.Mesh(geometry, material);
     // 地板需要面向天空
     groud.rotateX((-90 / 180) * Math.PI);
-    this.sceneRender.scene?.add(groud);
+    this.sceneRender.add(groud,false);
   }
 
   /**
@@ -66,7 +66,7 @@ export default class MapBuilder extends BaseThree {
       });
       var wall = new THREE.Mesh(box, material);
       wall.position.set(wallDate.position.x, this.wallHeight / 2, wallDate.position.y);
-      this.sceneRender.scene?.add(wall);
+      this.sceneRender.add(wall);
     });
   }
 
@@ -85,7 +85,7 @@ export default class MapBuilder extends BaseThree {
     var walls = new THREE.Mesh(geometry, material);
     walls.position.z -= this.map.height / 2;
     walls.position.y += this.wallHeight / 2;
-    this.sceneRender.scene?.add(walls);
+    this.sceneRender.add(walls);
 
     // 下边缘墙壁
     var geometry = new THREE.PlaneGeometry(this.map.width, this.wallHeight);
@@ -98,7 +98,7 @@ export default class MapBuilder extends BaseThree {
     var walls = new THREE.Mesh(geometry, material);
     walls.position.z += this.map.height / 2;
     walls.position.y += this.wallHeight / 2;
-    this.sceneRender.scene?.add(walls);
+    this.sceneRender.add(walls);
 
     // 左边缘墙壁
     var geometry = new THREE.PlaneGeometry(this.map.height, this.wallHeight);
@@ -112,7 +112,7 @@ export default class MapBuilder extends BaseThree {
     walls.rotateY((-90 / 180) * Math.PI);
     walls.position.x -= this.map.width / 2;
     walls.position.y += this.wallHeight / 2;
-    this.sceneRender.scene?.add(walls);
+    this.sceneRender.add(walls);
 
     // 右边缘墙壁
     var geometry = new THREE.PlaneGeometry(this.map.height, this.wallHeight);
@@ -126,7 +126,7 @@ export default class MapBuilder extends BaseThree {
     walls.rotateY((-90 / 180) * Math.PI);
     walls.position.x += this.map.width / 2;
     walls.position.y += this.wallHeight / 2;
-    this.sceneRender.scene?.add(walls);
+    this.sceneRender.add(walls);
   }
   update(): void { }
 }

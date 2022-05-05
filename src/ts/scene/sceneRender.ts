@@ -8,7 +8,7 @@ export default class SceneRender extends BaseThree {
   public renderer: THREE.WebGLRenderer | null = null;
   public ambientLight: THREE.AmbientLight = new THREE.AmbientLight(0x000000);
   public controls: OrbitControls | null = null;
-  
+  public collideMeshList: THREE.Object3D[] = [];
 
   /**
    * 是否允许使用control
@@ -43,6 +43,18 @@ export default class SceneRender extends BaseThree {
 
   /**
    *
+   * @param object 将物体添加到scene中
+   * @param isCollide 该物体是否具有碰撞体
+   */
+  add(object: THREE.Object3D, isCollide: boolean = true): void {
+    this.scene?.add(object);
+    if (isCollide) {
+      this.collideMeshList.push(object);
+    }
+  }
+
+  /**
+   *
    * @param camera 摄像机
    * @param ambientLight 环境光
    * @param useControls 是否使用control，可以使用鼠标移动摄像机
@@ -66,7 +78,6 @@ export default class SceneRender extends BaseThree {
     this.useControls = useControls;
     this.enable();
   }
-
 
   // 设置渲染器
   setRenderer(): void {

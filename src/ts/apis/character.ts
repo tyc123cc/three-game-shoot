@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import {
   AnimationAction,
   AnimationActionLoopStyles,
@@ -6,6 +7,7 @@ import {
   Group,
   LoopOnce,
   LoopRepeat,
+  Vector3,
 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import BaseThree from "../common/baseThree";
@@ -67,6 +69,18 @@ export default class Character extends BaseThree {
    */
   public AnimationStatus: AniStatus = AniStatus.Null;
 
+  /**
+   * 当前角色的前进目标点
+   */
+  public targetPos:THREE.Vector3|null = null;
+
+  /**
+   * 角色的移动速度
+   */
+  public moveSpeed:number = 0;
+
+  public colliderMeshList:THREE.Object3D[] = [];
+
   constructor(
     url: string,
     animations: Array<Animation>,
@@ -97,7 +111,40 @@ export default class Character extends BaseThree {
 
   start(): void {}
 
+  public moveTo(
+    pos: THREE.Vector3,
+    speed: number,
+  ) {
+    this.targetPos = pos;
+    this.moveSpeed = speed;
+  }
+
   update(): void {
+    this.upAnimationEnd();
+    this.move();
+  }
+
+  /**
+   * 角色移动函数
+   */
+  private move(){
+    if(this.group && this.targetPos){
+      let moveVec = this.targetPos.clone();
+      // 角色移动方向的方向向量
+      moveVec.sub(this.group.position).normalize();
+      this.group.position.add(moveVec.multiplyScalar(this.moveSpeed))
+      if(this.group.position.distanceTo(this.targetPos) < 0.01){
+        // 到达目的地
+        this.targetPos = null;
+      }
+    }
+  }
+
+  /**
+   * 上半身动画播放完毕时执行函数
+   * @returns
+   */
+  private upAnimationEnd(): void {
     //clock.getDelta()方法获得两帧的时间间隔
     if (!this.animationAction) {
       return;
@@ -129,11 +176,9 @@ export default class Character extends BaseThree {
         //this.play(this.nextAnimation.name);
 
         this.animationSet.forEach((ani) => {
-
           if (ani.name != this.playingAnimation?.name) {
             // 停止其他动画 防止出现攻击-移动-静止时依旧播放移动动画的情况
             this.mixer?.clipAction(ani.animationClip as AnimationClip).stop();
-
           }
         });
         this.animationSet.clear();
@@ -172,7 +217,6 @@ export default class Character extends BaseThree {
   private playMixAnimation(animation: Animation, action: AnimationAction) {
     // 当前未在播放动画，直接播放当前动画
     if (this.AnimationStatus == AniStatus.Null) {
-
       action.stop().play();
       this.animationAction = action;
       this.playingAnimation = animation;
@@ -186,7 +230,6 @@ export default class Character extends BaseThree {
       animation.effectScope == AniEffectScope.Upper &&
       this.AnimationStatus == AniStatus.Lower
     ) {
-
       // 不停止下半身动画，直接播放上半身动画进行动画融合
       // 克隆出该上半身动画数据，进行骨骼点裁剪，再将新动画与正在播放的下半身动画融合
       let animationClipTemp = animation.animationClip?.clone() as AnimationClip;
@@ -211,7 +254,6 @@ export default class Character extends BaseThree {
       // 将当前动画放在set中，待上半身动画结束后进行统一播放/停止
       if (!this.animationSet.has(this.playingAnimation as Animation)) {
         this.animationSet.add(this.playingAnimation as Animation);
-
       }
       // 设置当前播放动画
       this.playingAnimation = animation;
@@ -223,7 +265,6 @@ export default class Character extends BaseThree {
       animation.effectScope == AniEffectScope.Lower &&
       this.AnimationStatus == AniStatus.Upper
     ) {
-
       // 不停止上半身动画，直接播放下半身动画进行动画融合
 
       // 播放当前动画
@@ -271,7 +312,6 @@ export default class Character extends BaseThree {
       animation.effectScope != AniEffectScope.Upper
     ) {
       // 非上半身重复播放，不执行
-
     } else if (
       animation.effectScope == AniEffectScope.All &&
       this.AnimationStatus == AniStatus.Upper
@@ -323,7 +363,6 @@ export default class Character extends BaseThree {
       this.AnimationStatus == AniStatus.UpperAndLower &&
       animation.effectScope == AniEffectScope.Lower
     ) {
-
       // 当前下半身动作与需要播放的下半身动作不同时，进行刷新下半身动画操作，否则不进行操作
       if (animation.name != this.nextAnimation?.name) {
         // 需要将上半身动画的骨骼动画主脊髓骨骼动画改为新播放的下半身动画的主脊椎骨骼动画，因此需要重新生成上半身骨骼动画，
@@ -376,7 +415,6 @@ export default class Character extends BaseThree {
       this.AnimationStatus == AniStatus.UpperAndLower &&
       animation.effectScope == AniEffectScope.All
     ) {
-
       // 获取上半身动画（未裁剪过）的Action
       let upperAnimationAction = this.mixer?.clipAction(
         this.playingAnimation?.animationClip as AnimationClip
@@ -404,7 +442,6 @@ export default class Character extends BaseThree {
         this.animationSet.add(animation as Animation);
       }
     } else {
-
       // 其他情况直接播放动画
       // 播放当前动画
       action.stop().play();
@@ -419,7 +456,6 @@ export default class Character extends BaseThree {
         // 将当前动作放入set中
         if (!this.animationSet.has(this.playingAnimation as Animation)) {
           this.animationSet.add(this.playingAnimation as Animation);
-
         }
       }
       // 直接播放上半身动作时，不停止当前动画

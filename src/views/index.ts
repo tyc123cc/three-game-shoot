@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { SkinnedMesh, Texture } from "three";
+import { SkinnedMesh, Texture, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import BaseThree from "@/ts/common/baseThree";
 import SceneRender from "@/ts/scene/sceneRender";
@@ -79,7 +79,7 @@ export default class ThreeJs extends BaseThree {
     aniInputs.push(new AnimationInput("character/animate/rifle aiming idle.fbx", 0, "idle", AniEffectScope.All, 1, THREE.LoopRepeat))
     aniInputs.push(new AnimationInput("character/animate/Walk Backward.fbx", 0, "back", AniEffectScope.Lower, 10, THREE.LoopRepeat))
 
-    let player = new CharacterBuilder("character/Player.fbx", aniInputs, 2, this.sceneRender.scene as THREE.Scene, (object) => {
+    let player = new CharacterBuilder("character/Player.fbx", aniInputs, 2, this.sceneRender, (object) => {
       player.character?.group?.position.set(5, 0, 0)
       player.character?.group?.scale.set(0.05, 0.05, 0.05)
       player.character?.play("run")
@@ -101,6 +101,8 @@ export default class ThreeJs extends BaseThree {
       if (ev.key == 'w') {
         console.log("按下w")
         player.character?.play("run")
+       player.moveTo(new THREE.Vector3(0,0,10),3 * this.deltaTime)
+
         //  console.log(player)
       }
 

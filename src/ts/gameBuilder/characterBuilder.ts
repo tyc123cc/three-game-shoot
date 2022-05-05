@@ -6,6 +6,7 @@ import Character from "../apis/character";
 import { Group } from "three";
 import { AniEffectScope } from "../apis/enum";
 import AnimationInput from "../apis/animationInput";
+import gsap from "gsap";
 
 /**
  * 角色构建器
@@ -23,7 +24,7 @@ export default class CharacterBuilder extends BaseThree {
 
   public mixer: THREE.AnimationMixer | null = null;
 
-  public scene: THREE.Scene;
+  public scene: SceneRender;
 
   private onLoad: (object: Group) => void;
   private onProgress?: (event: ProgressEvent) => void;
@@ -33,7 +34,7 @@ export default class CharacterBuilder extends BaseThree {
     characterUrl: string,
     animationsInput: Array<AnimationInput>,
     skinMeshIndex: number,
-    scene: THREE.Scene,
+    scene: SceneRender,
     onLoad: (object: Group) => void,
     onProgress?: (event: ProgressEvent) => void,
     onError?: (event: ErrorEvent) => void
@@ -52,6 +53,26 @@ export default class CharacterBuilder extends BaseThree {
   start(): void {
     this.loadCharacter(0);
   }
+
+  public moveTo(
+    pos: THREE.Vector3,
+    speed: number,
+  ) {
+    if(this.character){
+      let collideObjs:THREE.Object3D[] = []
+      collideObjs = this.scene.collideMeshList.filter((obj)=>{
+        return obj.id != this.character?.group?.id;
+      })
+      console.log(this.scene.collideMeshList)
+      console.log(collideObjs,this.character?.group?.id)
+      this.character.colliderMeshList = collideObjs
+      this.character.moveTo(pos,speed)
+    }
+  
+   
+  }
+
+
 
   update(): void { }
 
