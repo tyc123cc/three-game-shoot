@@ -52,25 +52,29 @@ export default class CharacterBuilder extends BaseThree {
 
   start(): void {
     this.loadCharacter(0);
+
+
+  }
+
+  lookAt(pos: THREE.Vector3) {
+    this.character?.lookAt(pos);
   }
 
   public moveTo(
     pos: THREE.Vector3,
     speed: number,
   ) {
-    if(this.character){
-      let collideObjs:THREE.Object3D[] = []
-      collideObjs = this.scene.collideMeshList.filter((obj)=>{
+    if (this.character) {
+      let collideObjs: THREE.Object3D[] = []
+      collideObjs = this.scene.collideMeshList.filter((obj) => {
         return obj.id != this.character?.group?.id;
       })
-      console.log(this.scene.collideMeshList)
-      console.log(collideObjs,this.character?.group?.id)
       this.character.colliderMeshList = collideObjs
-      this.character.moveTo(pos,speed)
+      this.character.moveTo(pos, speed)
     }
-  
-   
+
   }
+
 
 
 

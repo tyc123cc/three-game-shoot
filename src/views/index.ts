@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { SkinnedMesh, Texture, Vector3 } from "three";
+import { Camera, SkinnedMesh, Texture, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import BaseThree from "@/ts/common/baseThree";
 import SceneRender from "@/ts/scene/sceneRender";
@@ -28,6 +28,7 @@ export default class ThreeJs extends BaseThree {
   mesh: THREE.Mesh | null = null;
   controls: OrbitControls | null = null;
   mixer: THREE.AnimationMixer | null = null
+  player: CharacterBuilder | null = null;
 
   constructor() {
     super()
@@ -66,6 +67,7 @@ export default class ThreeJs extends BaseThree {
 
     const material = new THREE.MeshBasicMaterial({ map: texture }); //然后创建一个phong材质来处理着色，并传递给纹理映射
     this.mesh = new THREE.Mesh(geometry, material); //网格模型对象Mesh
+    console.log(this.mesh)
     console.log(this.sceneRender)
     if (this.sceneRender.scene) {
       this.sceneRender.scene.add(this.mesh); //网格模型添加到场景中
@@ -85,6 +87,7 @@ export default class ThreeJs extends BaseThree {
       player.character?.play("run")
       // console.log("player", object)
       // console.log("loadedPlayer", player)
+      this.player = player;
     })
 
     document.addEventListener('keydown', (ev) => {
@@ -101,12 +104,12 @@ export default class ThreeJs extends BaseThree {
       if (ev.key == 'w') {
         console.log("按下w")
         player.character?.play("run")
-       player.moveTo(new THREE.Vector3(0,0,10),3 * this.deltaTime)
+        player.moveTo(new THREE.Vector3(10, 0, 10), 3 * this.deltaTime)
 
         //  console.log(player)
       }
 
-      
+
       if (ev.key == 'a') {
         console.log("按下a")
         player.character?.play("back")
@@ -125,7 +128,6 @@ export default class ThreeJs extends BaseThree {
         //console.log(ani2.animations[0].tracks.splice(45))
         loader.load("character/Player.fbx", (object) => {
           object.scale.set(0.05, 0.05, 0.05)
-          object.position.set(1, 0, 0)
           this.sceneRender?.scene?.add(object)
           //从返回对象获得骨骼网格模型
           var SkinnedMesh: THREE.SkinnedMesh = object.children[2] as SkinnedMesh;
@@ -142,6 +144,39 @@ export default class ThreeJs extends BaseThree {
         });
       })
     })
+
+    //addEventListener("mousemove", this.onDocumentMouseDown)
+  }
+
+  onDocumentMouseDown(event: MouseEvent) {
+    // console.log(this.sceneRender?.camera)
+    if (this.camera && this.player) {
+      var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
+      vector = vector.unproject(this.camera as Camera).sub((this.camera as Camera).position).normalize();
+      // console.log(vector)
+      let intersectPoint = this.CalPlaneLineIntersectPoint(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), vector, this.camera?.position as THREE.Vector3)
+      this.player?.lookAt(intersectPoint)
+    }
+
+
+  }
+
+  CalPlaneLineIntersectPoint(planeVector: THREE.Vector3, planePoint: THREE.Vector3, lineVector: THREE.Vector3, linePoint: THREE.Vector3) {
+    let returnResult = new THREE.Vector3(0, 0, 0);
+    let vpt = lineVector.x * planeVector.x + lineVector.y * planeVector.y + lineVector.z * planeVector.z;
+    //首先判断直线是否与平面平行
+    if (vpt == 0) {
+      return returnResult;
+    }
+    else {
+      let t = ((planePoint.x - linePoint.x) * planeVector.x + (planePoint.y - linePoint.y) * planeVector.y + (planePoint.z - linePoint.z)
+        * planeVector.z) / vpt;
+      returnResult.x = linePoint.x + lineVector.x * t;
+      returnResult.y = linePoint.y + lineVector.y * t;
+      returnResult.z = linePoint.z + lineVector.z * t;
+    }
+    // console.log(returnResult)
+    return returnResult;
   }
 
 }

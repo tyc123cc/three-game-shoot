@@ -7,6 +7,7 @@ import {
   Group,
   LoopOnce,
   LoopRepeat,
+  Raycaster,
   Vector3,
 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
@@ -72,14 +73,14 @@ export default class Character extends BaseThree {
   /**
    * 当前角色的前进目标点
    */
-  public targetPos:THREE.Vector3|null = null;
+  public targetPos: THREE.Vector3 | null = null;
 
   /**
    * 角色的移动速度
    */
-  public moveSpeed:number = 0;
+  public moveSpeed: number = 0;
 
-  public colliderMeshList:THREE.Object3D[] = [];
+  public colliderMeshList: THREE.Object3D[] = [];
 
   constructor(
     url: string,
@@ -109,7 +110,7 @@ export default class Character extends BaseThree {
     this.enable();
   }
 
-  start(): void {}
+  start(): void { }
 
   public moveTo(
     pos: THREE.Vector3,
@@ -117,6 +118,11 @@ export default class Character extends BaseThree {
   ) {
     this.targetPos = pos;
     this.moveSpeed = speed;
+    console.log(this.colliderMeshList)
+  }
+
+  public lookAt(pos: THREE.Vector3) {
+    this.group?.lookAt(pos)
   }
 
   update(): void {
@@ -127,17 +133,64 @@ export default class Character extends BaseThree {
   /**
    * 角色移动函数
    */
-  private move(){
-    if(this.group && this.targetPos){
+  private move() {
+    if (this.group && this.targetPos) {
       let moveVec = this.targetPos.clone();
       // 角色移动方向的方向向量
       moveVec.sub(this.group.position).normalize();
-      this.group.position.add(moveVec.multiplyScalar(this.moveSpeed))
-      if(this.group.position.distanceTo(this.targetPos) < 0.01){
+      // 角色移动前坐标
+      let originPostion = this.group.position;
+      // 方向向量乘以速度
+      moveVec.multiplyScalar(this.moveSpeed)
+
+      if (this.intersect(moveVec)) {
+        console.log("碰撞")
+        // 碰撞，停止移动
+        this.targetPos = null;
+        return;
+      }
+      this.group.position.add(moveVec)
+      if (this.group.position.distanceTo(this.targetPos) < 0.01) {
         // 到达目的地
         this.targetPos = null;
       }
     }
+  }
+
+  /**
+   * 检测角色是否与其他物体碰撞
+   * @returns 
+   */
+  intersect(dir: Vector3): boolean {
+
+    //声明一个变量用来表示是否碰撞
+    var bool = false;
+    // threejs的几何体默认情况下几何中心在场景中坐标是坐标原点。
+
+    // vertices[i]获得几何体索引是i的顶点坐标，
+    // 注意执行.clone()返回一个新的向量，以免改变几何体顶点坐标值
+    // 几何体的顶点坐标要执行该几何体绑定模型对象经过的旋转平移缩放变换
+    // 几何体顶点经过的变换可以通过模型的本地矩阵属性.matrix或世界矩阵属性.matrixWorld获得
+
+
+
+    //Raycaster构造函数创建一个射线投射器对象，参数1、参数2改变的是该对象的射线属性.ray
+    // 参数1：射线的起点
+    // 参数2：射线的方向，注意归一化的时候，需要先克隆,否则后面会执行dir.length()计算向量长度结果是1
+    var raycaster = new Raycaster(this.group?.position, dir.clone().normalize());
+
+
+    // 计算射线和参数1中的模型对象是否相交，参数1数组中可以设置多个模型模型对象，下面参数只设置了立方体网格模型
+    var intersects = raycaster.intersectObjects(this.colliderMeshList);
+    for (let intersect of intersects) {
+      if (intersect.distance < 2.0) {
+        //循环遍历几何体顶点，每一个顶点都要创建一个射线，进行一次交叉拾取计算，只要有一个满足上面的距离条件，就发生了碰撞
+        //console.log(intersect.point, intersect.distance, dir.length())
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

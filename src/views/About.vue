@@ -1,5 +1,6 @@
 <template>
-  <div id="threeCanvas">
+  <div id="threeCanvas"
+       @mousemove="onDocumentMouseDown">
   </div>
 </template>
 
@@ -16,8 +17,14 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
   },
 })
 export default class About extends Vue {
+  three: ThreeJs | null = null;
   mounted() {
-    new ThreeJs();
+    this.three = new ThreeJs();
+  }
+  onDocumentMouseDown(event: MouseEvent) {
+    if (this.three) {
+      this.three.onDocumentMouseDown(event);
+    }
   }
 }
 </script>
