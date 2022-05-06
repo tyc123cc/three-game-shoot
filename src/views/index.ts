@@ -93,26 +93,29 @@ export default class ThreeJs extends BaseThree {
     document.addEventListener('keydown', (ev) => {
       if (ev.key == 'd') {
         console.log("按下d")
-        player.character?.play("hit")
+        player.moveRight(5 * this.deltaTime)
+        player.character?.play("run")
       }
       if (ev.key == 's') {
         console.log("按下s")
-        player.character?.play("idle")
+        player.character?.play("back")
+        player.moveBack(5 * this.deltaTime)
         //console.log(player)
       }
 
       if (ev.key == 'w') {
         console.log("按下w")
         player.character?.play("run")
-        player.moveTo(new THREE.Vector3(10, 0, 10), 3 * this.deltaTime)
-
+        //player.moveTo(new THREE.Vector3(10, 0, 10), 3 * this.deltaTime)
+        player.moveAdvance(5 * this.deltaTime)
         //  console.log(player)
       }
 
 
       if (ev.key == 'a') {
         console.log("按下a")
-        player.character?.play("back")
+        player.moveLeft(5 * this.deltaTime)
+        player.character?.play("run")
         //  console.log(player)
       }
     })

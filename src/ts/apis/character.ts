@@ -80,6 +80,11 @@ export default class Character extends BaseThree {
    */
   public moveSpeed: number = 0;
 
+  /**
+   * 角色朝向点
+   */
+  public lookPoint:THREE.Vector3 = new Vector3()
+
   public colliderMeshList: THREE.Object3D[] = [];
 
   constructor(
@@ -123,6 +128,7 @@ export default class Character extends BaseThree {
 
   public lookAt(pos: THREE.Vector3) {
     this.group?.lookAt(pos)
+    this.lookPoint = pos;
   }
 
   update(): void {

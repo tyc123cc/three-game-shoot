@@ -52,33 +52,109 @@ export default class CharacterBuilder extends BaseThree {
 
   start(): void {
     this.loadCharacter(0);
-
-
   }
 
-  lookAt(pos: THREE.Vector3) {
+  public lookAt(pos: THREE.Vector3) {
     this.character?.lookAt(pos);
   }
 
-  public moveTo(
-    pos: THREE.Vector3,
-    speed: number,
-  ) {
+  /**
+   * 角色前进
+   * @param speed 前进速度
+   */
+  public moveAdvance(speed: number) {
     if (this.character) {
-      let collideObjs: THREE.Object3D[] = []
-      collideObjs = this.scene.collideMeshList.filter((obj) => {
-        return obj.id != this.character?.group?.id;
-      })
-      this.character.colliderMeshList = collideObjs
-      this.character.moveTo(pos, speed)
+      // 角色前进 朝向目标点移动
+      this.moveTo(this.character.lookPoint, speed);
     }
-
   }
 
+  /**
+   * 角色后退
+   * @param speed 速度
+   */
+  public moveBack(speed: number) {
+    if (this.character && this.character.group) {
+      // 角色前进 朝向目标点反方向移动
+      this.moveTo(
+        this.character.group.position.clone().sub(this.character.lookPoint),
+        speed
+      );
+    }
+  }
 
+  /**
+   * 角色左移
+   * @param speed 速度
+   */
+  public moveLeft(speed: number) {
+    if (this.character && this.character.group) {
+      let targetPos = this.changeAngleFromYAxis(
+        this.character.lookPoint.clone().sub(this.character.group.position),
+        -Math.PI / 2
+      );
+      this.moveTo(targetPos, speed);
+    }
+  }
 
+  /**
+   * 角色右移
+   * @param speed 速度
+   */
+   public moveRight(speed: number) {
+    if (this.character && this.character.group) {
+      let targetPos = this.changeAngleFromYAxis(
+        this.character.lookPoint.clone().sub(this.character.group.position),
+        Math.PI / 2
+      );
+      this.moveTo(targetPos, speed);
+    }
+  }
 
-  update(): void { }
+  /**
+   * 将向量根据y轴偏移角度
+   * @param vec 需要偏移的向量
+   * @param radian 需要偏移的弧度
+   *
+   * @returns 偏移后的向量
+   */
+  private changeAngleFromYAxis(
+    vec: THREE.Vector3,
+    radian: number
+  ): THREE.Vector3 {
+    if (vec.x !== 0 || vec.z !== 0) {
+      var x = vec.x;
+      var y = vec.z;
+      var tha1 = radian;
+
+      var value = Math.sqrt(x * x + y * y);
+
+      var cos1 = x / value;
+      var sin1 = y / value;
+
+      var cos2 = Math.cos(tha1);
+      var sin2 = Math.sin(tha1);
+
+      var cos3 = cos1 * cos2 - sin1 * sin2;
+      var sin3 = sin1 * cos2 + cos1 * sin2;
+
+      return new THREE.Vector3(value * cos3, vec.y, value * sin3);
+    }
+    return vec;
+  }
+
+  public moveTo(pos: THREE.Vector3, speed: number) {
+    if (this.character) {
+      let collideObjs: THREE.Object3D[] = [];
+      collideObjs = this.scene.collideMeshList.filter((obj) => {
+        return obj.id != this.character?.group?.id;
+      });
+      this.character.colliderMeshList = collideObjs;
+      this.character.moveTo(pos, speed);
+    }
+  }
+
+  update(): void {}
 
   loadCharacter(animationIndex: number) {
     if (animationIndex < this.animationsInput.length) {
@@ -113,7 +189,7 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-  onAnimationSuccess(object: Group) { }
+  onAnimationSuccess(object: Group) {}
 
-  onCharacterSuccess(object: Group) { }
+  onCharacterSuccess(object: Group) {}
 }
