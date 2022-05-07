@@ -101,13 +101,79 @@ export default class CharacterBuilder extends BaseThree {
    * 角色右移
    * @param speed 速度
    */
-   public moveRight(speed: number) {
+  public moveRight(speed: number) {
     if (this.character && this.character.group) {
       let targetPos = this.changeAngleFromYAxis(
         this.character.lookPoint.clone().sub(this.character.group.position),
         Math.PI / 2
       );
       this.moveTo(targetPos, speed);
+    }
+  }
+
+  /**
+   * 角色左前进
+   * @param speed 速度
+   */
+  public moveLeftAdvance(speed: number) {
+    if (this.character && this.character.group) {
+      let targetPos = this.changeAngleFromYAxis(
+        this.character.lookPoint.clone().sub(this.character.group.position),
+        -Math.PI / 4
+      );
+      this.moveTo(targetPos, speed);
+    }
+  }
+
+  /**
+   * 角色右前进
+   * @param speed 速度
+   */
+  public moveRightAdvance(speed: number) {
+    if (this.character && this.character.group) {
+      let targetPos = this.changeAngleFromYAxis(
+        this.character.lookPoint.clone().sub(this.character.group.position),
+        Math.PI / 4
+      );
+      this.moveTo(targetPos, speed);
+    }
+  }
+
+  /**
+   * 角色左后进
+   * @param speed 速度
+   */
+  public moveLeftBack(speed: number) {
+    if (this.character && this.character.group) {
+      let targetPos = this.changeAngleFromYAxis(
+        this.character.group.position.clone().sub(this.character.lookPoint),
+        Math.PI / 4
+      );
+      this.moveTo(targetPos, speed);
+    }
+  }
+
+  /**
+   * 角色右后进
+   * @param speed 速度
+   */
+  public moveRightBack(speed: number) {
+    if (this.character && this.character.group) {
+      let targetPos = this.changeAngleFromYAxis(
+        this.character.group.position.clone().sub(this.character.lookPoint),
+        -Math.PI / 4
+      );
+      this.moveTo(targetPos, speed);
+    }
+  }
+
+  /**
+   * 角色停止移动
+   */
+  public moveStop() {
+    if (this.character && this.character.group) {
+      let targetPos = null;
+      this.character.targetPos = targetPos;
     }
   }
 

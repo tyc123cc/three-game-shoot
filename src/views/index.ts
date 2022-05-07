@@ -20,6 +20,51 @@ export default class ThreeJs extends BaseThree {
       // 更新混合器相关的时间
       this.mixer.update(this.deltaTime);
     }
+
+    if(this.onLeftKeyDown && this.onUpKeyDown){
+     // console.log("左前进")
+      this.player?.moveLeftAdvance(10 * this.deltaTime);
+      this.player?.character?.play("run")
+    }
+    else if(this.onRightKeyDown && this.onUpKeyDown){
+     // console.log("右前进")
+      this.player?.moveRightAdvance(10 * this.deltaTime);
+      this.player?.character?.play("run")
+    }
+    else if(this.onRightKeyDown && this.onDownKeyDown){
+     // console.log("右后退")
+      this.player?.moveRightBack(5 * this.deltaTime);
+      this.player?.character?.play("back")
+    }
+    else if(this.onLeftKeyDown && this.onDownKeyDown){
+     // console.log("左后退")
+      this.player?.moveLeftBack(5 * this.deltaTime);
+      this.player?.character?.play("back")
+    }
+    else if(this.onUpKeyDown){
+     // console.log("前进")
+      this.player?.moveAdvance(10 * this.deltaTime);
+      this.player?.character?.play("run")
+    }
+    else if(this.onDownKeyDown){
+     // console.log("后退")
+      this.player?.moveBack(5 * this.deltaTime);
+      this.player?.character?.play("back")
+    }
+    else if(this.onLeftKeyDown){
+     // console.log("左移")
+      this.player?.moveLeft(10 * this.deltaTime);
+      this.player?.character?.play("run")
+    }
+    else if(this.onRightKeyDown){
+      //console.log("右移")
+      this.player?.moveRight(10 * this.deltaTime);
+      this.player?.character?.play("run")
+    }
+    else{
+      this.player?.moveStop();
+      this.player?.character?.play("idle");
+    }
   }
   sceneRender: SceneRender | null = null;
   camera: THREE.PerspectiveCamera | null = null;
@@ -29,6 +74,11 @@ export default class ThreeJs extends BaseThree {
   controls: OrbitControls | null = null;
   mixer: THREE.AnimationMixer | null = null
   player: CharacterBuilder | null = null;
+
+  onUpKeyDown:boolean = false;
+  onDownKeyDown:boolean = false;
+  onLeftKeyDown:boolean = false;
+  onRightKeyDown:boolean = false;
 
   constructor() {
     super()
@@ -92,30 +142,69 @@ export default class ThreeJs extends BaseThree {
 
     document.addEventListener('keydown', (ev) => {
       if (ev.key == 'd') {
-        console.log("按下d")
-        player.moveRight(5 * this.deltaTime)
-        player.character?.play("run")
+       // console.log("按下d")
+        this.onRightKeyDown = true;
+        // player.moveRight(5 * this.deltaTime)
+        // player.character?.play("run")
       }
       if (ev.key == 's') {
-        console.log("按下s")
-        player.character?.play("back")
-        player.moveBack(5 * this.deltaTime)
+        //console.log("按下s")
+        this.onDownKeyDown = true;
+        // player.character?.play("back")
+        // player.moveBack(5 * this.deltaTime)
         //console.log(player)
       }
 
       if (ev.key == 'w') {
-        console.log("按下w")
-        player.character?.play("run")
-        //player.moveTo(new THREE.Vector3(10, 0, 10), 3 * this.deltaTime)
-        player.moveAdvance(5 * this.deltaTime)
+       // console.log("按下w")
+        this.onUpKeyDown = true
+        // player.character?.play("run")
+        // //player.moveTo(new THREE.Vector3(10, 0, 10), 3 * this.deltaTime)
+        // player.moveAdvance(5 * this.deltaTime)
         //  console.log(player)
       }
 
 
       if (ev.key == 'a') {
-        console.log("按下a")
-        player.moveLeft(5 * this.deltaTime)
-        player.character?.play("run")
+        //console.log("按下a")
+        this.onLeftKeyDown = true;
+        // player.moveLeft(5 * this.deltaTime)
+        // player.character?.play("run")
+        //  console.log(player)
+      }
+
+    })
+
+    document.addEventListener('keyup', (ev) => {
+      if (ev.key == 'd') {
+        //console.log("松开d")
+        this.onRightKeyDown = false;
+        // player.moveRight(5 * this.deltaTime)
+        // player.character?.play("run")
+      }
+      if (ev.key == 's') {
+        //console.log("松开s")
+        this.onDownKeyDown = false;
+        // player.character?.play("back")
+        // player.moveBack(5 * this.deltaTime)
+        //console.log(player)
+      }
+
+      if (ev.key == 'w') {
+       // console.log("松开w")
+        this.onUpKeyDown = false
+        // player.character?.play("run")
+        // //player.moveTo(new THREE.Vector3(10, 0, 10), 3 * this.deltaTime)
+        // player.moveAdvance(5 * this.deltaTime)
+        //  console.log(player)
+      }
+
+
+      if (ev.key == 'a') {
+       // console.log("松开a")
+        this.onLeftKeyDown = false;
+        // player.moveLeft(5 * this.deltaTime)
+        // player.character?.play("run")
         //  console.log(player)
       }
     })

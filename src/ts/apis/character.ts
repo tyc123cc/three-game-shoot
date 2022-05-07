@@ -123,7 +123,6 @@ export default class Character extends BaseThree {
   ) {
     this.targetPos = pos;
     this.moveSpeed = speed;
-    console.log(this.colliderMeshList)
   }
 
   public lookAt(pos: THREE.Vector3) {
@@ -155,6 +154,7 @@ export default class Character extends BaseThree {
         this.targetPos = null;
         return;
       }
+      console.log("未碰撞")
       this.group.position.add(moveVec)
       if (this.group.position.distanceTo(this.targetPos) < 0.01) {
         // 到达目的地
@@ -189,9 +189,9 @@ export default class Character extends BaseThree {
     // 计算射线和参数1中的模型对象是否相交，参数1数组中可以设置多个模型模型对象，下面参数只设置了立方体网格模型
     var intersects = raycaster.intersectObjects(this.colliderMeshList);
     for (let intersect of intersects) {
-      if (intersect.distance < 2.0) {
+      if (intersect.distance < 3.0) {
         //循环遍历几何体顶点，每一个顶点都要创建一个射线，进行一次交叉拾取计算，只要有一个满足上面的距离条件，就发生了碰撞
-        //console.log(intersect.point, intersect.distance, dir.length())
+        console.log(intersect.point, intersect.distance, dir.length())
         return true;
       }
     }
