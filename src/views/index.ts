@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Camera, SkinnedMesh, Texture, Vector3 } from "three";
+import { BoxBufferGeometry, Camera, SkinnedMesh, Texture, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import BaseThree from "@/ts/common/baseThree";
 import SceneRender from "@/ts/scene/sceneRender";
@@ -21,49 +21,84 @@ export default class ThreeJs extends BaseThree {
       this.mixer.update(this.deltaTime);
     }
 
-    if(this.onLeftKeyDown && this.onUpKeyDown){
-     // console.log("左前进")
-      this.player?.moveLeftAdvance(10 * this.deltaTime);
-      this.player?.character?.play("run")
+    if (this.camera && this.player) {
+      var vector = new THREE.Vector3((this.mousePoint.x / window.innerWidth) * 2 - 1, -(this.mousePoint.y / window.innerHeight) * 2 + 1, 0.5);
+      vector = vector.unproject(this.camera as Camera).sub((this.camera as Camera).position).normalize();
+      // console.log(vector)
+      let intersectPoint = this.CalPlaneLineIntersectPoint(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), vector, this.camera?.position as THREE.Vector3)
+      this.player?.lookAt(intersectPoint)
     }
-    else if(this.onRightKeyDown && this.onUpKeyDown){
-     // console.log("右前进")
-      this.player?.moveRightAdvance(10 * this.deltaTime);
-      this.player?.character?.play("run")
+
+    if (this.onLeftKeyDown && this.onUpKeyDown) {
+      //console.log("左前进")
+      //this.player?.moveLeftAdvance(10 * this.deltaTime);
+      //this.player?.character?.play("run")
+      let angle = this.getIncludeAngle(new Vector3(-1, 0, -1))
+      let speed = this.playAnimation(angle)
+      this.player?.moveLeftAdvance(speed);
     }
-    else if(this.onRightKeyDown && this.onDownKeyDown){
-     // console.log("右后退")
-      this.player?.moveRightBack(5 * this.deltaTime);
-      this.player?.character?.play("back")
+    else if (this.onRightKeyDown && this.onUpKeyDown) {
+      // console.log("右前进")
+      // this.player?.moveRightAdvance(10 * this.deltaTime);
+      // this.player?.character?.play("run")
+      let angle = this.getIncludeAngle(new Vector3(1, 0, -1))
+      let speed = this.playAnimation(angle)
+      this.player?.moveRightAdvance(speed)
     }
-    else if(this.onLeftKeyDown && this.onDownKeyDown){
-     // console.log("左后退")
-      this.player?.moveLeftBack(5 * this.deltaTime);
-      this.player?.character?.play("back")
+    else if (this.onRightKeyDown && this.onDownKeyDown) {
+      // console.log("右后退")
+      // this.player?.moveRightBack(5 * this.deltaTime);
+      // this.player?.character?.play("back")
+      let angle = this.getIncludeAngle(new Vector3(1, 0, 1))
+      let speed = this.playAnimation(angle)
+      this.player?.moveRightBack(speed)
     }
-    else if(this.onUpKeyDown){
-     // console.log("前进")
-      this.player?.moveAdvance(10 * this.deltaTime);
-      this.player?.character?.play("run")
+    else if (this.onLeftKeyDown && this.onDownKeyDown) {
+      // console.log("左后退")
+      // this.player?.moveLeftBack(5 * this.deltaTime);
+      // this.player?.character?.play("back")
+      let angle = this.getIncludeAngle(new Vector3(-1, 0, 1))
+      let speed = this.playAnimation(angle)
+      this.player?.moveLeftBack(speed)
     }
-    else if(this.onDownKeyDown){
-     // console.log("后退")
-      this.player?.moveBack(5 * this.deltaTime);
-      this.player?.character?.play("back")
+    else if (this.onUpKeyDown) {
+      // console.log("前进")
+      let angle = this.getIncludeAngle(new Vector3(0, 0, -1))
+      let speed = this.playAnimation(angle)
+      this.player?.moveAdvance(speed)
+
     }
-    else if(this.onLeftKeyDown){
-     // console.log("左移")
-      this.player?.moveLeft(10 * this.deltaTime);
-      this.player?.character?.play("run")
+    else if (this.onDownKeyDown) {
+      // console.log("后退")
+      // this.player?.moveBack(5 * this.deltaTime);
+      // this.player?.character?.play("back")
+      let angle = this.getIncludeAngle(new Vector3(0, 0, 1))
+      let speed = this.playAnimation(angle)
+      this.player?.moveBack(speed)
     }
-    else if(this.onRightKeyDown){
+    else if (this.onLeftKeyDown) {
+      //console.log("左移")
+      // this.player?.moveLeft(10 * this.deltaTime);
+      // this.player?.character?.play("run")
+      let angle = this.getIncludeAngle(new Vector3(-1, 0, 0))
+      let speed = this.playAnimation(angle)
+      this.player?.moveLeft(speed)
+    }
+    else if (this.onRightKeyDown) {
       //console.log("右移")
-      this.player?.moveRight(10 * this.deltaTime);
-      this.player?.character?.play("run")
+      // this.player?.moveRight(10 * this.deltaTime);
+      // this.player?.character?.play("run")
+      let angle = this.getIncludeAngle(new Vector3(1, 0, 0))
+      let speed = this.playAnimation(angle)
+      this.player?.moveRight(speed)
     }
-    else{
+    else {
       this.player?.moveStop();
       this.player?.character?.play("idle");
+    }
+    if (this.player?.character?.group) {
+      this.camera?.position.set(this.player.character.group.position.x, this.player.character.group.position.y + 28, this.player.character.group.position.z + 37)
+      this.camera?.lookAt(this.player.character.group.position)
     }
   }
   sceneRender: SceneRender | null = null;
@@ -75,10 +110,12 @@ export default class ThreeJs extends BaseThree {
   mixer: THREE.AnimationMixer | null = null
   player: CharacterBuilder | null = null;
 
-  onUpKeyDown:boolean = false;
-  onDownKeyDown:boolean = false;
-  onLeftKeyDown:boolean = false;
-  onRightKeyDown:boolean = false;
+  onUpKeyDown: boolean = false;
+  onDownKeyDown: boolean = false;
+  onLeftKeyDown: boolean = false;
+  onRightKeyDown: boolean = false;
+
+  mousePoint: THREE.Vector2 = new THREE.Vector2();
 
   constructor() {
     super()
@@ -103,8 +140,9 @@ export default class ThreeJs extends BaseThree {
     );
     this.camera.position.z = 5;
     this.camera.position.set(11, 28, 37.5)
+    this.camera.lookAt(0, 0, 0)
     this.ambientLight = new THREE.AmbientLight(0xaaaaaa); // 环境光
-    this.sceneRender = new SceneRender(this.camera, this.ambientLight, true, 'threeCanvas')
+    this.sceneRender = new SceneRender(this.camera, this.ambientLight, false, 'threeCanvas')
     let light = new THREE.DirectionalLight(0xffffff)
     light.position.set(10, 10, 10)
     this.sceneRender.scene?.add(light)
@@ -131,18 +169,20 @@ export default class ThreeJs extends BaseThree {
     aniInputs.push(new AnimationInput("character/animate/rifle aiming idle.fbx", 0, "idle", AniEffectScope.All, 1, THREE.LoopRepeat))
     aniInputs.push(new AnimationInput("character/animate/Walk Backward.fbx", 0, "back", AniEffectScope.Lower, 10, THREE.LoopRepeat))
 
-    let player = new CharacterBuilder("character/Player.fbx", aniInputs, 2, this.sceneRender, (object) => {
+    let player = new CharacterBuilder("character/Player.fbx", "player", aniInputs, 2, this.sceneRender, (object) => {
       player.character?.group?.position.set(5, 0, 0)
       player.character?.group?.scale.set(0.05, 0.05, 0.05)
-      player.character?.play("run")
+      player.character?.play("idle")
       // console.log("player", object)
       // console.log("loadedPlayer", player)
+      let mesh = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 4), new THREE.MeshLambertMaterial())
+      player.addCollider(mesh)
       this.player = player;
     })
 
     document.addEventListener('keydown', (ev) => {
       if (ev.key == 'd') {
-       // console.log("按下d")
+        // console.log("按下d")
         this.onRightKeyDown = true;
         // player.moveRight(5 * this.deltaTime)
         // player.character?.play("run")
@@ -156,7 +196,7 @@ export default class ThreeJs extends BaseThree {
       }
 
       if (ev.key == 'w') {
-       // console.log("按下w")
+        // console.log("按下w")
         this.onUpKeyDown = true
         // player.character?.play("run")
         // //player.moveTo(new THREE.Vector3(10, 0, 10), 3 * this.deltaTime)
@@ -191,7 +231,7 @@ export default class ThreeJs extends BaseThree {
       }
 
       if (ev.key == 'w') {
-       // console.log("松开w")
+        // console.log("松开w")
         this.onUpKeyDown = false
         // player.character?.play("run")
         // //player.moveTo(new THREE.Vector3(10, 0, 10), 3 * this.deltaTime)
@@ -201,41 +241,28 @@ export default class ThreeJs extends BaseThree {
 
 
       if (ev.key == 'a') {
-       // console.log("松开a")
+        // console.log("松开a")
         this.onLeftKeyDown = false;
         // player.moveLeft(5 * this.deltaTime)
         // player.character?.play("run")
         //  console.log(player)
       }
     })
-    //player.character?.group?.scale.set(0.05,0.05,0.05)
-    loader.load("character/animate/Run Forward.fbx", (ani2) => {
-      loader.load("character/animate/hit reaction.fbx", (ani) => {
-        ani.animations[0].tracks.splice(45);
-        ani.animations[0].tracks.push(...ani2.animations[0].tracks.splice(45))
-        ani.animations[0].tracks[1] = ani2.animations[0].tracks[1]
-        //  ani.animations[0].tracks[2] = ani2.animations[0].tracks[2]
-        // ani.animations[0].tracks[3] = ani2.animations[0].tracks[3]
-        // ani.animations[0].tracks[4] = ani2.animations[0].tracks[4]
-        //console.log(ani2.animations[0].tracks.splice(45))
-        loader.load("character/Player.fbx", (object) => {
-          object.scale.set(0.05, 0.05, 0.05)
-          this.sceneRender?.scene?.add(object)
-          //从返回对象获得骨骼网格模型
-          var SkinnedMesh: THREE.SkinnedMesh = object.children[2] as SkinnedMesh;
-          //骨骼网格模型作为 参数创建一个混合器
-          this.mixer = new THREE.AnimationMixer(SkinnedMesh);
-          // 查看骨骼网格模型的帧动画数据
-          // console.log(SkinnedMesh.geometry.animations)
-          // 解析跑步状态对应剪辑对象clip中的关键帧数据
-          var AnimationAction = this.mixer.clipAction(ani.animations[0]);
-          // 解析步行状态对应剪辑对象clip中的关键帧数据
-          // var AnimationAction = mixer.clipAction(SkinnedMesh.geometry.animations[3]);
-          AnimationAction.play();
-        }, (event) => {
-        });
-      })
+
+    document.addEventListener('mousemove', (ev) => {
+      this.mousePoint.set(ev.clientX, ev.clientY)
     })
+    //player.character?.group?.scale.set(0.05,0.05,0.05)
+    let enemy = new CharacterBuilder("character/Player.fbx", "enemy", aniInputs, 2, this.sceneRender, (object) => {
+      enemy.character?.group?.position.set(-5, 0, 0)
+      enemy.character?.group?.scale.set(0.05, 0.05, 0.05)
+      enemy.character?.play("idle")
+      // console.log("player", object)
+      // console.log("loadedPlayer", player)
+      let mesh = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 4), new THREE.MeshLambertMaterial())
+      enemy.addCollider(mesh)
+    })
+
 
     //addEventListener("mousemove", this.onDocumentMouseDown)
   }
@@ -243,11 +270,13 @@ export default class ThreeJs extends BaseThree {
   onDocumentMouseDown(event: MouseEvent) {
     // console.log(this.sceneRender?.camera)
     if (this.camera && this.player) {
-      var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
-      vector = vector.unproject(this.camera as Camera).sub((this.camera as Camera).position).normalize();
-      // console.log(vector)
-      let intersectPoint = this.CalPlaneLineIntersectPoint(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), vector, this.camera?.position as THREE.Vector3)
-      this.player?.lookAt(intersectPoint)
+      // var vector = new THREE.Vector3((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1, 0.5);
+      // vector = vector.unproject(this.camera as Camera).sub((this.camera as Camera).position).normalize();
+      // // console.log(vector)
+      // let intersectPoint = this.CalPlaneLineIntersectPoint(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), vector, this.camera?.position as THREE.Vector3)
+      // this.player?.lookAt(intersectPoint)
+
+      this.mousePoint.set(event.clientX, event.clientY)
     }
 
 
@@ -270,5 +299,38 @@ export default class ThreeJs extends BaseThree {
     // console.log(returnResult)
     return returnResult;
   }
+
+  getIncludeAngle(vec: THREE.Vector3): number {
+    if (this.player && this.player.character && this.player.character.group) {
+      let vec1 = vec;
+      vec1.y = 0;
+      let vec2 = this.player.character.lookPoint.clone().sub(this.player.character.group.position);
+      vec2.y = 0;
+      let angle = vec1.angleTo(vec2)
+      // if (vec1.cross(vec2).y < 0) {
+      //   angle = -angle
+      // }
+      return angle / Math.PI * 180
+    }
+    return 0;
+  }
+
+  playAnimation(angle: number): number {
+    if (this.player && this.player.character && this.player.character.group) {
+      if (angle <= 90) {
+        this.player.character.play("run")
+        return 10 * this.deltaTime
+      }
+      else {
+        this.player.character.play("back")
+        return 5 * this.deltaTime
+      }
+
+
+    }
+
+    return 0
+  }
+
 
 }

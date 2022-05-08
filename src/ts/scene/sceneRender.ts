@@ -53,6 +53,12 @@ export default class SceneRender extends BaseThree {
     }
   }
 
+  setCollider(object: THREE.Mesh) {
+    object.visible = false;
+    this.scene?.add(object)
+    this.collideMeshList.push(object);
+  }
+
   /**
    *
    * @param camera 摄像机

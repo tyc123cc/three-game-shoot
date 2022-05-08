@@ -23,7 +23,7 @@ export default class About extends Vue {
   }
   onDocumentMouseDown(event: MouseEvent) {
     if (this.three) {
-      this.three.onDocumentMouseDown(event);
+      //this.three.onDocumentMouseDown(event);
     }
   }
 }
