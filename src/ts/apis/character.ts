@@ -160,13 +160,13 @@ export default class Character extends BaseThree {
       moveVec.multiplyScalar(this.moveSpeed)
 
       if (this.intersect(moveVec)) {
-        console.log("碰撞")
+        // console.log("碰撞")
         // 碰撞，停止移动
         this.targetPos = null;
         return;
       }
-      console.log(this.colliderMeshList)
-      console.log("未碰撞")
+      // console.log(this.colliderMeshList)
+      // console.log("未碰撞")
       this.group.position.add(moveVec)
       if (this.group.position.distanceTo(this.targetPos) < 0.01) {
         // 到达目的地
@@ -174,7 +174,7 @@ export default class Character extends BaseThree {
       }
       if (this.collider) {
         this.collider.position.copy(this.group.position);
-        console.log(this.collider.position)
+        // console.log(this.collider.position)
       }
     }
   }

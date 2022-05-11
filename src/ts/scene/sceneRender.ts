@@ -15,7 +15,7 @@ export default class SceneRender extends BaseThree {
    */
   private useControls: Boolean;
 
-  private container: HTMLElement | Window | null = null;
+  public container: HTMLElement | Window | null = null;
 
   start(): void {
     // 第一步新建一个场景
@@ -78,7 +78,7 @@ export default class SceneRender extends BaseThree {
       : null;
     // 没有找到dom或者未上送dom ID 则以窗口长宽为准
     this.container = container ? container : window;
-
+    console.log(elementId)
     this.camera = camera;
     this.ambientLight = ambientLight;
     this.useControls = useControls;
