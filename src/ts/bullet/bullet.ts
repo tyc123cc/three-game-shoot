@@ -19,7 +19,7 @@ export default class Bullet extends BaseThree {
   /**
    * 子弹的威力
    */
-  public power:number = 0;
+  public power: number = 0;
 
   /**
    * 子弹的移动方向
@@ -34,9 +34,9 @@ export default class Bullet extends BaseThree {
   /**
    * 碰撞体的list
    */
-  public colliderMeshList: Group[] = [];
+  public colliderMeshList: THREE.Object3D[] = [];
 
-  constructor(group: THREE.Group, size: number,power:number) {
+  constructor(group: THREE.Group, size: number, power: number) {
     super();
     this.group = group;
     this.size = size;
@@ -56,6 +56,7 @@ export default class Bullet extends BaseThree {
     this.group.visible = true;
     // 设置group的位置
     this.group.position.copy(pos);
+    this.group.position.y = 7
     this.moveVec = moveVec.clone().normalize();
     this.speed = speed;
   }
@@ -73,7 +74,7 @@ export default class Bullet extends BaseThree {
         const sendEvent = new CustomEvent("hit", {
           detail: {
             target,
-            power:this.power
+            power: this.power
           },
         });
         // 发送事件
@@ -86,6 +87,7 @@ export default class Bullet extends BaseThree {
       this.group.position.add(
         this.moveVec.clone().multiplyScalar(this.speed * this.deltaTime)
       );
+      //console.log(this.group.position)
     }
   }
 

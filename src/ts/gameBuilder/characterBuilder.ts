@@ -288,8 +288,6 @@ export default class CharacterBuilder extends BaseThree {
   public addCollider(collider: THREE.Mesh) {
     if (this.character?.group) {
       collider.position.copy(this.character.group?.position)
-      // 把碰撞体的坐标往上拉一半，使底部对齐地板
-      collider.position.y += collider.position.y / 2;
       collider.name = this.name;
       this.character.collider = collider;
       this.scene.setCollider(collider);

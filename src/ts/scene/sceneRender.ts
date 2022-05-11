@@ -101,6 +101,7 @@ export default class SceneRender extends BaseThree {
       );
     }
     this.renderer.setClearColor(0x000000, 1); //设置背景颜色
+    this.renderer.domElement.id = "threeCanvas"
     //这里 其实就是canvas 画布  renderer.domElement
     if (this.container instanceof HTMLElement) {
       this.container.appendChild(this.renderer.domElement);

@@ -15,6 +15,8 @@ import CharacterBuilder from "@/ts/gameBuilder/characterBuilder";
 import AnimationInput from "@/ts/apis/animationInput";
 import { AniEffectScope } from "@/ts/apis/enum";
 import { Heap } from "@/ts/common/heap";
+import Bullet from "@/ts/bullet/bullet";
+import Character from "@/ts/apis/character";
 
 export default class ThreeJs extends BaseThree {
   start(): void {
@@ -40,10 +42,12 @@ export default class ThreeJs extends BaseThree {
       // console.log(vector)
       let intersectPoint = this.CalPlaneLineIntersectPoint(
         new THREE.Vector3(0, 1, 0),
-        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 7, 0),
         vector,
         this.camera?.position as THREE.Vector3
       );
+      intersectPoint.y = 0;
+      // console.log(intersectPoint)
       this.player?.lookAt(intersectPoint);
     }
 
@@ -113,9 +117,19 @@ export default class ThreeJs extends BaseThree {
       );
       this.camera?.lookAt(this.player.character.group.position);
     }
-    if(this.enemy?.character?.group && this.camera && this.sceneRender){
-      let enemyScreenPos = this.createVector(this.enemy.character.group.position,this.camera,this.sceneRender)
+    if (this.enemy?.character?.group && this.camera && this.sceneRender) {
+      let enemyScreenPos = this.createVector(this.enemy.character.group.position, this.camera, this.sceneRender)
       this.enemyScreenPos = enemyScreenPos;
+      let tempV = this.enemy.character.group.position.clone().applyMatrix4(this.camera.matrixWorldInverse).applyMatrix4(this.camera.projectionMatrix);
+
+      if ((Math.abs(tempV.x) > 1) || (Math.abs(tempV.y) > 1) || (Math.abs(tempV.z) > 1)) {
+        // 在视野外了
+        this.enemyShow = false;
+
+      } else {
+        // 在视野内  
+        this.enemyShow = true;
+      }
     }
   }
   sceneRender: SceneRender | null = null;
@@ -135,7 +149,8 @@ export default class ThreeJs extends BaseThree {
 
   mousePoint: THREE.Vector2 = new THREE.Vector2();
 
-  enemyScreenPos:THREE.Vector2 = new THREE.Vector2();
+  enemyScreenPos: THREE.Vector2 = new THREE.Vector2();
+  enemyShow: boolean = false;
 
   constructor() {
     super();
@@ -162,7 +177,7 @@ export default class ThreeJs extends BaseThree {
       1000
     );
     this.camera.position.z = 5;
-    this.camera.position.set(11, 28, 37.5);
+    this.camera.position.set(0, 28, 37.5);
     this.camera.lookAt(0, 0, 0);
     this.ambientLight = new THREE.AmbientLight(0xaaaaaa); // 环境光
     this.sceneRender = new SceneRender(
@@ -240,15 +255,16 @@ export default class ThreeJs extends BaseThree {
       2,
       this.sceneRender,
       (object) => {
-        player.character?.group?.position.set(5, 0, 0);
+        player.character?.group?.position.set(0, 0, 0);
         player.character?.group?.scale.set(0.05, 0.05, 0.05);
         player.character?.play("idle");
         // console.log("player", object)
         // console.log("loadedPlayer", player)
         let mesh = new THREE.Mesh(
-          new THREE.BoxGeometry(4, 4, 4),
+          new THREE.BoxGeometry(4, 20, 4),
           new THREE.MeshLambertMaterial()
         );
+        mesh.position.y = 10
         player.addCollider(mesh);
         this.player = player;
       }
@@ -320,6 +336,23 @@ export default class ThreeJs extends BaseThree {
       }
     });
 
+    document.addEventListener("click", (ev) => {
+      if (this.player?.character?.group && this.sceneRender) {
+        // 点击鼠标发射子弹
+        this.player?.character?.play("hit")
+        let geometry = new THREE.SphereBufferGeometry(0.4)
+        let matrials = new THREE.MeshLambertMaterial({ color: "red" })
+        let bulletMesh = new THREE.Mesh(geometry, matrials)
+        let bulletGroup = new THREE.Group();
+        bulletGroup.add(bulletMesh);
+        this.sceneRender?.add(bulletGroup, false)
+        let bullet = new Bullet(bulletGroup, 0.2, 10);
+        bullet.colliderMeshList = this.sceneRender?.collideMeshList;
+        bullet.fire(this.player?.character?.group?.position, this.player.character.lookPoint.sub(this.player.character.group.position), 5)
+      }
+
+    })
+
     document.addEventListener("mousemove", (ev) => {
       this.mousePoint.set(ev.clientX, ev.clientY);
     });
@@ -337,9 +370,10 @@ export default class ThreeJs extends BaseThree {
         // console.log("player", object)
         // console.log("loadedPlayer", player)
         let mesh = new THREE.Mesh(
-          new THREE.BoxGeometry(4, 4, 4),
+          new THREE.BoxGeometry(4, 20, 4),
           new THREE.MeshLambertMaterial()
         );
+        mesh.position.y = 10
         enemy.addCollider(mesh);
         this.enemy = enemy;
       }
@@ -420,12 +454,16 @@ export default class ThreeJs extends BaseThree {
     return 0;
   }
 
-  createVector(vec:THREE.Vector3, camera:THREE.Camera, sceneRender:SceneRender) {
+  createVector(vec: THREE.Vector3, camera: THREE.Camera, sceneRender: SceneRender) {
     var p = vec.clone();
+    p.y += 5.2
+    p.x -= 3.6
     var vector = p.project(camera);
     let container = sceneRender.container as HTMLElement;
-    vector.x = (vector.x + 1) / 2 * window.innerWidth - 70;
-    vector.y = -(vector.y - 1) / 2 * window.innerHeight - 80;
-    return new THREE.Vector2(vector.x,vector.y);
-}
+    // vector.x = (vector.x + 1) / 2 * window.innerWidth + (vec.x - camera.position.x) * 0.6 - 70;
+    // vector.y = -(vector.y - 1) / 2 * window.innerHeight - (vec.z - camera.position.z) * 1 - 120;
+    vector.x = (vector.x + 1) / 2 * window.innerWidth + (vec.x + 11 - camera.position.x) * 0;
+    vector.y = -(vector.y - 1) / 2 * window.innerHeight - (vec.z + 37.5 - camera.position.z) * 1.1
+    return new THREE.Vector2(vector.x, vector.y);
+  }
 }

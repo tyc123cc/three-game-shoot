@@ -1,13 +1,11 @@
 <template>
-  <div>
-    <div id="threeCanvas" @mousemove="onDocumentMouseDown">
-      <blood
-        :current="40"
-        :max="100"
-        :posX="getPos().x"
-        :posY="getPos().y"
-      ></blood>
-    </div>
+  <div id="threeCanvas"
+       @mousemove="onDocumentMouseDown">
+    <blood :current="50"
+           :isShow="isShow()"
+           :max="100"
+           :posX="getPos().x"
+           :posY="getPos().y"></blood>
   </div>
 </template>
 
@@ -39,16 +37,21 @@ export default class About extends Vue {
     }
   }
 
-getPos(){
-  if(this.three){
-    return this.three.enemyScreenPos;
+  getPos() {
+    if (this.three) {
+      this.enemyPos = this.three.enemyScreenPos;
+      return this.three.enemyScreenPos;
+    } else {
+      return new Vector2(0, 0);
+    }
   }
-  else{
-    return new Vector2(0,0)
+
+  isShow() {
+    if (this.three) {
+      return this.three.enemyShow;
+    }
+    return false;
   }
-}
-  
-  
 }
 </script>
 
