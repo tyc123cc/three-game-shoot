@@ -56,7 +56,6 @@ export default class Bullet extends BaseThree {
     this.group.visible = true;
     // 设置group的位置
     this.group.position.copy(pos);
-    this.group.position.y = 7
     this.moveVec = moveVec.clone().normalize();
     this.speed = speed;
   }

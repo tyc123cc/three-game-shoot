@@ -17,6 +17,7 @@ import { AniEffectScope } from "@/ts/apis/enum";
 import { Heap } from "@/ts/common/heap";
 import Bullet from "@/ts/bullet/bullet";
 import Character from "@/ts/apis/character";
+import bulletBufferPool from "@/ts/bullet/bulletBufferPool";
 
 export default class ThreeJs extends BaseThree {
   start(): void {
@@ -151,6 +152,8 @@ export default class ThreeJs extends BaseThree {
 
   enemyScreenPos: THREE.Vector2 = new THREE.Vector2();
   enemyShow: boolean = false;
+
+  bulletPool:bulletBufferPool|null = null;
 
   constructor() {
     super();
@@ -336,19 +339,15 @@ export default class ThreeJs extends BaseThree {
       }
     });
 
+    this.bulletPool = new bulletBufferPool(10,0.4,"red",10,this.sceneRender)
+
     document.addEventListener("click", (ev) => {
       if (this.player?.character?.group && this.sceneRender) {
         // 点击鼠标发射子弹
         this.player?.character?.play("hit")
-        let geometry = new THREE.SphereBufferGeometry(0.4)
-        let matrials = new THREE.MeshLambertMaterial({ color: "red" })
-        let bulletMesh = new THREE.Mesh(geometry, matrials)
-        let bulletGroup = new THREE.Group();
-        bulletGroup.add(bulletMesh);
-        this.sceneRender?.add(bulletGroup, false)
-        let bullet = new Bullet(bulletGroup, 0.2, 10);
-        bullet.colliderMeshList = this.sceneRender?.collideMeshList;
-        bullet.fire(this.player?.character?.group?.position, this.player.character.lookPoint.sub(this.player.character.group.position), 5)
+        // 调整子弹初始位置，使子弹往人物前方移一点 公式：人物位置+人物面朝方向向量*偏移值
+        let initPos = this.player?.character?.group?.position.clone().add(this.player.character.lookPoint.clone().sub(this.player.character.group.position).normalize().multiplyScalar(2))
+        this.bulletPool?.fire(initPos, this.player.character.lookPoint.clone().sub(this.player.character.group.position), 5)
       }
 
     })
