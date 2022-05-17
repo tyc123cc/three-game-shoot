@@ -95,7 +95,8 @@ export default class Animation {
       // 上半身
       case AniEffectScope.Upper:
         return AniStatus.Upper;
-
+      case AniEffectScope.Death:
+        return AniStatus.Death;
       default:
         return AniStatus.Null;
     }

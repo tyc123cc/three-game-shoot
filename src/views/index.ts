@@ -115,19 +115,23 @@ export default class ThreeJs extends BaseThree {
       this.camera?.position.set(
         this.player.character.group.position.x,
         this.player.character.group.position.y + 28,
-        this.player.character.group.position.z + 37
+        this.player.character.group.position.z + 37.5
       );
       this.camera?.lookAt(this.player.character.group.position);
     }
-    if(this.player && this.enemy){
+    if (this.player && this.enemy) {
       this.updateCharacterHPInfo(this.player.character as Character)
       this.updateCharacterHPInfo(this.enemy.character as Character)
     }
-  
+
     this.characterHpInfos.splice(0);
     this.characterHpInfoMap.forEach((value, key, map) => {
       this.characterHpInfos.push(value);
     });
+
+    if (this.enemy?.character && this.enemy.character.hp <= 0) {
+      this.enemy.character.play("dying")
+    }
   }
   sceneRender: SceneRender | null = null;
   camera: THREE.PerspectiveCamera | null = null;
@@ -245,6 +249,16 @@ export default class ThreeJs extends BaseThree {
         AniEffectScope.Lower,
         10,
         THREE.LoopRepeat
+      )
+    );
+    aniInputs.push(
+      new AnimationInput(
+        "character/animate/Dying.fbx",
+        0,
+        "dying",
+        AniEffectScope.Death,
+        100,
+        THREE.LoopOnce
       )
     );
 

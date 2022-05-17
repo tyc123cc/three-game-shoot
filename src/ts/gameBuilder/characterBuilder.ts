@@ -58,7 +58,7 @@ export default class CharacterBuilder extends BaseThree {
 
   start(): void {
     this.loadCharacter(0);
-    document.addEventListener("hit", (e:Event) => {
+    document.addEventListener("hit", (e: Event) => {
       this.hitCharacter(e as CustomEvent);
     });
   }
@@ -337,13 +337,13 @@ export default class CharacterBuilder extends BaseThree {
   public addCollider(collider: THREE.Mesh) {
     if (this.character?.group) {
       collider.position.copy(this.character.group?.position);
-      collider.name = this.name;
+      collider.name = this.name + "collider";
       this.character.collider = collider;
       this.scene.setCollider(collider);
     }
   }
 
-  update(): void {}
+  update(): void { }
 
   loadCharacter(animationIndex: number) {
     if (animationIndex < this.animationsInput.length) {
@@ -382,7 +382,7 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-  onAnimationSuccess(object: Group) {}
+  onAnimationSuccess(object: Group) { }
 
-  onCharacterSuccess(object: Group) {}
+  onCharacterSuccess(object: Group) { }
 }

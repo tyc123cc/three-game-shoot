@@ -101,12 +101,12 @@ export default class Character extends BaseThree {
   /**
    * 当前血量
    */
-  public hp:number = 100;
+  public hp: number = 100;
 
   /**
    * 最大血量
    */
-  public maxHp:number = 100;
+  public maxHp: number = 100;
 
   constructor(
     url: string,
@@ -160,9 +160,9 @@ export default class Character extends BaseThree {
    * 角色受到伤害
    * @param power 伤害量
    */
-  damage(power:number){
+  damage(power: number) {
     this.hp -= power;
-    if(this.hp < 0){
+    if (this.hp < 0) {
       this.hp = 0;
     }
   }
@@ -341,6 +341,15 @@ export default class Character extends BaseThree {
       }
       this.nextAnimation = null;
     }
+    if (
+      this.playingAnimation?.effectScope == AniEffectScope.Death) {
+      // 获取死亡动画的clip
+      let clip = this.animationAction.getClip();
+      // 将动画固定在死亡的最后一刻
+      if (this.animationAction.time >= clip.duration - 0.1) {
+        this.animationAction.paused = true;
+      }
+    }
     // 更新混合器相关的时间
     this.mixer?.update(this.deltaTime);
   }
@@ -381,8 +390,23 @@ export default class Character extends BaseThree {
       );
       return;
     }
+    // 即将播放死亡动画，终止一切动画，优先播放死亡动画，死亡动画只能转向全身动画
+    if ((this.AnimationStatus != AniStatus.Death && animation.effectScope == AniEffectScope.Death) || (animation.effectScope == AniEffectScope.All && this.AnimationStatus == AniStatus.Death)) {
+      action.stop().play();
+      // 终止当前播放动画
+      this.animationAction?.stop();
+      // 设置当前播放动画和action
+      this.animationAction = action;
+      this.playingAnimation = animation;
+      this.AnimationStatus = Animation.changeAnimationEffectScopeToStatus(
+        animation.effectScope
+      );
+    }
+    else if (animation.effectScope != AniEffectScope.All && this.AnimationStatus == AniStatus.Death) {
+      // 当前正在播放死亡动画，且即将播放的动画非全身动画，不执行
+    }
     // 当前正在播放下半身动画，且需要播放上半身动画时（或相反情况），进行动画融合操作
-    if (
+    else if (
       animation.effectScope == AniEffectScope.Upper &&
       this.AnimationStatus == AniStatus.Lower
     ) {
