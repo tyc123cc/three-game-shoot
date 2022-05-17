@@ -98,6 +98,16 @@ export default class Character extends BaseThree {
 
   public colliderMeshList: THREE.Object3D[] = [];
 
+  /**
+   * 当前血量
+   */
+  public hp:number = 100;
+
+  /**
+   * 最大血量
+   */
+  public maxHp:number = 100;
+
   constructor(
     url: string,
     animations: Array<Animation>,
@@ -144,6 +154,17 @@ export default class Character extends BaseThree {
   update(): void {
     this.upAnimationEnd();
     this.move();
+  }
+
+  /**
+   * 角色受到伤害
+   * @param power 伤害量
+   */
+  damage(power:number){
+    this.hp -= power;
+    if(this.hp < 0){
+      this.hp = 0;
+    }
   }
 
   /**

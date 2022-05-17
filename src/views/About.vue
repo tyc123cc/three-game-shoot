@@ -1,16 +1,19 @@
 <template>
-  <div id="threeCanvas"
-       @mousemove="onDocumentMouseDown">
-    <blood :current="50"
-           :isShow="isShow()"
-           :max="100"
-           :posX="getPos().x"
-           :posY="getPos().y"></blood>
+  <div id="threeCanvas" @mousemove="onDocumentMouseDown">
+    <blood
+      v-for="character in characterHpInfos"
+      :key="character.name"
+      :current="character.hp"
+      :isShow="character.isShow"
+      :max="character.maxHp"
+      :posX="character.screenPos.x"
+      :posY="character.screenPos.y"
+    ></blood>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import ThreeJs from "./index";
 import * as THREE from "three";
 import Blood from "@/components/Blood.vue";
@@ -18,6 +21,7 @@ import Blood from "@/components/Blood.vue";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { Vector2 } from "three";
+import CharacterHpInfo from "@/ts/apis/characterHpInfo";
 @Component({
   components: {
     Blood,
@@ -26,29 +30,53 @@ import { Vector2 } from "three";
 export default class About extends Vue {
   three: ThreeJs | null = null;
 
-  enemyPos: THREE.Vector2 = new THREE.Vector2();
+  characterHpInfosMap: Map<string, CharacterHpInfo> = new Map();
+  characterHpInfos: CharacterHpInfo[] = [];
   mounted() {
     this.three = new ThreeJs();
-    this.enemyPos = this.three.enemyScreenPos;
+    this.characterHpInfosMap = this.three.characterHpInfoMap;
+    this.characterHpInfos = this.three.characterHpInfos;
+    // this.three.characterHpInfoMap.forEach((value, key, map) => {
+    //   this.characterHpInfos.push(value);
+    // });
   }
   onDocumentMouseDown(event: MouseEvent) {
     if (this.three) {
-      //this.three.onDocumentMouseDown(event);
+      // if (this.three) {
+      //   this.three.characterHpInfoMap.forEach((value, key, map) => {
+      //     infos.push(value);
+      //   });
+      // }
+      // this.characterHpInfos = infos;
     }
   }
 
-  getPos() {
+  // get characterHpInfos() {
+  //   let infos: CharacterHpInfo[] = [];
+  //   if (this.three) {
+  //     this.three.characterHpInfoMap.forEach((value, key, map) => {
+  //       infos.push(value);
+  //     });
+  //   }
+  //   return infos;
+  // }
+
+  getPos(name: string) {
     if (this.three) {
-      this.enemyPos = this.three.enemyScreenPos;
-      return this.three.enemyScreenPos;
+      let pos = this.three.characterHpInfoMap.get(name)?.screenPos;
+      return pos;
     } else {
       return new Vector2(0, 0);
     }
   }
 
-  isShow() {
+  isShow(name: string) {
+    // console.log(this.characterHpInfoMap)
     if (this.three) {
-      return this.three.enemyShow;
+      let show = this.three.characterHpInfoMap.get(name)?.isShow;
+      if (show) {
+        return show;
+      }
     }
     return false;
   }

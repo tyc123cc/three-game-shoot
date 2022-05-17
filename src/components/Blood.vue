@@ -21,11 +21,12 @@ export default class Blood extends Vue {
 
   @Prop(Number) private posY!: number;
 
-  @Prop(Boolean) private isShow: boolean = false;
+  @Prop(Boolean) private isShow!: boolean;
+  
 
   customColorMethod(percentage: number) {
     if (percentage < 30) {
-      return "#909399";
+      return "#ff0000";
     } else if (percentage < 70) {
       return "#e6a23c";
     } else {

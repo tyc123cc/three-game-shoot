@@ -58,6 +58,20 @@ export default class CharacterBuilder extends BaseThree {
 
   start(): void {
     this.loadCharacter(0);
+    document.addEventListener("hit", (e:Event) => {
+      this.hitCharacter(e as CustomEvent);
+    });
+  }
+
+  /**
+   * 接收子弹击中物体信息
+   * @param e 
+   */
+  hitCharacter(e: CustomEvent) {
+    // 如果被击中物体为当前角色，则扣除生命值
+    if (e.detail.target == this.name) {
+      this.character?.damage(e.detail.power);
+    }
   }
 
   public lookAt(pos: THREE.Vector3) {
@@ -72,13 +86,14 @@ export default class CharacterBuilder extends BaseThree {
     if (this.character && this.character.group) {
       if (this.moveInWorld) {
         // 角色前进 以世界坐标系为准 朝向(0,0,-1)移动
-        this.moveTo(this.character.group.position.clone().add(new Vector3(0, 0, -1)), speed);
-      }
-      else {
+        this.moveTo(
+          this.character.group.position.clone().add(new Vector3(0, 0, -1)),
+          speed
+        );
+      } else {
         // 角色前进 以自身坐标系为准 朝向目标点移动
         this.moveTo(this.character.lookPoint, speed);
       }
-
     }
   }
 
@@ -90,16 +105,23 @@ export default class CharacterBuilder extends BaseThree {
     if (this.character && this.character.group) {
       if (this.moveInWorld) {
         // 角色前进 以世界坐标系为准 朝向(0,0,1)移动
-        this.moveTo(this.character.group.position.clone().add(new Vector3(0, 0, 1)), speed);
-      }
-      else {
+        this.moveTo(
+          this.character.group.position.clone().add(new Vector3(0, 0, 1)),
+          speed
+        );
+      } else {
         // 角色后退 以自身坐标系为准 朝向目标点反方向移动
         this.moveTo(
-          this.character.group.position.clone().add(this.character.group.position.clone().sub(this.character.lookPoint)),
+          this.character.group.position
+            .clone()
+            .add(
+              this.character.group.position
+                .clone()
+                .sub(this.character.lookPoint)
+            ),
           speed
         );
       }
-
     }
   }
 
@@ -111,17 +133,21 @@ export default class CharacterBuilder extends BaseThree {
     if (this.character && this.character.group) {
       if (this.moveInWorld) {
         // 角色左移 以世界坐标系为准 朝向(-1,0,0)移动
-        this.moveTo(this.character.group.position.clone().add(new Vector3(-1, 0, 0)), speed);
-      }
-      else {
+        this.moveTo(
+          this.character.group.position.clone().add(new Vector3(-1, 0, 0)),
+          speed
+        );
+      } else {
         // 角色左移 以自身坐标系为准
         let targetPos = this.changeAngleFromYAxis(
           this.character.lookPoint.clone().sub(this.character.group.position),
           -Math.PI / 2
         );
-        this.moveTo(this.character.group.position.clone().add(targetPos), speed);
+        this.moveTo(
+          this.character.group.position.clone().add(targetPos),
+          speed
+        );
       }
-
     }
   }
 
@@ -133,17 +159,21 @@ export default class CharacterBuilder extends BaseThree {
     if (this.character && this.character.group) {
       if (this.moveInWorld) {
         // 角色右移 以世界坐标系为准 朝向(1,0,0)移动
-        this.moveTo(this.character.group.position.clone().add(new Vector3(1, 0, 0)), speed);
-      }
-      else {
+        this.moveTo(
+          this.character.group.position.clone().add(new Vector3(1, 0, 0)),
+          speed
+        );
+      } else {
         // 角色右移动 以自身坐标系为准
         let targetPos = this.changeAngleFromYAxis(
           this.character.lookPoint.clone().sub(this.character.group.position),
           Math.PI / 2
         );
-        this.moveTo(this.character.group.position.clone().add(targetPos), speed);
+        this.moveTo(
+          this.character.group.position.clone().add(targetPos),
+          speed
+        );
       }
-
     }
   }
 
@@ -155,17 +185,21 @@ export default class CharacterBuilder extends BaseThree {
     if (this.character && this.character.group) {
       if (this.moveInWorld) {
         // 角色左前进 以世界坐标系为准 朝向(-1,0,-1)移动
-        this.moveTo(this.character.group.position.clone().add(new Vector3(-1, 0, -1)), speed);
-      }
-      else {
+        this.moveTo(
+          this.character.group.position.clone().add(new Vector3(-1, 0, -1)),
+          speed
+        );
+      } else {
         // 角色左前进 以自身坐标系为准
         let targetPos = this.changeAngleFromYAxis(
           this.character.lookPoint.clone().sub(this.character.group.position),
           -Math.PI / 4
         );
-        this.moveTo(this.character.group.position.clone().add(targetPos), speed);
+        this.moveTo(
+          this.character.group.position.clone().add(targetPos),
+          speed
+        );
       }
-
     }
   }
 
@@ -177,15 +211,20 @@ export default class CharacterBuilder extends BaseThree {
     if (this.character && this.character.group) {
       if (this.moveInWorld) {
         // 角色右前进 以世界坐标系为准 朝向(1,0,-1)移动
-        this.moveTo(this.character.group.position.clone().add(new Vector3(1, 0, -1)), speed);
-      }
-      else {
+        this.moveTo(
+          this.character.group.position.clone().add(new Vector3(1, 0, -1)),
+          speed
+        );
+      } else {
         // 角色右前进 以自身坐标系为准
         let targetPos = this.changeAngleFromYAxis(
           this.character.lookPoint.clone().sub(this.character.group.position),
           Math.PI / 4
         );
-        this.moveTo(this.character.group.position.clone().add(targetPos), speed);
+        this.moveTo(
+          this.character.group.position.clone().add(targetPos),
+          speed
+        );
       }
     }
   }
@@ -198,15 +237,20 @@ export default class CharacterBuilder extends BaseThree {
     if (this.character && this.character.group) {
       if (this.moveInWorld) {
         // 角色左后退 以世界坐标系为准 朝向(-1,0,1)移动
-        this.moveTo(this.character.group.position.clone().add(new Vector3(-1, 0, 1)), speed);
-      }
-      else {
+        this.moveTo(
+          this.character.group.position.clone().add(new Vector3(-1, 0, 1)),
+          speed
+        );
+      } else {
         // 角色左后退 以自身坐标系为准
         let targetPos = this.changeAngleFromYAxis(
           this.character.group.position.clone().sub(this.character.lookPoint),
           Math.PI / 4
         );
-        this.moveTo(this.character.group.position.clone().add(targetPos), speed);
+        this.moveTo(
+          this.character.group.position.clone().add(targetPos),
+          speed
+        );
       }
     }
   }
@@ -219,15 +263,20 @@ export default class CharacterBuilder extends BaseThree {
     if (this.character && this.character.group) {
       if (this.moveInWorld) {
         // 角色右后退 以世界坐标系为准 朝向(1,0,1)移动
-        this.moveTo(this.character.group.position.clone().add(new Vector3(1, 0, 1)), speed);
-      }
-      else {
+        this.moveTo(
+          this.character.group.position.clone().add(new Vector3(1, 0, 1)),
+          speed
+        );
+      } else {
         // 角色右后退 以自身坐标系为准
         let targetPos = this.changeAngleFromYAxis(
           this.character.group.position.clone().sub(this.character.lookPoint),
           -Math.PI / 4
         );
-        this.moveTo(this.character.group.position.clone().add(targetPos), speed);
+        this.moveTo(
+          this.character.group.position.clone().add(targetPos),
+          speed
+        );
       }
     }
   }
@@ -287,14 +336,14 @@ export default class CharacterBuilder extends BaseThree {
 
   public addCollider(collider: THREE.Mesh) {
     if (this.character?.group) {
-      collider.position.copy(this.character.group?.position)
+      collider.position.copy(this.character.group?.position);
       collider.name = this.name;
       this.character.collider = collider;
       this.scene.setCollider(collider);
     }
   }
 
-  update(): void { }
+  update(): void {}
 
   loadCharacter(animationIndex: number) {
     if (animationIndex < this.animationsInput.length) {
@@ -333,7 +382,7 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-  onAnimationSuccess(object: Group) { }
+  onAnimationSuccess(object: Group) {}
 
-  onCharacterSuccess(object: Group) { }
+  onCharacterSuccess(object: Group) {}
 }
