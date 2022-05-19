@@ -3,6 +3,7 @@ import AnimationInput from "../apis/animationInput";
 import Character from "../apis/character";
 import CharacterHpInfo from "../apis/characterHpInfo";
 import { AniEffectScope } from "../apis/enum";
+import bulletBufferPool from "../bullet/bulletBufferPool";
 import BaseThree from "../common/baseThree";
 import SceneRender from "../scene/sceneRender";
 import ThreeMath from "../tool/threeMath";
@@ -11,7 +12,6 @@ import PlayerAndEnemyCommonBuilder from "./playerAndEnemyCommonBuilder";
 
 export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   player: CharacterBuilder | null = null;
-  collider: THREE.Mesh | null = null;
   mousePoint: THREE.Vector2 = new THREE.Vector2();
 
   onUpKeyDown: boolean = false;
@@ -24,21 +24,28 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    */
   characterHpInfo: CharacterHpInfo | null = null;
 
-  constructor(sceneRender: SceneRender, camera: THREE.Camera) {
+
+  constructor(sceneRender: SceneRender, camera: THREE.Camera, bulletPool: bulletBufferPool, initPos?: THREE.Vector3) {
     super(
       "player",
       "character/Player.fbx",
-      "character/animate/Run Forward.fbx",
-      "character/animate/Walk Backward.fbx",
-      "character/animate/hit reaction.fbx",
-      "character/animate/rifle aiming idle.fbx",
-      "character/animate/Dying.fbx",
+      "character/animate/player/Run Forward.fbx",
+      "character/animate/player/Walk Backward.fbx",
+      "character/animate/player/hit reaction.fbx",
+      "character/animate/player/rifle aiming idle.fbx",
+      "character/animate/player/Dying.fbx",
       sceneRender,
-      camera
+      camera,
+      (object) => {
+        this.player = this.characterBuilder
+      },
+      bulletPool,
+      initPos
     );
-    this.player = this.characterBuilder;
     this.enable();
   }
+
+
 
   start() {
     super.start();
@@ -61,88 +68,12 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     document.addEventListener("keyup", (ev) => {
       this.onDocumentKeyUp(ev);
     });
+    // 添加键盘点击事件，用于角色射击
+    document.addEventListener("click", (ev) => {
+      this.onDocumentMouseClick(ev);
+    });
   }
 
-  createPlayer() {
-    let aniInputs: Array<AnimationInput> = new Array<AnimationInput>();
-    // 创造动画属性
-    aniInputs.push(
-      new AnimationInput(
-        "character/animate/Run Forward.fbx",
-        0,
-        "run",
-        AniEffectScope.Lower,
-        10,
-        THREE.LoopRepeat
-      )
-    );
-    aniInputs.push(
-      new AnimationInput(
-        "character/animate/hit reaction.fbx",
-        0,
-        "hit",
-        AniEffectScope.Upper,
-        20,
-        THREE.LoopOnce
-      )
-    );
-    aniInputs.push(
-      new AnimationInput(
-        "character/animate/rifle aiming idle.fbx",
-        0,
-        "idle",
-        AniEffectScope.All,
-        1,
-        THREE.LoopRepeat
-      )
-    );
-    aniInputs.push(
-      new AnimationInput(
-        "character/animate/Walk Backward.fbx",
-        0,
-        "back",
-        AniEffectScope.Lower,
-        10,
-        THREE.LoopRepeat
-      )
-    );
-    aniInputs.push(
-      new AnimationInput(
-        "character/animate/Dying.fbx",
-        0,
-        "dying",
-        AniEffectScope.Death,
-        100,
-        THREE.LoopOnce
-      )
-    );
-
-    let player = new CharacterBuilder(
-      "character/Player.fbx",
-      "player",
-      aniInputs,
-      2,
-      this.sceneRender,
-      (object) => {
-        player.character?.group?.position.set(0, 0, 0);
-        // 缩放模型
-        player.character?.group?.scale.set(0.05, 0.05, 0.05);
-        // 播放待机动画
-        player.play("idle");
-        // 构建碰撞体
-        let mesh = new THREE.Mesh(
-          new THREE.BoxGeometry(4, 20, 4),
-          new THREE.MeshLambertMaterial()
-        );
-        mesh.position.y = 10;
-        this.collider = mesh;
-        player.addCollider(mesh);
-        this.player = player;
-      }
-    );
-    // 创建血条信息
-    this.characterHpInfo = new CharacterHpInfo("player");
-  }
 
   update() {
     super.update();
@@ -304,6 +235,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * 更新玩家朝向点
    */
   updateLookPoint() {
+    //console.log(this.player)
     if (this.camera && this.player) {
       var vector = new THREE.Vector3(
         (this.mousePoint.x / window.innerWidth) * 2 - 1,
@@ -332,6 +264,14 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       // 记录鼠标位置
       this.mousePoint.set(event.clientX, event.clientY);
     }
+  }
+
+  /**
+   * 鼠标点击事件
+   * @param event 
+   */
+  onDocumentMouseClick(event: MouseEvent) {
+    this.fire();
   }
 
   /**

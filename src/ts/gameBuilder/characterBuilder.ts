@@ -70,7 +70,7 @@ export default class CharacterBuilder extends BaseThree {
    */
   hitCharacter(e: CustomEvent) {
     // 如果被击中物体为当前角色，则扣除生命值
-    if (e.detail.target == this.name) {
+    if (e.detail.target == this.name + 'collider') {
       this.character?.damage(e.detail.power);
     }
   }
@@ -292,7 +292,7 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
- 
+
 
   public moveTo(pos: THREE.Vector3, speed: number) {
     if (this.character) {
@@ -315,10 +315,19 @@ export default class CharacterBuilder extends BaseThree {
   }
 
 
-  public removeCollider(){
-    if(this.character){
+  public removeCollider() {
+    if (this.character) {
       this.scene.removeCollider(this.character.collider)
       this.character.collider = null;
+    }
+  }
+
+  /**
+   * 重置生命值
+   */
+  public resetHP() {
+    if (this.character) {
+      this.character.hp = this.character.maxHp
     }
   }
 
@@ -326,11 +335,11 @@ export default class CharacterBuilder extends BaseThree {
    * 角色播放动画
    * @param aniName 动画名称
    */
-  play(aniName:string){
+  play(aniName: string) {
     this.character?.play(aniName)
   }
 
-  update(): void {}
+  update(): void { }
 
   loadCharacter(animationIndex: number) {
     if (animationIndex < this.animationsInput.length) {
