@@ -55,8 +55,23 @@ export default class SceneRender extends BaseThree {
 
   setCollider(object: THREE.Mesh) {
     object.visible = false;
-    this.scene?.add(object)
+    this.scene?.add(object);
     this.collideMeshList.push(object);
+  }
+
+  /**
+   * 移除碰撞体
+   * @param collider
+   */
+  removeCollider(collider: THREE.Mesh | null) {
+    if (collider) {
+      this.scene?.remove(collider);
+      var index = this.collideMeshList.indexOf(collider);
+      if (index > -1) {
+        // list中删除碰撞体
+        this.collideMeshList.splice(index, 1);
+      }
+    }
   }
 
   /**
@@ -78,7 +93,7 @@ export default class SceneRender extends BaseThree {
       : null;
     // 没有找到dom或者未上送dom ID 则以窗口长宽为准
     this.container = container ? container : window;
-    console.log(elementId)
+    console.log(elementId);
     this.camera = camera;
     this.ambientLight = ambientLight;
     this.useControls = useControls;
@@ -101,7 +116,7 @@ export default class SceneRender extends BaseThree {
       );
     }
     this.renderer.setClearColor(0x000000, 1); //设置背景颜色
-    this.renderer.domElement.id = "threeCanvas"
+    this.renderer.domElement.id = "threeCanvas";
     //这里 其实就是canvas 画布  renderer.domElement
     if (this.container instanceof HTMLElement) {
       this.container.appendChild(this.renderer.domElement);

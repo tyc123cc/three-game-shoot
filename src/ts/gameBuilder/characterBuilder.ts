@@ -7,6 +7,7 @@ import { Group, Vector3 } from "three";
 import { AniEffectScope } from "../apis/enum";
 import AnimationInput from "../apis/animationInput";
 import gsap from "gsap";
+import ThreeMath from "../tool/threeMath";
 
 /**
  * 角色构建器
@@ -139,7 +140,7 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色左移 以自身坐标系为准
-        let targetPos = this.changeAngleFromYAxis(
+        let targetPos = ThreeMath.changeAngleFromYAxis(
           this.character.lookPoint.clone().sub(this.character.group.position),
           -Math.PI / 2
         );
@@ -165,7 +166,7 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色右移动 以自身坐标系为准
-        let targetPos = this.changeAngleFromYAxis(
+        let targetPos = ThreeMath.changeAngleFromYAxis(
           this.character.lookPoint.clone().sub(this.character.group.position),
           Math.PI / 2
         );
@@ -191,7 +192,7 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色左前进 以自身坐标系为准
-        let targetPos = this.changeAngleFromYAxis(
+        let targetPos = ThreeMath.changeAngleFromYAxis(
           this.character.lookPoint.clone().sub(this.character.group.position),
           -Math.PI / 4
         );
@@ -217,7 +218,7 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色右前进 以自身坐标系为准
-        let targetPos = this.changeAngleFromYAxis(
+        let targetPos = ThreeMath.changeAngleFromYAxis(
           this.character.lookPoint.clone().sub(this.character.group.position),
           Math.PI / 4
         );
@@ -243,7 +244,7 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色左后退 以自身坐标系为准
-        let targetPos = this.changeAngleFromYAxis(
+        let targetPos = ThreeMath.changeAngleFromYAxis(
           this.character.group.position.clone().sub(this.character.lookPoint),
           Math.PI / 4
         );
@@ -269,7 +270,7 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色右后退 以自身坐标系为准
-        let targetPos = this.changeAngleFromYAxis(
+        let targetPos = ThreeMath.changeAngleFromYAxis(
           this.character.group.position.clone().sub(this.character.lookPoint),
           -Math.PI / 4
         );
@@ -291,43 +292,13 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-  /**
-   * 将向量根据y轴偏移角度
-   * @param vec 需要偏移的向量
-   * @param radian 需要偏移的弧度
-   *
-   * @returns 偏移后的向量
-   */
-  private changeAngleFromYAxis(
-    vec: THREE.Vector3,
-    radian: number
-  ): THREE.Vector3 {
-    if (vec.x !== 0 || vec.z !== 0) {
-      var x = vec.x;
-      var y = vec.z;
-      var tha1 = radian;
-
-      var value = Math.sqrt(x * x + y * y);
-
-      var cos1 = x / value;
-      var sin1 = y / value;
-
-      var cos2 = Math.cos(tha1);
-      var sin2 = Math.sin(tha1);
-
-      var cos3 = cos1 * cos2 - sin1 * sin2;
-      var sin3 = sin1 * cos2 + cos1 * sin2;
-
-      return new THREE.Vector3(value * cos3, vec.y, value * sin3);
-    }
-    return vec;
-  }
+ 
 
   public moveTo(pos: THREE.Vector3, speed: number) {
     if (this.character) {
       let collideObjs: THREE.Object3D[] = [];
       collideObjs = this.scene.collideMeshList.filter((obj) => {
-        return obj.id != this.character?.group?.id && obj.name != this.name;
+        return obj.id != this.character?.group?.id && obj.name != this.name + "collider";
       });
       this.character.colliderMeshList = collideObjs;
       this.character.moveTo(pos, speed);
@@ -343,7 +314,23 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-  update(): void { }
+
+  public removeCollider(){
+    if(this.character){
+      this.scene.removeCollider(this.character.collider)
+      this.character.collider = null;
+    }
+  }
+
+  /**
+   * 角色播放动画
+   * @param aniName 动画名称
+   */
+  play(aniName:string){
+    this.character?.play(aniName)
+  }
+
+  update(): void {}
 
   loadCharacter(animationIndex: number) {
     if (animationIndex < this.animationsInput.length) {

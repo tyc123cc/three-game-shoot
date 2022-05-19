@@ -19,17 +19,18 @@ import Bullet from "@/ts/bullet/bullet";
 import Character from "@/ts/apis/character";
 import bulletBufferPool from "@/ts/bullet/bulletBufferPool";
 import CharacterHpInfo from "@/ts/apis/characterHpInfo";
+import PlayerBuilder from "@/ts/gameBuilder/playerBuilder";
 
 export default class ThreeJs extends BaseThree {
   start(): void {
     // console.log('start')
   }
   update(): void {
-    if (this.mixer !== null) {
-      //clock.getDelta()方法获得两帧的时间间隔
-      // 更新混合器相关的时间
-      this.mixer.update(this.deltaTime);
-    }
+    // if (this.mixer !== null) {
+    //   //clock.getDelta()方法获得两帧的时间间隔
+    //   // 更新混合器相关的时间
+    //   this.mixer.update(this.deltaTime);
+    // }
 
     if (this.camera && this.player) {
       var vector = new THREE.Vector3(
@@ -124,13 +125,17 @@ export default class ThreeJs extends BaseThree {
       this.updateCharacterHPInfo(this.enemy.character as Character)
     }
 
-    this.characterHpInfos.splice(0);
-    this.characterHpInfoMap.forEach((value, key, map) => {
-      this.characterHpInfos.push(value);
-    });
+    // this.characterHpInfos.splice(0);
+    // this.characterHpInfoMap.forEach((value, key, map) => {
+    //   this.characterHpInfos.push(value);
+    // });
 
     if (this.enemy?.character && this.enemy.character.hp <= 0) {
       this.enemy.character.play("dying")
+    }
+
+    if(this.playerBuilder){
+      
     }
   }
   sceneRender: SceneRender | null = null;
@@ -155,6 +160,8 @@ export default class ThreeJs extends BaseThree {
   characterHpInfos: CharacterHpInfo[] = [];
 
   bulletPool: bulletBufferPool | null = null;
+
+  playerBuilder:PlayerBuilder|null = null;
 
   constructor() {
     super();
@@ -262,32 +269,36 @@ export default class ThreeJs extends BaseThree {
       )
     );
 
-    let player = new CharacterBuilder(
-      "character/Player.fbx",
-      "player",
-      aniInputs,
-      2,
-      this.sceneRender,
-      (object) => {
-        player.character?.group?.position.set(0, 0, 0);
-        player.character?.group?.scale.set(0.05, 0.05, 0.05);
-        player.character?.play("idle");
-        // console.log("player", object)
-        // console.log("loadedPlayer", player)
-        let mesh = new THREE.Mesh(
-          new THREE.BoxGeometry(4, 20, 4),
-          new THREE.MeshLambertMaterial()
-        );
-        mesh.position.y = 10;
-        player.addCollider(mesh);
-        this.player = player;
-        this.characterHpInfoMap.set(
-          this.player.name,
-          new CharacterHpInfo(this.player.name)
-        );
-      }
-    );
-
+    // let player = new CharacterBuilder(
+    //   "character/Player.fbx",
+    //   "player",
+    //   aniInputs,
+    //   2,
+    //   this.sceneRender,
+    //   (object) => {
+    //     player.character?.group?.position.set(0, 0, 0);
+    //     player.character?.group?.scale.set(0.05, 0.05, 0.05);
+    //     player.character?.play("idle");
+    //     // console.log("player", object)
+    //     // console.log("loadedPlayer", player)
+    //     let mesh = new THREE.Mesh(
+    //       new THREE.BoxGeometry(4, 20, 4),
+    //       new THREE.MeshLambertMaterial()
+    //     );
+    //     mesh.position.y = 10;
+    //     player.addCollider(mesh);
+    //     this.player = player;
+    //     this.characterHpInfoMap.set(
+    //       this.player.name,
+    //       new CharacterHpInfo(this.player.name)
+    //     );
+    //   }
+    // );
+    this.playerBuilder = new PlayerBuilder(this.sceneRender,this.camera);
+    if(this.playerBuilder.characterHpInfo){
+      this.characterHpInfos.push(this.playerBuilder.characterHpInfo)
+    }
+    
     document.addEventListener("keydown", (ev) => {
       if (ev.key == "d") {
         // console.log("按下d")

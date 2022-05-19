@@ -205,7 +205,6 @@ export default class Character extends BaseThree {
    * @returns 
    */
   intersect(dir: Vector3): boolean {
-
     if (!this.group) {
       return false;
     }
@@ -357,7 +356,6 @@ export default class Character extends BaseThree {
   /**
    *  播放动画
    * @param name 要播放动画的名称
-   * @param loop 是否循环
    */
   public play(name: string) {
     let animation = this.animations.filter((value) => value.name == name)[0];
