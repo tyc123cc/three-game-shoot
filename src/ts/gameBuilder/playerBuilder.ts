@@ -5,6 +5,7 @@ import CharacterHpInfo from "../apis/characterHpInfo";
 import { AniEffectScope } from "../apis/enum";
 import bulletBufferPool from "../bullet/bulletBufferPool";
 import BaseThree from "../common/baseThree";
+import Confs from "../common/confs/confs";
 import SceneRender from "../scene/sceneRender";
 import ThreeMath from "../tool/threeMath";
 import CharacterBuilder from "./characterBuilder";
@@ -24,8 +25,12 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    */
   characterHpInfo: CharacterHpInfo | null = null;
 
-
-  constructor(sceneRender: SceneRender, camera: THREE.Camera, bulletPool: bulletBufferPool, initPos?: THREE.Vector3) {
+  constructor(
+    sceneRender: SceneRender,
+    camera: THREE.Camera,
+    bulletPool: bulletBufferPool,
+    initPos?: THREE.Vector3
+  ) {
     super(
       "player",
       "character/Player.fbx",
@@ -37,15 +42,13 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       sceneRender,
       camera,
       (object) => {
-        this.player = this.characterBuilder
+        this.player = this.characterBuilder;
       },
       bulletPool,
       initPos
     );
     this.enable();
   }
-
-
 
   start() {
     super.start();
@@ -73,7 +76,6 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       this.onDocumentMouseClick(ev);
     });
   }
-
 
   update() {
     super.update();
@@ -137,7 +139,6 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       }
       // 更新摄像机位置
       this.updateCameraPosition();
-
     }
   }
 
@@ -223,9 +224,9 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     if (this.player?.character?.group) {
       // 更新摄像机位置，使摄像机始终与主角保持相对运动
       this.camera?.position.set(
-        this.player.character.group.position.x,
-        this.player.character.group.position.y + 28,
-        this.player.character.group.position.z + 37.5
+        this.player.character.group.position.x + Confs.cameraOffsetPos.x,
+        this.player.character.group.position.y + Confs.cameraOffsetPos.y,
+        this.player.character.group.position.z + Confs.cameraOffsetPos.z
       );
       this.camera?.lookAt(this.player.character.group.position);
     }
@@ -268,7 +269,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
 
   /**
    * 鼠标点击事件
-   * @param event 
+   * @param event
    */
   onDocumentMouseClick(event: MouseEvent) {
     this.fire();

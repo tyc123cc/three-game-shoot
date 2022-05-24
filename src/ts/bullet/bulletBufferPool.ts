@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import Confs from "../common/confs/confs";
 import SceneRender from "../scene/sceneRender";
 import Bullet from "./bullet";
 
@@ -74,7 +75,7 @@ export default class bulletBufferPool {
    */
   public fire(pos: THREE.Vector3, moveVec: THREE.Vector3, speed: number) {
     // 调整高度
-    pos.y = 7;
+    pos.y = Confs.bulletHeight;
     // 获得空闲子弹
     let bullet: Bullet | null = null;
     for (let bul of this.bullets) {

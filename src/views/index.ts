@@ -21,14 +21,14 @@ import bulletBufferPool from "@/ts/bullet/bulletBufferPool";
 import CharacterHpInfo from "@/ts/apis/characterHpInfo";
 import PlayerBuilder from "@/ts/gameBuilder/playerBuilder";
 import EnemyBuilder from "@/ts/gameBuilder/enemyBuilder";
+import Confs from "@/ts/common/confs/confs";
+import ConfsVar from "@/ts/common/confs/confsVar";
 
 export default class ThreeJs extends BaseThree {
   start(): void {
     // console.log('start')
   }
-  update(): void {
-
-  }
+  update(): void {}
   sceneRender: SceneRender | null = null;
   camera: THREE.PerspectiveCamera | null = null;
   renderer: THREE.WebGLRenderer | null = null;
@@ -38,6 +38,7 @@ export default class ThreeJs extends BaseThree {
   mixer: THREE.AnimationMixer | null = null;
   player: CharacterBuilder | null = null;
   enemy: CharacterBuilder | null = null;
+  mapBuilder: MapBuilder | null = null;
 
   onUpKeyDown: boolean = false;
   onDownKeyDown: boolean = false;
@@ -54,26 +55,20 @@ export default class ThreeJs extends BaseThree {
 
   playerBuilder: PlayerBuilder | null = null;
 
-  enemyBuilders: EnemyBuilder[] = []
+  enemyBuilders: EnemyBuilder[] = [];
 
   constructor() {
     super();
     this.init();
     this.enable();
-    new MapBuilder(
-      require("../assets/map/map01.json"),
-      this.sceneRender as SceneRender
-    );
   }
 
   init(): void {
-    // 第一步新建一个场景
-    // this.setCamera();
-    // this.setRenderer();
-    // this.setCube();
-    // this.setLight();
-    // this.animate();
-    // 第二参数就是 长度和宽度比 默认采用浏览器  返回以像素为单位的窗口的内部宽度和高度
+
+    // 设置配置值
+    let confsVar:ConfsVar = require("../assets/confs/confs.json");
+    Confs.setting(confsVar);
+
     this.camera = new THREE.PerspectiveCamera(
       45,
       window.innerWidth / window.innerHeight,
@@ -94,6 +89,19 @@ export default class ThreeJs extends BaseThree {
     light.position.set(10, 10, 10);
     this.sceneRender.scene?.add(light);
 
+    // 创建地图
+    this.mapBuilder = new MapBuilder(
+      require("../assets/map/map01.json"),
+      this.sceneRender
+    );
+
+
+    // 初始化摄像机位置
+    this.camera.position.set(
+      this.mapBuilder.playerInitPos.x + Confs.cameraOffsetPos.x,
+      this.mapBuilder.playerInitPos.y + Confs.cameraOffsetPos.y,
+      this.mapBuilder.playerInitPos.z + Confs.cameraOffsetPos.z
+    );
 
     this.bulletPool = new bulletBufferPool(
       10,
@@ -103,22 +111,32 @@ export default class ThreeJs extends BaseThree {
       this.sceneRender
     );
 
-    this.playerBuilder = new PlayerBuilder(this.sceneRender, this.camera, this.bulletPool);
+    this.playerBuilder = new PlayerBuilder(
+      this.sceneRender,
+      this.camera,
+      this.bulletPool,
+      this.mapBuilder.playerInitPos
+    );
     if (this.playerBuilder.characterHpInfo) {
-      this.characterHpInfos.push(this.playerBuilder.characterHpInfo)
+      this.characterHpInfos.push(this.playerBuilder.characterHpInfo);
     }
 
-    this.enemyBuilders.push(new EnemyBuilder("enemy1", this.sceneRender, this.camera, this.bulletPool, new THREE.Vector3(-5, 0, 0)))
-
-    this.enemyBuilders.push(new EnemyBuilder("enemy2", this.sceneRender, this.camera, this.bulletPool, new THREE.Vector3(5, 0, 0)))
-    this.enemyBuilders.forEach(enemy => {
+    for(let enemy of this.mapBuilder.Enemies){
+      this.enemyBuilders.push(
+        new EnemyBuilder(
+          enemy.name,
+          this.sceneRender,
+          this.camera,
+          this.bulletPool,
+          new THREE.Vector3(enemy.initPos.x,0,enemy.initPos.y)
+        )
+      );
+    }
+    
+    this.enemyBuilders.forEach((enemy) => {
       if (enemy.characterHpInfo) {
-        this.characterHpInfos.push(enemy.characterHpInfo)
+        this.characterHpInfos.push(enemy.characterHpInfo);
       }
-    })
-
-
+    });
   }
-
-
 }

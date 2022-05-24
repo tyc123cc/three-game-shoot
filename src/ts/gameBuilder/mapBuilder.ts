@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import SceneRender from "../scene/sceneRender";
 import BaseThree from "../common/baseThree";
-import Map from "../apis/map";
+import Map, { Enemies } from "../apis/map";
 import { Walls } from "../apis/map";
 
 export default class MapBuilder extends BaseThree {
@@ -9,11 +9,15 @@ export default class MapBuilder extends BaseThree {
 
   public map: Map;
 
-  public wallColor: number = 0x0099FF;
+  public wallColor: number = 0x0099ff;
 
   public wallHeight: number = 10;
 
   public wallOpacity: number = 0.4;
+
+  public playerInitPos: THREE.Vector3 = new THREE.Vector3();
+
+  public Enemies:Array<Enemies> = []
 
   constructor(map: Map, sceneRender: SceneRender) {
     super();
@@ -26,6 +30,27 @@ export default class MapBuilder extends BaseThree {
     // 建造地板
     this.createGroup();
     this.createWalls();
+    this.setPlayerInitPos();
+    this.setEnemies();
+  }
+
+  /**
+   * 设置敌人信息
+   */
+  setEnemies(){
+    this.Enemies = this.map.enemies;
+  }
+
+
+  /**
+   * 设置主角初始位置
+   */
+  setPlayerInitPos() {
+    this.playerInitPos = new THREE.Vector3(
+      this.map.initPos.x,
+      0,
+      this.map.initPos.y
+    );
   }
 
   /**
@@ -56,17 +81,25 @@ export default class MapBuilder extends BaseThree {
    */
   createMapWalls() {
     let walls: Walls[] = this.map.walls;
-    walls.forEach(wallDate => {
-      var box = new THREE.BoxGeometry(wallDate.width, this.wallHeight, wallDate.height);
+    walls.forEach((wallDate) => {
+      var box = new THREE.BoxGeometry(
+        wallDate.width,
+        this.wallHeight,
+        wallDate.height
+      );
       var material = new THREE.MeshLambertMaterial({
         color: this.wallColor,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: this.wallOpacity
+        opacity: this.wallOpacity,
       });
       var wall = new THREE.Mesh(box, material);
-      wall.position.set(wallDate.position.x, this.wallHeight / 2, wallDate.position.y);
-      wall.name = "walls"
+      wall.position.set(
+        wallDate.position.x,
+        this.wallHeight / 2,
+        wallDate.position.y
+      );
+      wall.name = "walls";
       this.sceneRender.add(wall);
     });
   }
@@ -81,12 +114,12 @@ export default class MapBuilder extends BaseThree {
       color: this.wallColor,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: this.wallOpacity
+      opacity: this.wallOpacity,
     });
     var walls = new THREE.Mesh(geometry, material);
     walls.position.z -= this.map.height / 2;
     walls.position.y += this.wallHeight / 2;
-    walls.name = "walls"
+    walls.name = "walls";
     this.sceneRender.add(walls);
 
     // 下边缘墙壁
@@ -95,12 +128,12 @@ export default class MapBuilder extends BaseThree {
       color: this.wallColor,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: this.wallOpacity
+      opacity: this.wallOpacity,
     });
     var walls = new THREE.Mesh(geometry, material);
     walls.position.z += this.map.height / 2;
     walls.position.y += this.wallHeight / 2;
-    walls.name = "walls"
+    walls.name = "walls";
     this.sceneRender.add(walls);
 
     // 左边缘墙壁
@@ -109,13 +142,13 @@ export default class MapBuilder extends BaseThree {
       color: this.wallColor,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: this.wallOpacity
+      opacity: this.wallOpacity,
     });
     var walls = new THREE.Mesh(geometry, material);
     walls.rotateY((-90 / 180) * Math.PI);
     walls.position.x -= this.map.width / 2;
     walls.position.y += this.wallHeight / 2;
-    walls.name = "walls"
+    walls.name = "walls";
     this.sceneRender.add(walls);
 
     // 右边缘墙壁
@@ -124,14 +157,14 @@ export default class MapBuilder extends BaseThree {
       color: this.wallColor,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: this.wallOpacity
+      opacity: this.wallOpacity,
     });
     var walls = new THREE.Mesh(geometry, material);
     walls.rotateY((-90 / 180) * Math.PI);
     walls.position.x += this.map.width / 2;
     walls.position.y += this.wallHeight / 2;
-    walls.name = "walls"
+    walls.name = "walls";
     this.sceneRender.add(walls);
   }
-  update(): void { }
+  update(): void {}
 }

@@ -4,6 +4,16 @@ export default class Map {
 
   public walls: Array<Walls> = []
 
+  public initPos:Vector2 = new Vector2(0,0);
+
+  public enemies:Array<Enemies> = [];
+
+}
+
+export class Enemies{
+  public name:string = "";
+  public initPos:Vector2 = new Vector2(0,0);
+
 }
 
 export class Walls {
