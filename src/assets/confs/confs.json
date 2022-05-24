@@ -1,8 +1,10 @@
 {
-    "cameraOffsetPos":{
-        "x":0,
-        "y":28,
-        "z":37.5
-    },
-    "bulletHeight":7
+  "cameraOffsetPos": {
+    "x": 0,
+    "y": 28,
+    "z": 37.5
+  },
+  "bulletHeight": 7,
+  "bulletSize": 0.4,
+  "characterColliderSize": 4
 }

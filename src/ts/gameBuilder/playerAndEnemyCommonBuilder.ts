@@ -5,6 +5,7 @@ import CharacterHpInfo from "../apis/characterHpInfo";
 import { AniEffectScope, CharacterStatus } from "../apis/enum";
 import bulletBufferPool from "../bullet/bulletBufferPool";
 import BaseThree from "../common/baseThree";
+import Confs from "../common/confs/confs";
 import SceneRender from "../scene/sceneRender";
 import ThreeMath from "../tool/threeMath";
 import CharacterBuilder from "./characterBuilder";
@@ -152,7 +153,7 @@ export default class PlayerAndEnemyCommonBuilder extends BaseThree {
         player.play("idle");
         // 构建碰撞体
         let mesh = new THREE.Mesh(
-          new THREE.BoxGeometry(4, 20, 4),
+          new THREE.BoxGeometry(Confs.characterColliderSize, 20, Confs.characterColliderSize),
           new THREE.MeshLambertMaterial()
         );
         mesh.position.copy(object.position)
