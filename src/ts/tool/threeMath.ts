@@ -30,7 +30,7 @@ export default class ThreeMath {
    * @param linePoint 线段的一点
    * @returns
    */
-   public static CalPlaneLineIntersectPoint(
+  public static CalPlaneLineIntersectPoint(
     planeVector: THREE.Vector3,
     planePoint: THREE.Vector3,
     lineVector: THREE.Vector3,
@@ -57,35 +57,45 @@ export default class ThreeMath {
     return returnResult;
   }
 
-   /**
+  /**
    * 将向量根据y轴偏移角度
    * @param vec 需要偏移的向量
    * @param radian 需要偏移的弧度
    *
    * @returns 偏移后的向量
    */
-    public static  changeAngleFromYAxis(
-        vec: THREE.Vector3,
-        radian: number
-      ): THREE.Vector3 {
-        if (vec.x !== 0 || vec.z !== 0) {
-          var x = vec.x;
-          var y = vec.z;
-          var tha1 = radian;
-    
-          var value = Math.sqrt(x * x + y * y);
-    
-          var cos1 = x / value;
-          var sin1 = y / value;
-    
-          var cos2 = Math.cos(tha1);
-          var sin2 = Math.sin(tha1);
-    
-          var cos3 = cos1 * cos2 - sin1 * sin2;
-          var sin3 = sin1 * cos2 + cos1 * sin2;
-    
-          return new THREE.Vector3(value * cos3, vec.y, value * sin3);
-        }
-        return vec;
-      }
+  public static changeAngleFromYAxis(
+    vec: THREE.Vector3,
+    radian: number
+  ): THREE.Vector3 {
+    if (vec.x !== 0 || vec.z !== 0) {
+      var x = vec.x;
+      var y = vec.z;
+      var tha1 = radian;
+
+      var value = Math.sqrt(x * x + y * y);
+
+      var cos1 = x / value;
+      var sin1 = y / value;
+
+      var cos2 = Math.cos(tha1);
+      var sin2 = Math.sin(tha1);
+
+      var cos3 = cos1 * cos2 - sin1 * sin2;
+      var sin3 = sin1 * cos2 + cos1 * sin2;
+
+      return new THREE.Vector3(value * cos3, vec.y, value * sin3);
+    }
+    return vec;
+  }
+
+  /**
+   * 将number值精细化
+   * @param number 数值
+   * @param percision 精细化的程度
+   * @returns 精细化后的值
+   */
+  public static toPrecision(number: number, percision: number): number {
+    return Math.floor(number * percision) / percision;
+  }
 }
