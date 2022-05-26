@@ -63,11 +63,12 @@ export default class AStar {
     // 目标节点
     let targetNode = this.getNode(endPos, endPos, nodes);
     // closeList中先放入初始节点
-    closeList.push(startNode);
+    //closeList.push(startNode);
     // openList中加入初始节点
-    openList.push(targetNode);
-    this.AStarWayFind(openList, closeList, targetNode, nodes);
-    
+    openList.push(startNode);
+    let hasPath = this.AStarWayFind(openList, closeList, targetNode, nodes);
+
+    console.log(targetNode, hasPath)
     return [];
   }
 
@@ -96,7 +97,6 @@ export default class AStar {
     ) {
       return true;
     }
-
     return this.AStarWayFind(openList, closeList, targetNode, nodes);
   }
 
@@ -107,6 +107,7 @@ export default class AStar {
     closeList: Node[],
     nodes: Map<string, Node>
   ): boolean {
+    console.log(node)
     // 试探周围的8个点
     for (
       let x = -1 / this.precision;
@@ -140,12 +141,14 @@ export default class AStar {
           let index = this.getNodeIndex(openList, surroundNode);
           if (index == -1) {
             // 该节点不在openList中，将其加入openList
-            openList.push(node);
+            openList.push(surroundNode);
           } else {
             // 该节点存在openList中，更新parent
             this.updateParent(openList, index, surroundNode, movePrice);
           }
           if (surroundNode.equals(targetNode)) {
+            console.log("target", surroundNode)
+            targetNode.parent = surroundNode.parent
             return true;
           }
         }
@@ -214,11 +217,11 @@ export default class AStar {
           (node.pos.x - Confs.characterColliderSize / 2 >=
             collider.position.x - Confs.characterColliderSize / 2 &&
             node.pos.x + Confs.characterColliderSize / 2 <=
-              collider.position.x + Confs.characterColliderSize / 2) ||
+            collider.position.x + Confs.characterColliderSize / 2) ||
           (node.pos.y - Confs.characterColliderSize / 2 >=
             collider.position.y - Confs.characterColliderSize / 2 &&
             node.pos.y + Confs.characterColliderSize / 2 <=
-              collider.position.y + Confs.characterColliderSize / 2)
+            collider.position.y + Confs.characterColliderSize / 2)
         ) {
           return true;
         }
@@ -239,11 +242,11 @@ export default class AStar {
         (node.pos.x - Confs.characterColliderSize / 2 >=
           wall.position.x - wall.width / 2 &&
           node.pos.x + Confs.characterColliderSize / 2 <=
-            wall.position.x + wall.width / 2) ||
+          wall.position.x + wall.width / 2) ||
         (node.pos.y - Confs.characterColliderSize / 2 >=
           wall.position.y - wall.height / 2 &&
           node.pos.y + Confs.characterColliderSize / 2 <=
-            wall.position.y + wall.height / 2)
+          wall.position.y + wall.height / 2)
       ) {
         return true;
       }
@@ -273,6 +276,7 @@ export default class AStar {
    */
   private removeNode(list: Node[], target: Node) {
     var index = this.getNodeIndex(list, target);
+    //debugger
     if (index > -1) {
       // list中删除节点
       list.splice(index, 1);

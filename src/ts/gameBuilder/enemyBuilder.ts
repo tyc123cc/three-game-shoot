@@ -7,13 +7,16 @@ import bulletBufferPool from "../bullet/bulletBufferPool";
 import BaseThree from "../common/baseThree";
 import SceneRender from "../scene/sceneRender";
 import ThreeMath from "../tool/threeMath";
+import AStar from "./AStar";
 import CharacterBuilder from "./characterBuilder";
+import MapBuilder from "./mapBuilder";
 import PlayerAndEnemyCommonBuilder from "./playerAndEnemyCommonBuilder";
 
 export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
   enemy: CharacterBuilder | null = null;
   collider: THREE.Mesh | null = null;
   mousePoint: THREE.Vector2 = new THREE.Vector2();
+  mapBuilder: MapBuilder;
 
   name: string
 
@@ -27,8 +30,10 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
    */
   characterHpInfo: CharacterHpInfo | null = null;
 
+  navigation: AStar | null = null;
 
-  constructor(name: string, sceneRender: SceneRender, camera: THREE.Camera, bulletPool: bulletBufferPool, initPos?: THREE.Vector3) {
+
+  constructor(name: string, sceneRender: SceneRender, camera: THREE.Camera, bulletPool: bulletBufferPool, mapBuilder: MapBuilder, initPos?: THREE.Vector3) {
     super(
       name,
       "character/Enemy.fbx",
@@ -41,11 +46,14 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
       camera,
       (object) => {
         this.enemy = this.characterBuilder
+        this.navigation = new AStar(this.mapBuilder.map, this.sceneRender.collideMeshList, this.name, "player", 1)
+        this.navigation?.builder();
       },
       bulletPool,
       initPos
     );
     this.name = name;
+    this.mapBuilder = mapBuilder;
     this.enable();
   }
 
@@ -53,6 +61,7 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
 
   start() {
     super.start();
+
   }
 
 

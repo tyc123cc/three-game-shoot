@@ -28,7 +28,7 @@ export default class ThreeJs extends BaseThree {
   start(): void {
     // console.log('start')
   }
-  update(): void {}
+  update(): void { }
   sceneRender: SceneRender | null = null;
   camera: THREE.PerspectiveCamera | null = null;
   renderer: THREE.WebGLRenderer | null = null;
@@ -66,7 +66,7 @@ export default class ThreeJs extends BaseThree {
   init(): void {
 
     // 设置配置值
-    let confsVar:ConfsVar = require("../assets/confs/confs.json");
+    let confsVar: ConfsVar = require("../assets/confs/confs.json");
     Confs.setting(confsVar);
 
     this.camera = new THREE.PerspectiveCamera(
@@ -105,7 +105,7 @@ export default class ThreeJs extends BaseThree {
 
     this.bulletPool = new bulletBufferPool(
       10,
-      0.4,
+      Confs.bulletSize,
       "red",
       10,
       this.sceneRender
@@ -121,18 +121,19 @@ export default class ThreeJs extends BaseThree {
       this.characterHpInfos.push(this.playerBuilder.characterHpInfo);
     }
 
-    for(let enemy of this.mapBuilder.Enemies){
+    for (let enemy of this.mapBuilder.Enemies) {
       this.enemyBuilders.push(
         new EnemyBuilder(
           enemy.name,
           this.sceneRender,
           this.camera,
           this.bulletPool,
-          new THREE.Vector3(enemy.initPos.x,0,enemy.initPos.y)
+          this.mapBuilder,
+          new THREE.Vector3(enemy.initPos.x, 0, enemy.initPos.y)
         )
       );
     }
-    
+
     this.enemyBuilders.forEach((enemy) => {
       if (enemy.characterHpInfo) {
         this.characterHpInfos.push(enemy.characterHpInfo);
