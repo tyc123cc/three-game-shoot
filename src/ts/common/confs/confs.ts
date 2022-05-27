@@ -7,6 +7,11 @@ export default class Confs {
   public static cameraOffsetPos: THREE.Vector3;
 
   /**
+   * 血条偏移量
+   */
+  public static hpInfoOffsetPos: THREE.Vector3;
+
+  /**
    * 子弹发射高度
    */
   public static bulletHeight: number;
@@ -17,8 +22,8 @@ export default class Confs {
   public static bulletSize: number;
 
   /**
-  * 角色碰撞体的大小
-  */
+   * 角色碰撞体的大小
+   */
   public static characterColliderSize: number;
 
   /**
@@ -26,9 +31,9 @@ export default class Confs {
    */
   public static setting(confVars: ConfsVar) {
     this.cameraOffsetPos = confVars.cameraOffsetPos;
+    this.hpInfoOffsetPos = confVars.hpInfoOffsetPos;
     this.bulletHeight = confVars.bulletHeight;
     this.bulletSize = confVars.bulletSize;
     this.characterColliderSize = confVars.characterColliderSize;
   }
-
 }

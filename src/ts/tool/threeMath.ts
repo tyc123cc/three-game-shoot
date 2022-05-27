@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import Confs from "../common/confs/confs";
 
 export default class ThreeMath {
   /**
@@ -10,8 +11,8 @@ export default class ThreeMath {
   public static createVector(vec: THREE.Vector3, camera: THREE.Camera) {
     var p = vec.clone();
     // 设置偏移值
-    p.y += 5.2;
-    p.x -= 3.6;
+    p.x += Confs.hpInfoOffsetPos.x;
+    p.y += Confs.hpInfoOffsetPos.y;
     var vector = p.project(camera);
     vector.x =
       ((vector.x + 1) / 2) * window.innerWidth +
@@ -97,5 +98,25 @@ export default class ThreeMath {
    */
   public static toPrecision(number: number, percision: number): number {
     return Math.floor(number * percision) / percision;
+  }
+
+  /**
+   * 二维坐标点是否在长方形范围内
+   * @param pos 坐标点
+   * @param leftTopPos 长方形的左上角
+   * @param rightBottomPos 长方形的右下角
+   * @returns 
+   */
+  public static posInScope(
+    pos: THREE.Vector2,
+    leftTopPos: THREE.Vector2,
+    rightBottomPos: THREE.Vector2
+  ) {
+    return (
+      pos.x > leftTopPos.x &&
+      pos.x < rightBottomPos.x &&
+      pos.y > rightBottomPos.y &&
+      pos.y < leftTopPos.y
+    );
   }
 }

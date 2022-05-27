@@ -47,7 +47,9 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
       (object) => {
         this.enemy = this.characterBuilder
         this.navigation = new AStar(this.mapBuilder.map, this.sceneRender.collideMeshList, this.name, "player", 1)
-        this.navigation?.builder();
+        if(this.name == "enemy2"){
+          console.log(this.navigation?.builder());
+        }
       },
       bulletPool,
       initPos
@@ -61,7 +63,6 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
 
   start() {
     super.start();
-
   }
 
 

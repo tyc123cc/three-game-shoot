@@ -68,8 +68,16 @@ export default class AStar {
     openList.push(startNode);
     let hasPath = this.AStarWayFind(openList, closeList, targetNode, nodes);
 
-    console.log(targetNode, hasPath)
-    return [];
+    let result: Vector3[] = [];
+    if (!hasPath) {
+      return [];
+    }
+    while (targetNode.parent) {
+      result.push(new Vector3(targetNode.pos.x, 0, targetNode.pos.y));
+      targetNode = targetNode.parent;
+    }
+
+    return result.reverse();
   }
 
   /**
@@ -107,16 +115,15 @@ export default class AStar {
     closeList: Node[],
     nodes: Map<string, Node>
   ): boolean {
-    console.log(node)
     // 试探周围的8个点
     for (
       let x = -1 / this.precision;
-      x < 1 / this.precision;
+      x <= 1 / this.precision;
       x += 1 / this.precision
     ) {
       for (
         let y = -1 / this.precision;
-        y < 1 / this.precision;
+        y <= 1 / this.precision;
         y += 1 / this.precision
       ) {
         if (x == 0 && y == 0) {
@@ -125,7 +132,7 @@ export default class AStar {
         }
         // 移动代价
         let movePrice = 1 / this.precision;
-        if (x != 0 || y != 0) {
+        if (x != 0 && y != 0) {
           movePrice *= 1.4;
         }
         // 获得此周围节点
@@ -147,8 +154,7 @@ export default class AStar {
             this.updateParent(openList, index, surroundNode, movePrice);
           }
           if (surroundNode.equals(targetNode)) {
-            console.log("target", surroundNode)
-            targetNode.parent = surroundNode.parent
+            targetNode.parent = node;
             return true;
           }
         }
@@ -186,10 +192,10 @@ export default class AStar {
   private nodeIsValid(node: Node, closeList: Node[]) {
     // 节点超过地图范围（需考虑碰撞体体积）
     if (
-      node.pos.x - Confs.characterColliderSize / 2 <= -this.map.width / 2 ||
-      node.pos.x + Confs.characterColliderSize / 2 >= this.map.width / 2 ||
-      node.pos.y - Confs.characterColliderSize / 2 <= -this.map.height / 2 ||
-      node.pos.y + Confs.characterColliderSize / 2 >= this.map.height / 2
+      node.pos.x - Confs.characterColliderSize / 2 < -this.map.width / 2 ||
+      node.pos.x + Confs.characterColliderSize / 2 > this.map.width / 2 ||
+      node.pos.y - Confs.characterColliderSize / 2 < -this.map.height / 2 ||
+      node.pos.y + Confs.characterColliderSize / 2 > this.map.height / 2
     ) {
       return false;
     }
@@ -209,24 +215,73 @@ export default class AStar {
    * @param node
    */
   isCollideCollider(node: Node): boolean {
-    this.colliderList.forEach((collider) => {
+    let leftTopPos = new Vector2(
+      node.pos.x - Confs.characterColliderSize / 2,
+      node.pos.y + Confs.characterColliderSize / 2
+    );
+    let rightTopPos = new Vector2(
+      node.pos.x + Confs.characterColliderSize / 2,
+      node.pos.y + Confs.characterColliderSize / 2
+    );
+    let leftBottonPos = new Vector2(
+      node.pos.x - Confs.characterColliderSize / 2,
+      node.pos.y - Confs.characterColliderSize / 2
+    );
+    let rightBottonPos = new Vector2(
+      node.pos.x + Confs.characterColliderSize / 2,
+      node.pos.y - Confs.characterColliderSize / 2
+    );
+    if(node.pos.x == 40){
+      //debugger
+    }
+    for (let collider of this.colliderList) {
       // 角色碰撞体
-      if (collider.name.endsWith("collider")) {
+      if (
+        collider.name.endsWith("collider") &&
+        !collider.name.startsWith("player") &&
+        !collider.name.startsWith((this.start as Object3D).name)
+      ) {
+        let colliderLeftTopPos = new Vector2(
+          collider.position.x - Confs.characterColliderSize / 2,
+          collider.position.z + Confs.characterColliderSize / 2
+        );
+        let colliderRightBottonPos = new Vector2(
+          collider.position.x + Confs.characterColliderSize / 2,
+          collider.position.z - Confs.characterColliderSize / 2
+        );
+
         // 该节点与其他角色的碰撞体相撞
         if (
-          (node.pos.x - Confs.characterColliderSize / 2 >=
-            collider.position.x - Confs.characterColliderSize / 2 &&
-            node.pos.x + Confs.characterColliderSize / 2 <=
-            collider.position.x + Confs.characterColliderSize / 2) ||
-          (node.pos.y - Confs.characterColliderSize / 2 >=
-            collider.position.y - Confs.characterColliderSize / 2 &&
-            node.pos.y + Confs.characterColliderSize / 2 <=
-            collider.position.y + Confs.characterColliderSize / 2)
+          ThreeMath.posInScope(
+            node.pos,
+            colliderLeftTopPos,
+            colliderRightBottonPos
+          ) ||
+          ThreeMath.posInScope(
+            leftTopPos,
+            colliderLeftTopPos,
+            colliderRightBottonPos
+          ) ||
+          ThreeMath.posInScope(
+            rightTopPos,
+            colliderLeftTopPos,
+            colliderRightBottonPos
+          ) ||
+          ThreeMath.posInScope(
+            leftBottonPos,
+            colliderLeftTopPos,
+            colliderRightBottonPos
+          ) ||
+          ThreeMath.posInScope(
+            rightBottonPos,
+            colliderLeftTopPos,
+            colliderRightBottonPos
+          )
         ) {
           return true;
         }
       }
-    });
+    }
     return false;
   }
 
@@ -235,22 +290,49 @@ export default class AStar {
    * @param node
    */
   isCollideWall(node: Node): boolean {
+    let leftTopPos = new Vector2(
+      node.pos.x - Confs.characterColliderSize / 2,
+      node.pos.y + Confs.characterColliderSize / 2
+    );
+    let rightTopPos = new Vector2(
+      node.pos.x + Confs.characterColliderSize / 2,
+      node.pos.y + Confs.characterColliderSize / 2
+    );
+    let leftBottonPos = new Vector2(
+      node.pos.x - Confs.characterColliderSize / 2,
+      node.pos.y - Confs.characterColliderSize / 2
+    );
+    let rightBottonPos = new Vector2(
+      node.pos.x + Confs.characterColliderSize / 2,
+      node.pos.y - Confs.characterColliderSize / 2
+    );
     let walls = this.map.walls;
-    walls.forEach((wall) => {
+
+    for (let wall of walls) {
+      let wallLeftTopPos = new Vector2(
+        wall.position.x - wall.width / 2,
+        wall.position.y + wall.height / 2
+      );
+
+      let wallRightBottonPos = new Vector2(
+        wall.position.x + wall.width / 2,
+        wall.position.y - wall.height / 2
+      );
       // 节点在墙内
       if (
-        (node.pos.x - Confs.characterColliderSize / 2 >=
-          wall.position.x - wall.width / 2 &&
-          node.pos.x + Confs.characterColliderSize / 2 <=
-          wall.position.x + wall.width / 2) ||
-        (node.pos.y - Confs.characterColliderSize / 2 >=
-          wall.position.y - wall.height / 2 &&
-          node.pos.y + Confs.characterColliderSize / 2 <=
-          wall.position.y + wall.height / 2)
+        ThreeMath.posInScope(node.pos, wallLeftTopPos, wallRightBottonPos) ||
+        ThreeMath.posInScope(leftTopPos, wallLeftTopPos, wallRightBottonPos) ||
+        ThreeMath.posInScope(rightTopPos, wallLeftTopPos, wallRightBottonPos) ||
+        ThreeMath.posInScope(
+          leftBottonPos,
+          wallLeftTopPos,
+          wallRightBottonPos
+        ) ||
+        ThreeMath.posInScope(rightBottonPos, wallLeftTopPos, wallRightBottonPos)
       ) {
         return true;
       }
-    });
+    }
     return false;
   }
 

@@ -4,6 +4,10 @@
     "y": 28,
     "z": 37.5
   },
+  "hpInfoOffsetPos":{
+    "x":-3.6,
+    "y":5.2
+  },
   "bulletHeight": 7,
   "bulletSize": 0.4,
   "characterColliderSize": 4

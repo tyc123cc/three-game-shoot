@@ -23,6 +23,7 @@ import PlayerBuilder from "@/ts/gameBuilder/playerBuilder";
 import EnemyBuilder from "@/ts/gameBuilder/enemyBuilder";
 import Confs from "@/ts/common/confs/confs";
 import ConfsVar from "@/ts/common/confs/confsVar";
+import ThreeMath from "@/ts/tool/threeMath";
 
 export default class ThreeJs extends BaseThree {
   start(): void {
@@ -120,6 +121,8 @@ export default class ThreeJs extends BaseThree {
     if (this.playerBuilder.characterHpInfo) {
       this.characterHpInfos.push(this.playerBuilder.characterHpInfo);
     }
+
+    //console.log(ThreeMath.posInScope(new THREE.Vector2(-20,20),new THREE.Vector2(-21,25),new THREE.Vector2(-19,-9)))
 
     for (let enemy of this.mapBuilder.Enemies) {
       this.enemyBuilders.push(
