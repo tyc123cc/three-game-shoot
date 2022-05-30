@@ -12,6 +12,7 @@ import {
 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import BaseThree from "../common/baseThree";
+import Confs from "../common/confs/confs";
 import { Heap } from "../common/heap";
 import Animation from "./animation";
 import { AniEffectScope, AniStatus } from "./enum";
@@ -90,6 +91,11 @@ export default class Character extends BaseThree {
    * 角色朝向点
    */
   public lookPoint: THREE.Vector3 = new Vector3()
+
+  /**
+   * 碰撞开关，若为false,则移动时不检测碰撞
+   */
+  public colliderSwitch: boolean = true;
 
   /**
    * 角色碰撞器
@@ -180,7 +186,7 @@ export default class Character extends BaseThree {
       // 方向向量乘以速度
       moveVec.multiplyScalar(this.moveSpeed)
 
-      if (this.intersect(moveVec)) {
+      if (this.colliderSwitch && this.intersect(moveVec)) {
         // console.log("碰撞")
         // 碰撞，停止移动
         this.targetPos = null;
@@ -223,7 +229,7 @@ export default class Character extends BaseThree {
     // 参数1：射线的起点
     // 参数2：射线的方向，注意归一化的时候，需要先克隆,否则后面会执行dir.length()计算向量长度结果是1
 
-    let rayLength = 2.0;
+    let rayLength = Confs.characterColliderSize / 2;
     let colliderScope = 1.0
     let directVec = dir.clone().normalize();
 

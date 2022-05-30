@@ -4,11 +4,15 @@
     "y": 28,
     "z": 37.5
   },
-  "hpInfoOffsetPos":{
-    "x":-3.6,
-    "y":5.2
+  "hpInfoOffsetPos": {
+    "x": -3.6,
+    "y": 5.2
   },
   "bulletHeight": 7,
   "bulletSize": 0.4,
-  "characterColliderSize": 4
+  "characterColliderSize": 4,
+  "forwardSpeed": 10,
+  "backSpeed": 5,
+  "bulletSpeed": 20,
+  "enemyRange": 20
 }

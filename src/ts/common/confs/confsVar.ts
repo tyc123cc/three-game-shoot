@@ -26,4 +26,24 @@ export default class ConfsVar {
    * 角色碰撞体的大小
    */
   public characterColliderSize: number = 0;
+
+  /**
+ * 前进速度
+ */
+  public forwardSpeed: number = 0;
+
+  /**
+    * 后退速度
+    */
+  public backSpeed: number = 0;
+
+  /**
+    * 子弹速度
+    */
+  public bulletSpeed: number = 0;
+
+  /**
+    * 敌人射程
+    */
+  public enemyRange: number = 0;
 }

@@ -27,6 +27,26 @@ export default class Confs {
   public static characterColliderSize: number;
 
   /**
+   * 前进速度
+   */
+  public static forwardSpeed: number;
+
+  /**
+    * 后退速度
+    */
+  public static backSpeed: number;
+
+  /**
+    * 子弹速度
+    */
+  public static bulletSpeed: number;
+
+  /**
+   * 敌人射程
+   */
+  public static enemyRange: number;
+
+  /**
    * 配置设置项
    */
   public static setting(confVars: ConfsVar) {
@@ -35,5 +55,9 @@ export default class Confs {
     this.bulletHeight = confVars.bulletHeight;
     this.bulletSize = confVars.bulletSize;
     this.characterColliderSize = confVars.characterColliderSize;
+    this.forwardSpeed = confVars.forwardSpeed;
+    this.backSpeed = confVars.backSpeed;
+    this.bulletSpeed = confVars.bulletSpeed;
+    this.enemyRange = confVars.enemyRange;
   }
 }

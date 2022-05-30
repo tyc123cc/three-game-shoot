@@ -97,7 +97,7 @@ export default class ThreeMath {
    * @returns 精细化后的值
    */
   public static toPrecision(number: number, percision: number): number {
-    return Math.floor(number * percision) / percision;
+    return Math.round((number + Number.EPSILON) * percision) / percision;
   }
 
   /**

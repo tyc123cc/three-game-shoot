@@ -17,7 +17,7 @@ export default class MapBuilder extends BaseThree {
 
   public playerInitPos: THREE.Vector3 = new THREE.Vector3();
 
-  public Enemies:Array<Enemies> = []
+  public enemies: Array<Enemies> = []
 
   constructor(map: Map, sceneRender: SceneRender) {
     super();
@@ -37,8 +37,8 @@ export default class MapBuilder extends BaseThree {
   /**
    * 设置敌人信息
    */
-  setEnemies(){
-    this.Enemies = this.map.enemies;
+  setEnemies() {
+    this.enemies = this.map.enemies;
   }
 
 
@@ -166,5 +166,5 @@ export default class MapBuilder extends BaseThree {
     walls.name = "walls";
     this.sceneRender.add(walls);
   }
-  update(): void {}
+  update(): void { }
 }

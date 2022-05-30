@@ -2,7 +2,7 @@ import * as THREE from "three";
 import AnimationInput from "../apis/animationInput";
 import Character from "../apis/character";
 import CharacterHpInfo from "../apis/characterHpInfo";
-import { AniEffectScope } from "../apis/enum";
+import { AniEffectScope, CharacterStatus } from "../apis/enum";
 import bulletBufferPool from "../bullet/bulletBufferPool";
 import BaseThree from "../common/baseThree";
 import Confs from "../common/confs/confs";
@@ -79,8 +79,10 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
 
   update() {
     super.update();
-    this.updateLookPoint();
-    this.updatePlayerStatus();
+    if (this.characterStatus == CharacterStatus.Alive) {
+      this.updateLookPoint();
+      this.updatePlayerStatus();
+    }
   }
 
   /**
@@ -185,10 +187,10 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     if (this.player && this.player.character && this.player.character.group) {
       if (angle <= 90) {
         this.player.character.play("run");
-        return 10 * this.deltaTime;
+        return Confs.forwardSpeed * this.deltaTime;
       } else {
         this.player.character.play("back");
-        return 5 * this.deltaTime;
+        return Confs.backSpeed * this.deltaTime;
       }
     }
 

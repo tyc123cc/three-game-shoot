@@ -213,6 +213,8 @@ export default class PlayerAndEnemyCommonBuilder extends BaseThree {
         this.characterBuilder.character.play("dying");
         // 将角色状态设置为死亡
         this.characterStatus = CharacterStatus.Death;
+        // 角色停止前进
+        this.characterBuilder.character.targetPos = null;
         // 移除碰撞体
         this.characterBuilder.removeCollider();
       }
@@ -260,7 +262,7 @@ export default class PlayerAndEnemyCommonBuilder extends BaseThree {
    */
   fire() {
     if (this.characterBuilder?.character?.group && this.sceneRender) {
-      // 点击鼠标发射子弹
+      // 播放射击动画
       this.characterBuilder?.character?.play("hit");
       // 调整子弹初始位置，使子弹往人物前方移一点 公式：人物位置+人物面朝方向向量*偏移值
       let initPos = this.characterBuilder?.character?.group?.position
@@ -277,7 +279,7 @@ export default class PlayerAndEnemyCommonBuilder extends BaseThree {
         this.characterBuilder.character.lookPoint
           .clone()
           .sub(this.characterBuilder.character.group.position),
-        15
+        Confs.bulletSpeed
       );
     }
   }

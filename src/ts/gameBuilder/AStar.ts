@@ -62,6 +62,10 @@ export default class AStar {
     let startNode = this.getNode(startPos, endPos, nodes);
     // 目标节点
     let targetNode = this.getNode(endPos, endPos, nodes);
+    // 初始节点与目标节点相同，无需寻路
+    if (startNode.equals(targetNode)) {
+      return [];
+    }
     // closeList中先放入初始节点
     //closeList.push(startNode);
     // openList中加入初始节点
@@ -83,7 +87,7 @@ export default class AStar {
   /**
    * A*寻路算法
    */
-  AStarWayFind(
+  private AStarWayFind(
     openList: Node[],
     closeList: Node[],
     targetNode: Node,
@@ -231,9 +235,6 @@ export default class AStar {
       node.pos.x + Confs.characterColliderSize / 2,
       node.pos.y - Confs.characterColliderSize / 2
     );
-    if(node.pos.x == 40){
-      //debugger
-    }
     for (let collider of this.colliderList) {
       // 角色碰撞体
       if (

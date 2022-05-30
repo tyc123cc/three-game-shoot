@@ -124,10 +124,11 @@ export default class ThreeJs extends BaseThree {
 
     //console.log(ThreeMath.posInScope(new THREE.Vector2(-20,20),new THREE.Vector2(-21,25),new THREE.Vector2(-19,-9)))
 
-    for (let enemy of this.mapBuilder.Enemies) {
+    for (let enemy of this.mapBuilder.enemies) {
       this.enemyBuilders.push(
         new EnemyBuilder(
           enemy.name,
+          this.playerBuilder,
           this.sceneRender,
           this.camera,
           this.bulletPool,
