@@ -184,7 +184,7 @@ export default class Character extends BaseThree {
       // 角色移动前坐标
       let originPostion = this.group.position;
       // 方向向量乘以速度
-      moveVec.multiplyScalar(this.moveSpeed)
+      moveVec.multiplyScalar(this.moveSpeed * this.deltaTime)
 
       if (this.colliderSwitch && this.intersect(moveVec)) {
         // console.log("碰撞")

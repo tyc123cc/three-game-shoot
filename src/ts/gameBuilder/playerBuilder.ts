@@ -187,10 +187,10 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     if (this.player && this.player.character && this.player.character.group) {
       if (angle <= 90) {
         this.player.character.play("run");
-        return Confs.forwardSpeed * this.deltaTime;
+        return Confs.forwardSpeed;
       } else {
         this.player.character.play("back");
-        return Confs.backSpeed * this.deltaTime;
+        return Confs.backSpeed;
       }
     }
 

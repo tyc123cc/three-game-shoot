@@ -76,7 +76,6 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
     super.start();
   }
 
-
   update() {
     super.update();
     if (this.characterStatus == CharacterStatus.Alive) {
@@ -85,6 +84,7 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
       if (!isShoot) {
         // 不可射击时进行寻路操作
         this.navi();
+
       }
     }
 
@@ -185,14 +185,12 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
    */
   navi() {
     if (this.enemy?.character?.group && this.navigation) {
-      //console.log(this.enemy?.character.targetPos)
       if ((!this.enemy.character.targetPos || (this.enemy.character.targetPos &&
         this.enemy.character.targetPos.distanceTo(this.enemy.character.group.position) < 0.2))) {
-
         let naviPath = this.navigation?.builder();
         // 可能出现下一节点坐标与当前坐标过于接近，此时不更新角色朝向，避免出现闪顿现象
         if (naviPath.length > 0 && naviPath[0].distanceTo(this.enemy.character.group.position) >= 0.2) {
-          this.enemy?.moveTo(naviPath[0], Confs.backSpeed * this.deltaTime);
+          this.enemy?.moveTo(naviPath[0], Confs.backSpeed);
           // 使用gsap做补间动画，使转向动作连贯
           let originPos = { x: this.lookPoint.x, y: this.lookPoint.y, z: this.lookPoint.z }
           // 先杀死之前如果未做完的动画，避免出现两个动画同时渲染导致闪屏现象
@@ -206,8 +204,6 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
             }
           });
           this.lookPoint = naviPath[0];
-
-
         }
       }
     }
