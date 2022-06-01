@@ -47,6 +47,31 @@ export default class Confs {
   public static enemyRange: number;
 
   /**
+   * 敌人设计冷却时间
+   */
+  public static enemyShootCD:number;
+
+  /**
+   * 敌人复活时间
+   */
+  public static enemyRebirthTime:number;
+
+  /**
+   * 玩家复活时间
+   */
+  public static playerRebirthTime:number;
+
+  /**
+   * 敌人子弹威力
+   */
+  public static enemyBulletPower:number;
+
+  /**
+   * 玩家子弹威力
+   */
+  public static playerBulletPower:number;
+
+  /**
    * 配置设置项
    */
   public static setting(confVars: ConfsVar) {
@@ -59,5 +84,10 @@ export default class Confs {
     this.backSpeed = confVars.backSpeed;
     this.bulletSpeed = confVars.bulletSpeed;
     this.enemyRange = confVars.enemyRange;
+    this.enemyShootCD = confVars.enemyShootCD;
+    this.enemyRebirthTime = confVars.enemyRebirthTime;
+    this.playerRebirthTime = confVars.playerRebirthTime;
+    this.enemyBulletPower = confVars.enemyBulletPower;
+    this.playerBulletPower = confVars.playerBulletPower;
   }
 }

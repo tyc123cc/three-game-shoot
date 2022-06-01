@@ -1,10 +1,8 @@
 import * as THREE from "three";
-import AnimationInput from "../apis/animationInput";
 import Character from "../apis/character";
 import CharacterHpInfo from "../apis/characterHpInfo";
 import { AniEffectScope, CharacterStatus } from "../apis/enum";
 import bulletBufferPool from "../bullet/bulletBufferPool";
-import BaseThree from "../common/baseThree";
 import Confs from "../common/confs/confs";
 import SceneRender from "../scene/sceneRender";
 import ThreeMath from "../tool/threeMath";
@@ -47,6 +45,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       bulletPool,
       initPos
     );
+    this.rebirthTime = Confs.playerRebirthTime;
     this.enable();
   }
 
@@ -274,7 +273,9 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * @param event
    */
   onDocumentMouseClick(event: MouseEvent) {
-    this.fire();
+    if(this.characterStatus == CharacterStatus.Alive){
+      this.fire();
+    }
   }
 
   /**

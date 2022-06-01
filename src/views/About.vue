@@ -22,6 +22,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { Vector2 } from "three";
 import CharacterHpInfo from "@/ts/apis/characterHpInfo";
+import { Loading } from 'element-ui';
 @Component({
   components: {
     Blood,
@@ -36,9 +37,8 @@ export default class About extends Vue {
     this.three = new ThreeJs();
     this.characterHpInfosMap = this.three.characterHpInfoMap;
     this.characterHpInfos = this.three.characterHpInfos;
-    // this.three.characterHpInfoMap.forEach((value, key, map) => {
-    //   this.characterHpInfos.push(value);
-    // });
+    //let options = {fullscreen:true,text:"正在拼命加载"}
+    //Loading.service(options);
   }
   onDocumentMouseDown(event: MouseEvent) {
     if (this.three) {

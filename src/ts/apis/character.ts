@@ -230,7 +230,7 @@ export default class Character extends BaseThree {
     // 参数2：射线的方向，注意归一化的时候，需要先克隆,否则后面会执行dir.length()计算向量长度结果是1
 
     let rayLength = Confs.characterColliderSize / 2;
-    let colliderScope = 1.0
+    let colliderScope = 100 * this.deltaTime;
     let directVec = dir.clone().normalize();
 
     let originPos = new Vector3(this.group.position.x, this.group.position.y, this.group.position.z)

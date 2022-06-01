@@ -52,7 +52,6 @@ export default class ThreeJs extends BaseThree {
 
   characterHpInfos: CharacterHpInfo[] = [];
 
-  bulletPool: bulletBufferPool | null = null;
 
   playerBuilder: PlayerBuilder | null = null;
 
@@ -104,18 +103,28 @@ export default class ThreeJs extends BaseThree {
       this.mapBuilder.playerInitPos.z + Confs.cameraOffsetPos.z
     );
 
-    this.bulletPool = new bulletBufferPool(
+    // 玩家子弹缓冲池
+    let playerBulletPool = new bulletBufferPool(
       10,
       Confs.bulletSize,
       "red",
+      Confs.playerBulletPower,
+      this.sceneRender
+    );
+
+    // 敌人子弹缓冲池
+    let enemyBulletPool = new bulletBufferPool(
       10,
+      Confs.bulletSize,
+      "blue",
+      Confs.enemyBulletPower,
       this.sceneRender
     );
 
     this.playerBuilder = new PlayerBuilder(
       this.sceneRender,
       this.camera,
-      this.bulletPool,
+      playerBulletPool,
       this.mapBuilder.playerInitPos
     );
     if (this.playerBuilder.characterHpInfo) {
@@ -131,7 +140,7 @@ export default class ThreeJs extends BaseThree {
           this.playerBuilder,
           this.sceneRender,
           this.camera,
-          this.bulletPool,
+          enemyBulletPool,
           this.mapBuilder,
           new THREE.Vector3(enemy.initPos.x, 0, enemy.initPos.y)
         )

@@ -14,5 +14,11 @@
   "forwardSpeed": 10,
   "backSpeed": 5,
   "bulletSpeed": 20,
-  "enemyRange": 20
+  "enemyRange": 20,
+  "enemyShootCD":1,
+  "enemyRebirthTime":10,
+  "playerRebirthTime":5,
+  "enemyBulletPower":10,
+  "playerBulletPower":20
+
 }

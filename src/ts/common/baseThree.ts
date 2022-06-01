@@ -4,7 +4,6 @@ import { Clock } from "three";
  * 公共方法
  */
 export default abstract class BaseThree {
-
   // 创建一个时钟对象Clock
   private clock: Clock = new Clock();
 
@@ -30,8 +29,11 @@ export default abstract class BaseThree {
     requestAnimationFrame(this.ani.bind(this));
     // 更新每帧时间
     this.deltaTime = this.clock.getDelta();
-    // update主方法
-    this.update();
+    // 10帧以下不执行update
+    if (this.deltaTime < 0.1) {
+      // update主方法
+      this.update();
+    }
   }
   /**
    * 每帧都会调用该方法

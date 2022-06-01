@@ -214,7 +214,7 @@ export default class PlayerAndEnemyCommonBuilder extends BaseThree {
         // 将角色状态设置为死亡
         this.characterStatus = CharacterStatus.Death;
         // 角色停止前进
-        this.characterBuilder.character.targetPos = null;
+        this.characterBuilder.moveStop();
         // 移除碰撞体
         this.characterBuilder.removeCollider();
       }

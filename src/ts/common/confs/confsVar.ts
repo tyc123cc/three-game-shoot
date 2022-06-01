@@ -28,22 +28,47 @@ export default class ConfsVar {
   public characterColliderSize: number = 0;
 
   /**
- * 前进速度
- */
+   * 前进速度
+   */
   public forwardSpeed: number = 0;
 
   /**
-    * 后退速度
-    */
+   * 后退速度
+   */
   public backSpeed: number = 0;
 
   /**
-    * 子弹速度
-    */
+   * 子弹速度
+   */
   public bulletSpeed: number = 0;
 
   /**
-    * 敌人射程
-    */
+   * 敌人射程
+   */
   public enemyRange: number = 0;
+
+  /**
+   * 敌人设计冷却时间
+   */
+  public enemyShootCD: number = 0;
+
+  /**
+   * 敌人复活时间
+   */
+  public enemyRebirthTime: number = 0;
+
+  /**
+   * 玩家复活时间
+   */
+  public playerRebirthTime: number = 0;
+
+  /**
+   * 敌人子弹威力
+   */
+  public enemyBulletPower: number = 0;
+
+  /**
+   * 玩家子弹威力
+   */
+  public playerBulletPower: number = 0;
 }
