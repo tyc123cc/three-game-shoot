@@ -10,6 +10,7 @@ import CharacterBuilder from "./characterBuilder";
 import PlayerAndEnemyCommonBuilder from "./playerAndEnemyCommonBuilder";
 
 export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
+
   player: CharacterBuilder | null = null;
   mousePoint: THREE.Vector2 = new THREE.Vector2();
 
@@ -74,6 +75,11 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     document.addEventListener("click", (ev) => {
       this.onDocumentMouseClick(ev);
     });
+
+    // 添加自定义事件获得道具，用于获得道具后角色的状态变化
+    document.addEventListener("getItem", (e: Event) => {
+      this.getItem(e as CustomEvent);
+    });
   }
 
   update() {
@@ -82,6 +88,12 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       this.updateLookPoint();
       this.updatePlayerStatus();
     }
+  }
+
+  /**
+   * 角色死亡抽象函数
+   */
+  death(): void {
   }
 
   /**
@@ -273,7 +285,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * @param event
    */
   onDocumentMouseClick(event: MouseEvent) {
-    if(this.characterStatus == CharacterStatus.Alive){
+    if (this.characterStatus == CharacterStatus.Alive) {
       this.fire();
     }
   }
@@ -326,5 +338,13 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       // 松开a
       this.onLeftKeyDown = false;
     }
+  }
+
+  /**
+   * 获得道具时的事件
+   * @param e 
+   */
+  getItem(e: CustomEvent) {
+    this.characterBuilder?.character?.cure(Confs.itemAddHP)
   }
 }

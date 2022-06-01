@@ -13,7 +13,7 @@ import CharacterBuilder from "./characterBuilder";
 /**
  *
  */
-export default class PlayerAndEnemyCommonBuilder extends BaseThree {
+export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
   characterBuilder: CharacterBuilder | null = null;
   sceneRender: SceneRender;
   collider: THREE.Mesh | null = null;
@@ -217,11 +217,18 @@ export default class PlayerAndEnemyCommonBuilder extends BaseThree {
         this.characterBuilder.moveStop();
         // 移除碰撞体
         this.characterBuilder.removeCollider();
+        // 执行角色死亡函数
+        this.death();
       }
       // 更新血量条信息
       this.updateCharacterHPInfo(this.characterBuilder.character);
     }
   }
+
+  /**
+   * 角色死亡抽象函数
+   */
+  abstract death(): void;
 
   /**
    * 更新血量条信息

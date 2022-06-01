@@ -7,6 +7,7 @@ import { AniEffectScope, CharacterStatus } from "../apis/enum";
 import bulletBufferPool from "../bullet/bulletBufferPool";
 import BaseThree from "../common/baseThree";
 import Confs from "../common/confs/confs";
+import ItemBufferPoll from "../item/itemBufferPool";
 import SceneRender from "../scene/sceneRender";
 import ThreeMath from "../tool/threeMath";
 import AStar from "./AStar";
@@ -15,6 +16,7 @@ import MapBuilder from "./mapBuilder";
 import PlayerAndEnemyCommonBuilder from "./playerAndEnemyCommonBuilder";
 
 export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
+
   enemy: CharacterBuilder | null = null;
   collider: THREE.Mesh | null = null;
   mousePoint: THREE.Vector2 = new THREE.Vector2();
@@ -40,6 +42,8 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
 
   navigation: AStar | null = null;
 
+  public itemBufferPool: ItemBufferPoll;
+
   constructor(
     name: string,
     target: PlayerAndEnemyCommonBuilder,
@@ -47,6 +51,7 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
     camera: THREE.Camera,
     bulletPool: bulletBufferPool,
     mapBuilder: MapBuilder,
+    itemBufferPool: ItemBufferPoll,
     initPos?: THREE.Vector3
   ) {
     super(
@@ -80,11 +85,22 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
     this.mapBuilder = mapBuilder;
     this.target = target;
     this.rebirthTime = Confs.enemyRebirthTime;
+    this.itemBufferPool = itemBufferPool;
     this.enable();
   }
 
   start() {
     super.start();
+  }
+
+  /**
+   * 角色死亡后进行的操作
+   */
+  death(): void {
+    if (this.characterBuilder?.character?.group) {
+      // 敌人死亡后生成道具
+      this.itemBufferPool.generateItem(this.characterBuilder.character.group.position)
+    }
   }
 
   update() {
@@ -133,7 +149,7 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
       return true;
     }
     // 正在进行射击CD，不进行射击，返回TRUE使其也不寻路
-    else if(this.shootCDTime > 0){
+    else if (this.shootCDTime > 0) {
       //this.characterBuilder?.play("idle");
       return true;
     }
