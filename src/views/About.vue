@@ -10,6 +10,7 @@
       :posY="character.screenPos.y"
     ></blood>
     <rebirth-time
+    class="rebirthTime"
       :nowRebirthTime="nowRebirthTime"
       :rebirthTime="rebirthTime"
       :originPosY="rebirthTimeOriginY"
@@ -40,11 +41,13 @@ export default class About extends Vue {
 
   mounted() {
     this.three = new ThreeJs();
+   
     //let options = {fullscreen:true,text:"正在拼命加载"}
     //Loading.service(options);
   }
 
   get characterHpInfos() {
+    console.log(this.three?.characterHpInfos)
     return this.three?.characterHpInfos;
   }
 
@@ -95,5 +98,7 @@ export default class About extends Vue {
 #threeCanvas {
   height: 720px;
   width: 100%;
+  overflow:hidden
 }
+
 </style>

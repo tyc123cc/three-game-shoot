@@ -117,6 +117,7 @@ export default class SceneRender extends BaseThree {
     }
     this.renderer.setClearColor(0x000000, 1); //设置背景颜色
     this.renderer.domElement.id = "threeCanvas";
+    this.renderer.domElement.className = "threeCanvasRender";
     //这里 其实就是canvas 画布  renderer.domElement
     if (this.container instanceof HTMLElement) {
       this.container.appendChild(this.renderer.domElement);
@@ -128,7 +129,6 @@ export default class SceneRender extends BaseThree {
       // this.controls.target.set(0, 100, 0);
       this.controls.update();
     }
-
     // 设置axesHelper
     // 辅助坐标系  参数250表示坐标系大小，可以根据场景大小去设置
     var axisHelper = new THREE.AxesHelper(1000);
