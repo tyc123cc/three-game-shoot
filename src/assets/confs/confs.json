@@ -18,7 +18,7 @@
   "enemyShootCD":1,
   "enemyRebirthTime":10,
   "playerRebirthTime":5,
-  "enemyBulletPower":10,
+  "enemyBulletPower":100,
   "playerBulletPower":20
 
 }

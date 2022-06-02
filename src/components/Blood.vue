@@ -39,7 +39,7 @@ export default class Blood extends Vue {
   }
 }
 </script>
-<style>
+<style scoped>
 .el-progress {
   width: 100px;
   position: absolute;
