@@ -174,6 +174,17 @@ export default class Character extends BaseThree {
   }
 
   /**
+   * 角色受到治疗
+   * @param hp 治疗的血量
+   */
+  cure(hp: number) {
+    this.hp += hp;
+    if (this.hp > this.maxHp) {
+      this.hp = this.maxHp
+    }
+  }
+
+  /**
    * 角色移动函数
    */
   private move() {
@@ -248,56 +259,37 @@ export default class Character extends BaseThree {
     let originPos4 = new Vector3(this.group.position.x - rayLength, this.group.position.y, this.group.position.z - rayLength)
     var raycaster4 = new Raycaster(originPos4, directVec, 0, colliderScope);
 
-    // 计算射线和参数1中的模型对象是否相交，参数1数组中可以设置多个模型模型对象，下面参数只设置了立方体网格模型
-    var intersects = raycaster.intersectObjects(this.colliderMeshList);
-    for (let intersect of intersects) {
-      if (intersect.distance < rayLength + colliderScope) {
-        //中心点
-        return true;
-      }
+    //循环遍历几何体顶点，每一个顶点都要创建一个射线，进行一次交叉拾取计算，只要有一个满足上面的距离条件，就发生了碰撞
+    if (this.checkIntersect(raycaster, colliderScope) ||
+      this.checkIntersect(raycaster1, colliderScope) ||
+      this.checkIntersect(raycaster2, colliderScope) ||
+      this.checkIntersect(raycaster3, colliderScope) ||
+      this.checkIntersect(raycaster4, colliderScope)) {
+      return true;
     }
 
+    return false;
+  }
 
-    // 计算射线和参数1中的模型对象是否相交，参数1数组中可以设置多个模型模型对象，下面参数只设置了立方体网格模型
-    var intersects = raycaster1.intersectObjects(this.colliderMeshList);
-    for (let intersect of intersects) {
-      if (intersect.distance < colliderScope) {
-        //循环遍历几何体顶点，每一个顶点都要创建一个射线，进行一次交叉拾取计算，只要有一个满足上面的距离条件，就发生了碰撞
-        // console.log(intersect.point, intersect.distance, dir.length())
-        return true;
-      }
-    }
-
-    // 计算射线和参数1中的模型对象是否相交，参数1数组中可以设置多个模型模型对象，下面参数只设置了立方体网格模型
-    var intersects = raycaster2.intersectObjects(this.colliderMeshList);
+  checkIntersect(raycaster: THREE.Raycaster, colliderScope: number): Boolean {
+    let intersects = raycaster.intersectObjects(this.colliderMeshList);
     for (let intersect of intersects) {
       if (intersect.distance < colliderScope) {
-        //循环遍历几何体顶点，每一个顶点都要创建一个射线，进行一次交叉拾取计算，只要有一个满足上面的距离条件，就发生了碰撞
-        // console.log(intersect.point, intersect.distance, dir.length())
+        // 接触到道具
+        if (intersect.object.name.startsWith("item")) {
+          // 接触到道具,触发事件
+          const sendEvent = new CustomEvent("getItem", {
+            detail: {
+              name: intersect.object.name
+            },
+          });
+          // 发送事件
+          document.dispatchEvent(sendEvent)
+        }
+
         return true;
       }
     }
-
-    // 计算射线和参数1中的模型对象是否相交，参数1数组中可以设置多个模型模型对象，下面参数只设置了立方体网格模型
-    var intersects = raycaster3.intersectObjects(this.colliderMeshList);
-    for (let intersect of intersects) {
-      if (intersect.distance < colliderScope) {
-        //循环遍历几何体顶点，每一个顶点都要创建一个射线，进行一次交叉拾取计算，只要有一个满足上面的距离条件，就发生了碰撞
-        // console.log(intersect.point, intersect.distance, dir.length())
-        return true;
-      }
-    }
-
-    // 计算射线和参数1中的模型对象是否相交，参数1数组中可以设置多个模型模型对象，下面参数只设置了立方体网格模型
-    var intersects = raycaster4.intersectObjects(this.colliderMeshList);
-    for (let intersect of intersects) {
-      if (intersect.distance < colliderScope) {
-        //循环遍历几何体顶点，每一个顶点都要创建一个射线，进行一次交叉拾取计算，只要有一个满足上面的距离条件，就发生了碰撞
-        // console.log(intersect.point, intersect.distance, dir.length())
-        return true;
-      }
-    }
-
     return false;
   }
 

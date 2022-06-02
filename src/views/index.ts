@@ -24,6 +24,8 @@ import EnemyBuilder from "@/ts/gameBuilder/enemyBuilder";
 import Confs from "@/ts/common/confs/confs";
 import ConfsVar from "@/ts/common/confs/confsVar";
 import ThreeMath from "@/ts/tool/threeMath";
+import Item from "@/ts/item/item";
+import ItemBufferPoll from "@/ts/item/itemBufferPool";
 
 export default class ThreeJs extends BaseThree {
   start(): void {
@@ -132,6 +134,7 @@ export default class ThreeJs extends BaseThree {
     }
 
     //console.log(ThreeMath.posInScope(new THREE.Vector2(-20,20),new THREE.Vector2(-21,25),new THREE.Vector2(-19,-9)))
+    let itemBufferPool = new ItemBufferPoll(2, Confs.itemSize, "/img/item.png", Confs.itemHeight, this.sceneRender)
 
     for (let enemy of this.mapBuilder.enemies) {
       this.enemyBuilders.push(
@@ -142,6 +145,7 @@ export default class ThreeJs extends BaseThree {
           this.camera,
           enemyBulletPool,
           this.mapBuilder,
+          itemBufferPool,
           new THREE.Vector3(enemy.initPos.x, 0, enemy.initPos.y)
         )
       );

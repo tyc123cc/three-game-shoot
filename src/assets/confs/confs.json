@@ -15,10 +15,14 @@
   "backSpeed": 5,
   "bulletSpeed": 20,
   "enemyRange": 20,
-  "enemyShootCD":1,
-  "enemyRebirthTime":10,
-  "playerRebirthTime":5,
-  "enemyBulletPower":100,
-  "playerBulletPower":20
-
+  "enemyShootCD": 1,
+  "enemyRebirthTime": 10,
+  "playerRebirthTime": 5,
+  "enemyBulletPower": 100,
+  "playerBulletPower": 20,
+  "itemSize": 3,
+  "itemRotateSpeed": 1,
+  "itemMoveSpeed": 1,
+  "itemHeight": 1,
+  "itemAddHP": 10
 }

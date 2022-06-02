@@ -40,11 +40,12 @@ export default class RebirthTime extends Vue {
   }
 
   get percentage(){
-      if(this.rebirthTime == 0){
+      if(this.rebirthTime <= 1){
           return 0;
       }
+      let rate = this.rebirthTime / (this.rebirthTime - 1);
      // console.log(this.nowRebirthTime)
-      let percentage:number = (this.rebirthTime - this.nowRebirthTime) / this.rebirthTime * 100
+      let percentage:number = (this.rebirthTime - this.nowRebirthTime) / this.rebirthTime * 100 / rate
       //console.log(percentage)
       return percentage
   }

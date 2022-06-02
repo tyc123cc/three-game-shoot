@@ -71,4 +71,29 @@ export default class ConfsVar {
    * 玩家子弹威力
    */
   public playerBulletPower: number = 0;
+
+  /**
+ * 道具大小
+ */
+  public itemSize: number = 0;
+
+  /**
+ * 道具自旋转速度
+ */
+  public itemRotateSpeed: number = 0;
+
+  /**
+   * 道具上下移动速度
+   */
+  public itemMoveSpeed: number = 0;
+
+  /**
+   * 道具离地高度
+   */
+  public itemHeight: number = 0;
+
+  /**
+ * 获得道具后的加血值
+ */
+  public itemAddHP: number = 0;
 }

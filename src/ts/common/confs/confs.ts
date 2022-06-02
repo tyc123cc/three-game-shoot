@@ -49,27 +49,53 @@ export default class Confs {
   /**
    * 敌人设计冷却时间
    */
-  public static enemyShootCD:number;
+  public static enemyShootCD: number;
 
   /**
    * 敌人复活时间
    */
-  public static enemyRebirthTime:number;
+  public static enemyRebirthTime: number;
 
   /**
    * 玩家复活时间
    */
-  public static playerRebirthTime:number;
+  public static playerRebirthTime: number;
 
   /**
    * 敌人子弹威力
    */
-  public static enemyBulletPower:number;
+  public static enemyBulletPower: number;
 
   /**
    * 玩家子弹威力
    */
-  public static playerBulletPower:number;
+  public static playerBulletPower: number;
+
+  /**
+   * 道具大小
+   */
+  public static itemSize: number;
+
+  /**
+ * 道具自旋转速度
+ */
+  public static itemRotateSpeed: number;
+
+
+  /**
+   * 道具上下移动速度
+   */
+  public static itemMoveSpeed: number;
+
+  /**
+   * 道具离地高度
+   */
+  public static itemHeight: number;
+
+  /**
+   * 获得道具后的加血值
+   */
+  public static itemAddHP: number;
 
   /**
    * 配置设置项
@@ -89,5 +115,10 @@ export default class Confs {
     this.playerRebirthTime = confVars.playerRebirthTime;
     this.enemyBulletPower = confVars.enemyBulletPower;
     this.playerBulletPower = confVars.playerBulletPower;
+    this.itemSize = confVars.itemSize;
+    this.itemRotateSpeed = confVars.itemRotateSpeed;
+    this.itemMoveSpeed = confVars.itemMoveSpeed;
+    this.itemHeight = confVars.itemHeight;
+    this.itemAddHP = confVars.itemAddHP;
   }
 }
