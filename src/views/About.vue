@@ -9,31 +9,30 @@
       :posX="character.screenPos.x"
       :posY="character.screenPos.y"
     ></blood>
-    <rebirth-time
+    <rebirth-time-process
     class="rebirthTime"
       :nowRebirthTime="nowRebirthTime"
       :rebirthTime="rebirthTime"
-      :originPosY="rebirthTimeOriginY"
-    ></rebirth-time>
+      :originPosY="originY"
+    ></rebirth-time-process>
+  <game-process :originPosY="originY"></game-process>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import ThreeJs from "./index";
-import * as THREE from "three";
 import Blood from "@/components/Blood.vue";
-import RebirthTime from "@/components/RebirthTime.vue";
+import RebirthTimeProcess from "@/components/RebirthTimeProcess.vue";
+import GameProcess from "@/components/GameProcess.vue"
 
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { Vector2 } from "three";
-import CharacterHpInfo from "@/ts/apis/characterHpInfo";
-import { Loading } from "element-ui";
+
 @Component({
   components: {
     Blood,
-    RebirthTime,
+    RebirthTimeProcess,
+    GameProcess
   },
 })
 export default class About extends Vue {
@@ -47,7 +46,6 @@ export default class About extends Vue {
   }
 
   get characterHpInfos() {
-    console.log(this.three?.characterHpInfos)
     return this.three?.characterHpInfos;
   }
 
@@ -65,7 +63,7 @@ export default class About extends Vue {
     return this.three.playerBuilder.rebirthTime;
   }
 
-  get rebirthTimeOriginY() {
+  get originY() {
     if (!this.three?.sceneRender?.renderer) {
       return -1000;
     }
@@ -91,6 +89,7 @@ export default class About extends Vue {
     }
     return false;
   }
+
 }
 </script>
 
@@ -98,7 +97,16 @@ export default class About extends Vue {
 #threeCanvas {
   height: 720px;
   width: 100%;
-  overflow:hidden
+  overflow:hidden;
 }
+
+.gameProcess{
+  position:absolute;
+  right:120px;
+  color:white;
+  font-size: 25px;
+}
+
+
 
 </style>
