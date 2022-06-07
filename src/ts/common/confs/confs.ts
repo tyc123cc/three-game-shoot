@@ -4,17 +4,17 @@ export default class Confs {
   /**
    * store方法重置进度
    */
-  public static STORE_RESETPROCESS = "resetProcess";
+  public static readonly STORE_RESETPROCESS = "resetProcess";
 
   /**
    * store方法玩家死亡
    */
-  public static STORE_DEATH = "death";
+  public static readonly STORE_DEATH = "death";
 
   /**
    * store方法增加进度
    */
-  public static STORE_ADDPROCESS = "addProcess";
+  public static readonly STORE_ADDPROCESS = "addProcess";
 
   /**
    * 摄像机偏移量
