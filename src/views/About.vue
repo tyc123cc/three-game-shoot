@@ -102,7 +102,7 @@ export default class About extends Vue {
 
 .gameProcess{
   position:absolute;
-  right:120px;
+  right:80px;
   color:white;
   font-size: 25px;
 }

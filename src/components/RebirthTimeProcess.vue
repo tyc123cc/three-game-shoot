@@ -114,6 +114,7 @@ export default class RebirthTimeProcess extends Vue {
   height: 120px;
   margin: auto;
   position: absolute;
+  user-select: none;
 }
 
 .text {

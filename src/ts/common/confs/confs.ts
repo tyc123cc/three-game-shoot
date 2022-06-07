@@ -2,6 +2,21 @@ import ConfsVar from "./confsVar";
 
 export default class Confs {
   /**
+   * store方法重置进度
+   */
+  public static STORE_RESETPROCESS = "resetProcess";
+
+  /**
+   * store方法玩家死亡
+   */
+  public static STORE_DEATH = "death";
+
+  /**
+   * store方法增加进度
+   */
+  public static STORE_ADDPROCESS = "addProcess";
+
+  /**
    * 摄像机偏移量
    */
   public static cameraOffsetPos: THREE.Vector3;
@@ -32,13 +47,13 @@ export default class Confs {
   public static forwardSpeed: number;
 
   /**
-    * 后退速度
-    */
+   * 后退速度
+   */
   public static backSpeed: number;
 
   /**
-    * 子弹速度
-    */
+   * 子弹速度
+   */
   public static bulletSpeed: number;
 
   /**
@@ -77,10 +92,9 @@ export default class Confs {
   public static itemSize: number;
 
   /**
- * 道具自旋转速度
- */
+   * 道具自旋转速度
+   */
   public static itemRotateSpeed: number;
-
 
   /**
    * 道具上下移动速度

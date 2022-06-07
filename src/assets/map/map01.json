@@ -1,6 +1,8 @@
 {
   "width": 100,
   "height": 50,
+  "targetProcess":3,
+  "life":3,
   "initPos": {
     "x": 45,
     "y": -20

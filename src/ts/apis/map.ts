@@ -8,6 +8,16 @@ export default class Map {
 
   public enemies:Array<Enemies> = [];
 
+  /**
+   * 通关需要进度
+   */
+  public targetProcess:number = 0;
+
+  /**
+   * 玩家初始生命
+   */
+  public life:number = 0;
+
 }
 
 export class Enemies{

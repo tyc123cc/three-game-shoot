@@ -1,3 +1,4 @@
+import store from "@/store";
 import * as THREE from "three";
 import Character from "../apis/character";
 import CharacterHpInfo from "../apis/characterHpInfo";
@@ -10,7 +11,6 @@ import CharacterBuilder from "./characterBuilder";
 import PlayerAndEnemyCommonBuilder from "./playerAndEnemyCommonBuilder";
 
 export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
-
   player: CharacterBuilder | null = null;
   mousePoint: THREE.Vector2 = new THREE.Vector2();
 
@@ -94,6 +94,8 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * 角色死亡抽象函数
    */
   death(): void {
+    // 玩家死亡，生命减一
+    store.commit(Confs.STORE_DEATH);
   }
 
   /**
@@ -342,9 +344,11 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
 
   /**
    * 获得道具时的事件
-   * @param e 
+   * @param e
    */
   getItem(e: CustomEvent) {
-    this.characterBuilder?.character?.cure(Confs.itemAddHP)
+    this.characterBuilder?.character?.cure(Confs.itemAddHP);
+    // 获得道具，游戏进度加一
+    store.commit(Confs.STORE_ADDPROCESS);
   }
 }

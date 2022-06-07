@@ -1,11 +1,5 @@
 import * as THREE from "three";
-import {
-  BoxBufferGeometry,
-  Camera,
-  SkinnedMesh,
-  Texture,
-  Vector3,
-} from "three";
+import store from "@/store";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import BaseThree from "@/ts/common/baseThree";
 import SceneRender from "@/ts/scene/sceneRender";
@@ -31,7 +25,7 @@ export default class ThreeJs extends BaseThree {
   start(): void {
     // console.log('start')
   }
-  update(): void { }
+  update(): void {}
   sceneRender: SceneRender | null = null;
   camera: THREE.PerspectiveCamera | null = null;
   renderer: THREE.WebGLRenderer | null = null;
@@ -54,7 +48,6 @@ export default class ThreeJs extends BaseThree {
 
   characterHpInfos: CharacterHpInfo[] = [];
 
-
   playerBuilder: PlayerBuilder | null = null;
 
   enemyBuilders: EnemyBuilder[] = [];
@@ -66,20 +59,16 @@ export default class ThreeJs extends BaseThree {
   }
 
   init(): void {
-
     // 设置配置值
     let confsVar: ConfsVar = require("../assets/confs/confs.json");
     Confs.setting(confsVar);
-
+    
     this.camera = new THREE.PerspectiveCamera(
       45,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
     );
-    this.camera.position.z = 5;
-    this.camera.position.set(0, 28, 37.5);
-    this.camera.lookAt(0, 0, 0);
     this.ambientLight = new THREE.AmbientLight(0xaaaaaa); // 环境光
     this.sceneRender = new SceneRender(
       this.camera,
@@ -97,6 +86,8 @@ export default class ThreeJs extends BaseThree {
       this.sceneRender
     );
 
+    // 初始化游戏进度
+    store.commit(Confs.STORE_RESETPROCESS,{ targetProcess:this.mapBuilder.map.targetProcess, maxLife:this.mapBuilder.map.life})
 
     // 初始化摄像机位置
     this.camera.position.set(
@@ -104,6 +95,7 @@ export default class ThreeJs extends BaseThree {
       this.mapBuilder.playerInitPos.y + Confs.cameraOffsetPos.y,
       this.mapBuilder.playerInitPos.z + Confs.cameraOffsetPos.z
     );
+    this.camera.lookAt(this.mapBuilder.playerInitPos.x, this.mapBuilder.playerInitPos.y, this.mapBuilder.playerInitPos.z);
 
     // 玩家子弹缓冲池
     let playerBulletPool = new bulletBufferPool(
@@ -134,7 +126,13 @@ export default class ThreeJs extends BaseThree {
     }
 
     //console.log(ThreeMath.posInScope(new THREE.Vector2(-20,20),new THREE.Vector2(-21,25),new THREE.Vector2(-19,-9)))
-    let itemBufferPool = new ItemBufferPoll(2, Confs.itemSize, "/img/item.png", Confs.itemHeight, this.sceneRender)
+    let itemBufferPool = new ItemBufferPoll(
+      2,
+      Confs.itemSize,
+      "/img/item.png",
+      Confs.itemHeight,
+      this.sceneRender
+    );
 
     for (let enemy of this.mapBuilder.enemies) {
       this.enemyBuilders.push(
