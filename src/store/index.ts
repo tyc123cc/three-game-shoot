@@ -45,6 +45,7 @@ export default new Vuex.Store({
     [Confs.STORE_DEATH](state: any) {
       // 生命小于0
       if (--state.life <= 0) {
+        state.life = 0;
         // 生命小于0，发送游戏结束事件
         const sendEvent = new CustomEvent("gameOver", {
           detail: {},

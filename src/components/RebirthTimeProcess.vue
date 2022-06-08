@@ -36,7 +36,7 @@
         />
         <!-- 上面 stroke-dasharray="314"  314是圆的周长，2πr = 2 x 3.14 x 50 -->
         <!-- 定义了实线长度为314，stroke-dashoffset可以通过动态绑定来控制 -->
-        <text class="text" fill="white" x="58" y="63">
+        <text class="text" fill="white" x="58" y="65">
           {{ text() }}
         </text>
       </svg>

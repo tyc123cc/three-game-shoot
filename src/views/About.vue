@@ -1,5 +1,6 @@
 <template>
   <div id="threeCanvas">
+    <game-menu :originPosY="originY"></game-menu>
     <blood
       v-for="character in characterHpInfos"
       :key="character.name"
@@ -25,14 +26,15 @@ import ThreeJs from "./index";
 import Blood from "@/components/Blood.vue";
 import RebirthTimeProcess from "@/components/RebirthTimeProcess.vue";
 import GameProcess from "@/components/GameProcess.vue"
-
+import GameMenu from "@/components/GameMenu.vue"
 import { Vector2 } from "three";
 
 @Component({
   components: {
     Blood,
     RebirthTimeProcess,
-    GameProcess
+    GameProcess,
+    GameMenu
   },
 })
 export default class About extends Vue {
