@@ -55,6 +55,8 @@ export default class RebirthTimeProcess extends Vue {
 
   @Prop(Number) private originPosY!: number;
 
+  @Prop(Number) private originPosX!: number;
+
   public posY: number = 15;
 
   mounted() {
@@ -103,14 +105,14 @@ export default class RebirthTimeProcess extends Vue {
    * 调整进度条位置
    */
   style(): string {
-    return `top:${this.originPosY + this.posY}px`;
+    return `top:${this.originPosY + this.posY}px;left:${this.originPosX - 60}px`;
   }
 }
 </script>
 <style scoped>
 #pro {
   /* 容器 */
-  width: 100%;
+  width: 120px;
   height: 120px;
   margin: auto;
   position: absolute;

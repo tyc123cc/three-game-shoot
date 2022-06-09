@@ -26,6 +26,12 @@ export default class ThreeJs extends BaseThree {
     // console.log('start')
   }
   update(): void {}
+
+  /**
+   * 关卡序号
+   */
+  levelIndex: number = 0;
+
   sceneRender: SceneRender | null = null;
   camera: THREE.PerspectiveCamera | null = null;
   renderer: THREE.WebGLRenderer | null = null;
@@ -52,17 +58,26 @@ export default class ThreeJs extends BaseThree {
 
   enemyBuilders: EnemyBuilder[] = [];
 
-  constructor() {
+  constructor(index: number) {
     super();
+    this.levelIndex = index;
     this.init();
     this.enable();
   }
 
   init(): void {
-    // 设置配置值
-    let confsVar: ConfsVar = require("../assets/confs/confs.json");
-    Confs.setting(confsVar);
-    
+
+    if (!Confs.levelFiles) {
+      // 设置配置值
+      let confsVar: ConfsVar = require("../assets/confs/confs.json");
+      Confs.setting(confsVar);
+    }
+    // 传递的关卡序号有误
+    if(this.levelIndex < 0 || this.levelIndex >= Confs.levelFiles.length){
+      return;
+    }
+    let mapName = Confs.levelFiles[this.levelIndex];
+
     this.camera = new THREE.PerspectiveCamera(
       45,
       window.innerWidth / window.innerHeight,
@@ -82,12 +97,15 @@ export default class ThreeJs extends BaseThree {
 
     // 创建地图
     this.mapBuilder = new MapBuilder(
-      require("../assets/map/map01.json"),
+      require("../assets/map/" + mapName + ".json"),
       this.sceneRender
     );
 
     // 初始化游戏进度
-    store.commit(Confs.STORE_RESETPROCESS,{ targetProcess:this.mapBuilder.map.targetProcess, maxLife:this.mapBuilder.map.life})
+    store.commit(Confs.STORE_RESETPROCESS, {
+      targetProcess: this.mapBuilder.map.targetProcess,
+      maxLife: this.mapBuilder.map.life,
+    });
 
     // 初始化摄像机位置
     this.camera.position.set(
@@ -95,7 +113,11 @@ export default class ThreeJs extends BaseThree {
       this.mapBuilder.playerInitPos.y + Confs.cameraOffsetPos.y,
       this.mapBuilder.playerInitPos.z + Confs.cameraOffsetPos.z
     );
-    this.camera.lookAt(this.mapBuilder.playerInitPos.x, this.mapBuilder.playerInitPos.y, this.mapBuilder.playerInitPos.z);
+    this.camera.lookAt(
+      this.mapBuilder.playerInitPos.x,
+      this.mapBuilder.playerInitPos.y,
+      this.mapBuilder.playerInitPos.z
+    );
 
     // 玩家子弹缓冲池
     let playerBulletPool = new bulletBufferPool(

@@ -1,11 +1,13 @@
 <template>
   <div>
-    <el-progress v-show="isShow"
-                 :stroke-width="10"
-                 :percentage="(current / max) * 100"
-                 :color="customColorMethod"
-                 :show-text="false"
-                 :style="style()"></el-progress>
+    <el-progress
+      v-show="isShow"
+      :stroke-width="10"
+      :percentage="(current / max) * 100"
+      :color="customColorMethod"
+      :show-text="false"
+      :style="style()"
+    ></el-progress>
   </div>
 </template>
 <script lang="ts">
@@ -22,7 +24,6 @@ export default class Blood extends Vue {
   @Prop(Number) private posY!: number;
 
   @Prop(Boolean) private isShow!: boolean;
-  
 
   customColorMethod(percentage: number) {
     if (percentage < 30) {

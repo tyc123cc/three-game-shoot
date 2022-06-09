@@ -10,7 +10,6 @@
   </div>
 </template>
 <script lang="ts">
-import store from "@/store";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component

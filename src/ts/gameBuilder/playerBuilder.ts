@@ -32,12 +32,12 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   ) {
     super(
       "player",
-      "character/Player.fbx",
-      "character/animate/player/Run Forward.fbx",
-      "character/animate/player/Walk Backward.fbx",
-      "character/animate/player/hit reaction.fbx",
-      "character/animate/player/rifle aiming idle.fbx",
-      "character/animate/player/Dying.fbx",
+      "../character/Player.fbx",
+      "../character/animate/player/Run Forward.fbx",
+      "../character/animate/player/Walk Backward.fbx",
+      "../character/animate/player/hit reaction.fbx",
+      "../character/animate/player/rifle aiming idle.fbx",
+      "../character/animate/player/Dying.fbx",
       sceneRender,
       camera,
       (object) => {
@@ -157,39 +157,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     }
   }
 
-  /**
-   * 更新血量条信息
-   */
-  updateCharacterHPInfo(character: Character) {
-    if (character.group && this.camera && this.sceneRender) {
-      let screenPos = ThreeMath.createVector(
-        character.group.position,
-        this.camera
-      );
-      let HpInfo = this.characterHpInfo;
-      if (HpInfo) {
-        HpInfo.screenPos = screenPos;
-        let tempV = character.group.position
-          .clone()
-          .applyMatrix4(this.camera.matrixWorldInverse)
-          .applyMatrix4(this.camera.projectionMatrix);
-
-        if (
-          Math.abs(tempV.x) > 1 ||
-          Math.abs(tempV.y) > 1 ||
-          Math.abs(tempV.z) > 1
-        ) {
-          // 在视野外了
-          HpInfo.isShow = false;
-        } else {
-          // 在视野内
-          HpInfo.isShow = true;
-        }
-        // 更新hp
-        HpInfo.hp = character.hp;
-      }
-    }
-  }
+ 
 
   /**
    * 根据当前角色朝向与前进方向的夹角来播放动画
@@ -287,6 +255,11 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * @param event
    */
   onDocumentMouseClick(event: MouseEvent) {
+    // 避免UI穿透
+    if(Confs.CLICKUI){
+      Confs.CLICKUI = false;
+      return;
+    }
     if (this.characterStatus == CharacterStatus.Alive) {
       this.fire();
     }

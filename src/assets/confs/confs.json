@@ -5,9 +5,12 @@
     "z": 37.5
   },
   "hpInfoOffsetPos": {
-    "x": -3.6,
-    "y": 5.2
+    "x": -2.3,
+    "y": 9.5
   },
+  "levelFiles":[
+    "map01"
+  ],
   "bulletHeight": 7,
   "bulletSize": 0.4,
   "characterColliderSize": 4,
@@ -18,7 +21,7 @@
   "enemyShootCD": 1,
   "enemyRebirthTime": 10,
   "playerRebirthTime": 5,
-  "enemyBulletPower": 10,
+  "enemyBulletPower": 0,
   "playerBulletPower": 20,
   "itemSize": 3,
   "itemRotateSpeed": 1,

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import Confs from "../common/confs/confs";
+import SceneRender from "../scene/sceneRender";
 
 export default class ThreeMath {
   /**
@@ -8,18 +9,25 @@ export default class ThreeMath {
    * @param camera 摄像机
    * @returns 屏幕坐标
    */
-  public static createVector(vec: THREE.Vector3, camera: THREE.Camera) {
+  public static createVector(
+    vec: THREE.Vector3,
+    camera: THREE.Camera,
+    sceneRender: SceneRender
+  ) {
     var p = vec.clone();
     // 设置偏移值
     p.x += Confs.hpInfoOffsetPos.x;
     p.y += Confs.hpInfoOffsetPos.y;
     var vector = p.project(camera);
-    vector.x =
-      ((vector.x + 1) / 2) * window.innerWidth +
-      (vec.x + 11 - camera.position.x) * 0;
-    vector.y =
-      (-(vector.y - 1) / 2) * window.innerHeight -
-      (vec.z + 37.5 - camera.position.z) * 1.1;
+    let width = 0,
+      height = 0;
+    if (sceneRender.renderer) {
+      width = sceneRender.renderer.domElement.width;
+      height = sceneRender.renderer.domElement.height;
+    }
+    vector.x = ((vector.x + 1) / 2) * width;
+    vector.y = (-(vector.y - 1) / 2) * height;
+
     return new THREE.Vector2(vector.x, vector.y);
   }
 
@@ -105,7 +113,7 @@ export default class ThreeMath {
    * @param pos 坐标点
    * @param leftTopPos 长方形的左上角
    * @param rightBottomPos 长方形的右下角
-   * @returns 
+   * @returns
    */
   public static posInScope(
     pos: THREE.Vector2,

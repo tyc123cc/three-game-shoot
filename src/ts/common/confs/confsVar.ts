@@ -3,6 +3,11 @@ import Confs from "./confs";
 
 export default class ConfsVar {
   /**
+   * 关卡文件名
+   */
+  public levelFiles: string[] = [];
+
+  /**
    * 摄像机偏移量
    */
   public cameraOffsetPos: THREE.Vector3 = new THREE.Vector3();
@@ -73,13 +78,13 @@ export default class ConfsVar {
   public playerBulletPower: number = 0;
 
   /**
- * 道具大小
- */
+   * 道具大小
+   */
   public itemSize: number = 0;
 
   /**
- * 道具自旋转速度
- */
+   * 道具自旋转速度
+   */
   public itemRotateSpeed: number = 0;
 
   /**
@@ -93,7 +98,7 @@ export default class ConfsVar {
   public itemHeight: number = 0;
 
   /**
- * 获得道具后的加血值
- */
+   * 获得道具后的加血值
+   */
   public itemAddHP: number = 0;
 }

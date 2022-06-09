@@ -1,4 +1,5 @@
 import { Clock } from "three";
+import Confs from "./confs/confs";
 
 /**
  * 公共方法
@@ -30,7 +31,7 @@ export default abstract class BaseThree {
     // 更新每帧时间
     this.deltaTime = this.clock.getDelta();
     // 10帧以下不执行update
-    if (this.deltaTime < 0.1) {
+    if (!Confs.PAUSED && this.deltaTime < 0.1) {
       // update主方法
       this.update();
     }

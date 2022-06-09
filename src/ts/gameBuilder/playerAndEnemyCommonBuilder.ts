@@ -237,7 +237,8 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
     if (character.group && this.camera && this.sceneRender) {
       let screenPos = ThreeMath.createVector(
         character.group.position,
-        this.camera
+        this.camera,
+        this.sceneRender
       );
       let HpInfo = this.characterHpInfo;
       if (HpInfo) {

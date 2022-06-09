@@ -11,23 +11,23 @@
       :posY="character.screenPos.y"
     ></blood>
     <rebirth-time-process
-    class="rebirthTime"
+      class="rebirthTime"
       :nowRebirthTime="nowRebirthTime"
       :rebirthTime="rebirthTime"
       :originPosY="originY"
       :originPosX="rebirthTimeX()"
     ></rebirth-time-process>
-  <game-process :originPosY="originY"></game-process>
+    <game-process :originPosY="originY"></game-process>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import ThreeJs from "./index";
 import Blood from "@/components/Blood.vue";
 import RebirthTimeProcess from "@/components/RebirthTimeProcess.vue";
-import GameProcess from "@/components/GameProcess.vue"
-import GameMenu from "@/components/GameMenu.vue"
+import GameProcess from "@/components/GameProcess.vue";
+import GameMenu from "@/components/GameMenu.vue";
 import { Vector2 } from "three";
 
 @Component({
@@ -35,17 +35,22 @@ import { Vector2 } from "three";
     Blood,
     RebirthTimeProcess,
     GameProcess,
-    GameMenu
+    GameMenu,
   },
 })
-export default class About extends Vue {
+export default class Game extends Vue {
+  @Prop(String) private level!: string;
+
   three: ThreeJs | null = null;
 
   mounted() {
-    this.three = new ThreeJs(0);
-   
-    //let options = {fullscreen:true,text:"正在拼命加载"}
-    //Loading.service(options);
+    let level = Number(this.level);
+    if (!isNaN(level)) {
+      this.three = new ThreeJs(Number.parseInt(this.level));
+      console.log(this.level);
+      //let options = {fullscreen:true,text:"正在拼命加载"}
+      //Loading.service(options);
+    }
   }
 
   get characterHpInfos() {
@@ -95,17 +100,15 @@ export default class About extends Vue {
   }
 
   // 使用函数而不是计算，因为vue无法响应宽度变化
-  rebirthTimeX(){
+  rebirthTimeX() {
     let left = this.three?.sceneRender?.renderer?.domElement.width;
-    if(!left){
+    if (!left) {
       left = 0;
-    }
-    else{
+    } else {
       left = left / 2;
     }
     return left;
   }
-
 }
 </script>
 
@@ -113,17 +116,14 @@ export default class About extends Vue {
 #threeCanvas {
   height: 100%;
   width: 100%;
-  overflow:hidden;
-  position:relative;
+  overflow: hidden;
+  position: relative;
 }
 
-.gameProcess{
-  position:absolute;
-  right:80px;
-  color:white;
+.gameProcess {
+  position: absolute;
+  right: 80px;
+  color: white;
   font-size: 25px;
 }
-
-
-
 </style>

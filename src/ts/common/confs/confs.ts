@@ -16,6 +16,18 @@ export default class Confs {
    */
   public static readonly STORE_ADDPROCESS = "addProcess";
 
+  public static CLICKUI = false;
+
+  /**
+   * 游戏是否是暂停状态
+   */
+  public static PAUSED: boolean = false;
+
+  /**
+   * 关卡文件名
+   */
+  public static levelFiles:string[];
+
   /**
    * 摄像机偏移量
    */
@@ -134,5 +146,6 @@ export default class Confs {
     this.itemMoveSpeed = confVars.itemMoveSpeed;
     this.itemHeight = confVars.itemHeight;
     this.itemAddHP = confVars.itemAddHP;
+    this.levelFiles = confVars.levelFiles;
   }
 }

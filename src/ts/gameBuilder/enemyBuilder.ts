@@ -56,12 +56,12 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
   ) {
     super(
       name,
-      "character/Enemy.fbx",
-      "character/animate/player/Run Forward.fbx",
-      "character/animate/player/Walk Backward.fbx",
-      "character/animate/player/hit reaction.fbx",
-      "character/animate/player/rifle aiming idle.fbx",
-      "character/animate/player/Dying.fbx",
+      "../character/Enemy.fbx",
+      "../character/animate/player/Run Forward.fbx",
+      "../character/animate/player/Walk Backward.fbx",
+      "../character/animate/player/hit reaction.fbx",
+      "../character/animate/player/rifle aiming idle.fbx",
+      "../character/animate/player/Dying.fbx",
       sceneRender,
       camera,
       (object) => {
