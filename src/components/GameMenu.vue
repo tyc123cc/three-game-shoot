@@ -16,6 +16,7 @@
   </div>
 </template>
 <script lang="ts">
+import router from "@/router";
 import Confs from "@/ts/common/confs/confs";
 import ElementUI from "element-ui";
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -61,15 +62,17 @@ export default class GameMenu extends Vue {
       cancelButtonText: "取消",
       type: "warning",
       showClose: true,
-      beforeClose:(action, instance, done)=>{
+      beforeClose: (action, instance, done) => {
         // 避免UI穿透
         Confs.CLICKUI = true;
-                        done();
-      }
+        done();
+      },
     })
       .then(() => {
-        // 继续游戏
+        // 恢复暂停状态
         Confs.PAUSED = false;
+        // 返回主菜单
+        router.push({ name: "ChooseLevel" });
       })
       .catch(() => {
         // 继续游戏

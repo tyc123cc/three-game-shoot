@@ -1,22 +1,18 @@
 <template>
   <div id="threeCanvas">
     <game-menu :originPosY="originY"></game-menu>
-    <blood
-      v-for="character in characterHpInfos"
-      :key="character.name"
-      :current="character.hp"
-      :isShow="character.isShow"
-      :max="character.maxHp"
-      :posX="character.screenPos.x"
-      :posY="character.screenPos.y"
-    ></blood>
-    <rebirth-time-process
-      class="rebirthTime"
-      :nowRebirthTime="nowRebirthTime"
-      :rebirthTime="rebirthTime"
-      :originPosY="originY"
-      :originPosX="rebirthTimeX()"
-    ></rebirth-time-process>
+    <blood v-for="character in characterHpInfos"
+           :key="character.name"
+           :current="character.hp"
+           :isShow="character.isShow"
+           :max="character.maxHp"
+           :posX="character.screenPos.x"
+           :posY="character.screenPos.y"></blood>
+    <rebirth-time-process class="rebirthTime"
+                          :nowRebirthTime="nowRebirthTime"
+                          :rebirthTime="rebirthTime"
+                          :originPosY="originY"
+                          :originPosX="rebirthTimeX()"></rebirth-time-process>
     <game-process :originPosY="originY"></game-process>
   </div>
 </template>
@@ -47,10 +43,14 @@ export default class Game extends Vue {
     let level = Number(this.level);
     if (!isNaN(level)) {
       this.three = new ThreeJs(Number.parseInt(this.level));
-      console.log(this.level);
+      console.log("第" + (level + 1) + "关");
       //let options = {fullscreen:true,text:"正在拼命加载"}
       //Loading.service(options);
     }
+  }
+
+  beforeDestroy() {
+    this.three?.clear();
   }
 
   get characterHpInfos() {

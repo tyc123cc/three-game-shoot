@@ -53,6 +53,8 @@ export default class Item extends BaseThree {
    */
   public isUpper: boolean = true;
 
+  getItemEvent: (e: Event) => void = this.getItem.bind(this)
+
   constructor(name: string, size: number, textureUrl: string, height: number, sceneRender: SceneRender) {
     super();
     this.name = name;
@@ -66,18 +68,21 @@ export default class Item extends BaseThree {
   }
 
   start() {
-    document.addEventListener("getItem", (e: Event) => {
-      this.getItem(e as CustomEvent);
-    });
+    document.addEventListener("getItem", this.getItemEvent);
+  }
+
+  clear() {
+    document.removeEventListener("getItem", this.getItemEvent);
   }
 
   /**
    * 获得道具事件
    * @param e 
    */
-  getItem(e: CustomEvent) {
+  getItem(e: Event) {
+    let ev = e as CustomEvent
     // 获得道具的名字与该道具名字相同，表明获得的道具为该道具本身
-    if (e.detail.name == this.name) {
+    if (ev.detail.name == this.name) {
       this.unVisible();
     }
   }

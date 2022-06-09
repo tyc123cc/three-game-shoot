@@ -25,7 +25,7 @@ export default class ThreeJs extends BaseThree {
   start(): void {
     // console.log('start')
   }
-  update(): void {}
+  update(): void { }
 
   /**
    * 关卡序号
@@ -58,6 +58,8 @@ export default class ThreeJs extends BaseThree {
 
   enemyBuilders: EnemyBuilder[] = [];
 
+  itemBufferPool: ItemBufferPoll | null = null;
+
   constructor(index: number) {
     super();
     this.levelIndex = index;
@@ -73,7 +75,7 @@ export default class ThreeJs extends BaseThree {
       Confs.setting(confsVar);
     }
     // 传递的关卡序号有误
-    if(this.levelIndex < 0 || this.levelIndex >= Confs.levelFiles.length){
+    if (this.levelIndex < 0 || this.levelIndex >= Confs.levelFiles.length) {
       return;
     }
     let mapName = Confs.levelFiles[this.levelIndex];
@@ -148,7 +150,7 @@ export default class ThreeJs extends BaseThree {
     }
 
     //console.log(ThreeMath.posInScope(new THREE.Vector2(-20,20),new THREE.Vector2(-21,25),new THREE.Vector2(-19,-9)))
-    let itemBufferPool = new ItemBufferPoll(
+    this.itemBufferPool = new ItemBufferPoll(
       2,
       Confs.itemSize,
       "/img/item.png",
@@ -165,7 +167,7 @@ export default class ThreeJs extends BaseThree {
           this.camera,
           enemyBulletPool,
           this.mapBuilder,
-          itemBufferPool,
+          this.itemBufferPool,
           new THREE.Vector3(enemy.initPos.x, 0, enemy.initPos.y)
         )
       );
@@ -176,5 +178,16 @@ export default class ThreeJs extends BaseThree {
         this.characterHpInfos.push(enemy.characterHpInfo);
       }
     });
+  }
+
+  clear() {
+    this.sceneRender?.scene?.clear();
+    this.playerBuilder?.removeEventListener();
+    this.enemyBuilders.forEach((enemy: EnemyBuilder) => {
+      enemy.characterBuilder?.clear();
+    })
+    if (this.itemBufferPool) {
+      this.itemBufferPool.clear();
+    }
   }
 }

@@ -31,6 +31,8 @@ export default class CharacterBuilder extends BaseThree {
 
   public name: string;
 
+  hitEvent: ((e: Event) => void) = this.hitCharacter.bind(this);
+
   private onLoad: (object: Group) => void;
   private onProgress?: (event: ProgressEvent) => void;
   private onError?: (event: ErrorEvent) => void;
@@ -59,19 +61,25 @@ export default class CharacterBuilder extends BaseThree {
 
   start(): void {
     this.loadCharacter(0);
-    document.addEventListener("hit", (e: Event) => {
-      this.hitCharacter(e as CustomEvent);
-    });
+    document.addEventListener("hit",
+      this.hitEvent
+    );
   }
+
+  clear() {
+    document.removeEventListener("hit", this.hitEvent)
+  }
+
 
   /**
    * 接收子弹击中物体信息
    * @param e 
    */
-  hitCharacter(e: CustomEvent) {
+  hitCharacter(e: Event) {
+    let ev = e as CustomEvent;
     // 如果被击中物体为当前角色，则扣除生命值
-    if (e.detail.target == this.name + 'collider') {
-      this.character?.damage(e.detail.power);
+    if (ev.detail.target == this.name + 'collider') {
+      this.character?.damage(ev.detail.power);
     }
   }
 

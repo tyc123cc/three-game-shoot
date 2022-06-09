@@ -44,6 +44,12 @@ export default class ItemBufferPoll extends BaseThree {
     this.initPool();
   }
 
+  clear() {
+    this.items.forEach(item => {
+      item.clear();
+    })
+  }
+
   /**
    * 为缓冲池添加道具
    */

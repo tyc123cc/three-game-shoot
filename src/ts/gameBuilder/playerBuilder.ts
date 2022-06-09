@@ -24,6 +24,12 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    */
   characterHpInfo: CharacterHpInfo | null = null;
 
+  documentMouseMoveEvent: ((event: MouseEvent) => void) | null = null;
+  documentMouseClickEvent: ((event: MouseEvent) => void) | null = null;
+  documentKeyDownEvent: ((event: KeyboardEvent) => void) | null = null;
+  documentKeyUpEvent: ((event: KeyboardEvent) => void) | null = null;
+  getItemEvent: ((event: Event) => void) | null = null;
+
   constructor(
     sceneRender: SceneRender,
     camera: THREE.Camera,
@@ -59,27 +65,51 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * 添加事件监听器
    */
   addEventListener() {
-    // 添加鼠标移动的事件，用来更新角色朝向
-    document.addEventListener("mousemove", (ev) => {
-      this.onDocumentMouseMove(ev);
-    });
-    // 添加键盘按下事件，用于角色移动
-    document.addEventListener("keydown", (ev) => {
-      this.onDocumentKeyDown(ev);
-    });
-    // 添加键盘抬起事件，用于停止角色移动
-    document.addEventListener("keyup", (ev) => {
-      this.onDocumentKeyUp(ev);
-    });
-    // 添加键盘点击事件，用于角色射击
-    document.addEventListener("click", (ev) => {
-      this.onDocumentMouseClick(ev);
-    });
+    this.documentMouseMoveEvent = this.onDocumentMouseMove.bind(this)
+    this.documentKeyDownEvent = this.onDocumentKeyDown.bind(this)
+    this.documentKeyUpEvent = this.onDocumentKeyUp.bind(this);
+    this.documentMouseClickEvent = this.onDocumentMouseClick.bind(this);
+    this.getItemEvent = this.getItem.bind(this);
 
+    // 添加鼠标移动的事件，用来更新角色朝向
+    document.addEventListener("mousemove", this.documentMouseMoveEvent)
+    // 添加键盘按下事件，用于角色移动
+    document.addEventListener("keydown", this.documentKeyDownEvent);
+    // 添加键盘抬起事件，用于停止角色移动
+    document.addEventListener("keyup", this.documentKeyUpEvent);
+    // 添加键盘点击事件，用于角色射击
+    document.addEventListener("click", this.documentMouseClickEvent);
     // 添加自定义事件获得道具，用于获得道具后角色的状态变化
-    document.addEventListener("getItem", (e: Event) => {
-      this.getItem(e as CustomEvent);
-    });
+    document.addEventListener("getItem", this.getItemEvent);
+  }
+
+  /**
+ * 移除事件监听器
+ */
+  removeEventListener() {
+    if (this.documentMouseMoveEvent) {
+      // 移除鼠标移动的事件，用来更新角色朝向
+      document.removeEventListener("mousemove", this.documentMouseMoveEvent)
+    }
+    if (this.documentKeyDownEvent) {
+      // 移除键盘按下事件，用于角色移动
+      document.removeEventListener("keydown", this.documentKeyDownEvent);
+    }
+    if (this.documentKeyUpEvent) {
+      // 移除键盘抬起事件，用于停止角色移动
+      document.removeEventListener("keyup", this.documentKeyUpEvent);
+    }
+    if (this.documentMouseClickEvent) {
+      // 移除键盘点击事件，用于角色射击
+      document.removeEventListener("click", this.documentMouseClickEvent);
+    }
+    if (this.getItemEvent) {
+      // 添加自定义事件获得道具，用于获得道具后角色的状态变化
+      document.removeEventListener("getItem", this.getItemEvent);
+
+    }
+
+    this.characterBuilder?.clear();
   }
 
   update() {
@@ -157,7 +187,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     }
   }
 
- 
+
 
   /**
    * 根据当前角色朝向与前进方向的夹角来播放动画
@@ -256,7 +286,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    */
   onDocumentMouseClick(event: MouseEvent) {
     // 避免UI穿透
-    if(Confs.CLICKUI){
+    if (Confs.CLICKUI) {
       Confs.CLICKUI = false;
       return;
     }
@@ -319,7 +349,8 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * 获得道具时的事件
    * @param e
    */
-  getItem(e: CustomEvent) {
+  getItem(ev: Event) {
+    let event = ev as CustomEvent
     this.characterBuilder?.character?.cure(Confs.itemAddHP);
     // 获得道具，游戏进度加一
     store.commit(Confs.STORE_ADDPROCESS);
