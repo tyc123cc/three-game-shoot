@@ -1,24 +1,32 @@
 <template lang="">
-  <div class="gameWin" :style="gameWinStyle">
-    <div class="winText">恭喜通关！</div>
+  <div class="gameWin" >
+    <el-card  shadow="always">
+    <div class="winText">恭喜通关!</div>
     <div class="button">
-      <el-button type="primary" :disabled="hasNext" @click="next()"
+      <el-button class="nextButton" type="primary" :disabled="nextButtonDisabled" @click="next()"
         >下一关</el-button
       >
       <el-button type="primary" plain @click="back()">主菜单</el-button>
+      
     </div>
+    </el-card>
   </div>
 </template>
 <script lang="ts">
+import Confs from "@/ts/common/confs/confs";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class GameWin extends Vue {
-  @Prop(Number) private originPosY!: number;
+
+  @Prop({type:Number,default:-1}) public level!: number;
 
   public posY: number = 30;
 
-  public hasNext: boolean = true;
+  get nextButtonDisabled(){
+    return !(this.level >= 0 && this.level < Confs.levelFiles.length - 1);
+  }
+
 
   /**
    * 下一关按钮点击事件
@@ -30,18 +38,16 @@ export default class GameWin extends Vue {
    */
   back() {}
 
-  get gameWinStyle() {
-    return `top:${this.originPosY + this.posY}px`;
-  }
 }
 </script>
 <style scoped>
-.life {
-  margin-top: 20px;
+.winText{
+  font:bolder 50px arial,sans-serif;
+  color: crimson;
+  margin-bottom: 30px;
 }
 
-.life,
-.target {
-  user-select: none;
+.nextButton{
+  margin-right: 30px;
 }
 </style>
