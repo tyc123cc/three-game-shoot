@@ -165,8 +165,5 @@ export default class Game extends Vue {
 
 .gameWin {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 </style>

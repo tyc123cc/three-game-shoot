@@ -1,6 +1,8 @@
 <template lang="">
   <div class="gameWin" >
-    <el-card  shadow="always">
+    <!-- 做一个遮罩，使游戏胜利页面弹出时，其他按钮不可点击 -->
+    <div class="background">
+    <el-card shadow="always">
     <div class="winText">恭喜通关!</div>
     <div class="button">
       <el-button class="nextButton" type="primary" :disabled="nextButtonDisabled" @click="next()"
@@ -10,6 +12,7 @@
       
     </div>
     </el-card>
+        </div>
   </div>
 </template>
 <script lang="ts">
@@ -49,5 +52,23 @@ export default class GameWin extends Vue {
 
 .nextButton{
   margin-right: 30px;
+}
+
+.gameWin{
+  width:100%;
+  height:100%
+}
+
+.el-card{
+  position:absolute;
+    top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.background{
+  position:relative;
+  width:100%;
+  height: 100%;
 }
 </style>
