@@ -17,6 +17,7 @@
 </template>
 <script lang="ts">
 import Confs from "@/ts/common/confs/confs";
+import ConfsVar from "@/ts/common/confs/confsVar";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
@@ -27,6 +28,9 @@ export default class GameWin extends Vue {
   public posY: number = 30;
 
   get nextButtonDisabled(){
+    if(!Confs.levelFiles){
+      return true;
+    }
     return !(this.level >= 0 && this.level < Confs.levelFiles.length - 1);
   }
 
@@ -34,12 +38,16 @@ export default class GameWin extends Vue {
   /**
    * 下一关按钮点击事件
    */
-  next() {}
+  next() {
+    this.$emit("next")
+  }
 
   /**
    * 返回主菜单按钮点击事件
    */
-  back() {}
+  back() {
+    this.$emit("home")
+  }
 
 }
 </script>

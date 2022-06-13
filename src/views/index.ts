@@ -25,7 +25,7 @@ export default class ThreeJs extends BaseThree {
   start(): void {
     // console.log('start')
   }
-  update(): void { }
+  update(): void {}
 
   /**
    * 关卡序号
@@ -59,6 +59,10 @@ export default class ThreeJs extends BaseThree {
   enemyBuilders: EnemyBuilder[] = [];
 
   itemBufferPool: ItemBufferPoll | null = null;
+  // 玩家子弹缓冲池
+  playerBulletPool: bulletBufferPool | null = null;
+  // 敌人子弹缓冲池
+  enemyBulletPool: bulletBufferPool | null = null;
 
   constructor(index: number) {
     super();
@@ -68,7 +72,6 @@ export default class ThreeJs extends BaseThree {
   }
 
   init(): void {
-
     if (!Confs.levelFiles) {
       // 设置配置值
       let confsVar: ConfsVar = require("../assets/confs/confs.json");
@@ -80,19 +83,29 @@ export default class ThreeJs extends BaseThree {
     }
     let mapName = Confs.levelFiles[this.levelIndex];
 
-    this.camera = new THREE.PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    this.ambientLight = new THREE.AmbientLight(0xaaaaaa); // 环境光
-    this.sceneRender = new SceneRender(
-      this.camera,
-      this.ambientLight,
-      false,
-      "threeCanvas"
-    );
+    if (!this.camera) {
+      this.camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+    }
+    if (!this.ambientLight) {
+      this.ambientLight = new THREE.AmbientLight(0xaaaaaa); // 环境光
+    }
+    if (!this.sceneRender) {
+      this.sceneRender = new SceneRender(
+        this.camera,
+        this.ambientLight,
+        false,
+        "threeCanvas"
+      );
+    } else {
+      // 加入环境光
+      this.sceneRender.scene?.add(this.ambientLight);
+    }
+
     let light = new THREE.DirectionalLight(0xffffff);
     light.position.set(10, 10, 10);
     this.sceneRender.scene?.add(light);
@@ -120,9 +133,8 @@ export default class ThreeJs extends BaseThree {
       this.mapBuilder.playerInitPos.y,
       this.mapBuilder.playerInitPos.z
     );
-
     // 玩家子弹缓冲池
-    let playerBulletPool = new bulletBufferPool(
+    this.playerBulletPool = new bulletBufferPool(
       10,
       Confs.bulletSize,
       "red",
@@ -131,7 +143,7 @@ export default class ThreeJs extends BaseThree {
     );
 
     // 敌人子弹缓冲池
-    let enemyBulletPool = new bulletBufferPool(
+    this.enemyBulletPool = new bulletBufferPool(
       10,
       Confs.bulletSize,
       "blue",
@@ -142,21 +154,22 @@ export default class ThreeJs extends BaseThree {
     this.playerBuilder = new PlayerBuilder(
       this.sceneRender,
       this.camera,
-      playerBulletPool,
+      this.playerBulletPool,
       this.mapBuilder.playerInitPos
     );
     if (this.playerBuilder.characterHpInfo) {
       this.characterHpInfos.push(this.playerBuilder.characterHpInfo);
     }
-
-    //console.log(ThreeMath.posInScope(new THREE.Vector2(-20,20),new THREE.Vector2(-21,25),new THREE.Vector2(-19,-9)))
-    this.itemBufferPool = new ItemBufferPoll(
-      2,
-      Confs.itemSize,
-      "/img/item.png",
-      Confs.itemHeight,
-      this.sceneRender
-    );
+    if(!this.itemBufferPool){
+      this.itemBufferPool = new ItemBufferPoll(
+        2,
+        Confs.itemSize,
+        "/img/item.png",
+        Confs.itemHeight,
+        this.sceneRender
+      );
+    }
+    
 
     for (let enemy of this.mapBuilder.enemies) {
       this.enemyBuilders.push(
@@ -165,7 +178,7 @@ export default class ThreeJs extends BaseThree {
           this.playerBuilder,
           this.sceneRender,
           this.camera,
-          enemyBulletPool,
+          this.enemyBulletPool,
           this.mapBuilder,
           this.itemBufferPool,
           new THREE.Vector3(enemy.initPos.x, 0, enemy.initPos.y)
@@ -180,14 +193,47 @@ export default class ThreeJs extends BaseThree {
     });
   }
 
+  /**
+   * 重新加载界面
+   */
+  reload(levelIndex?: number) {
+    this.clear();
+    // 重新加载界面不清理该类
+    this.isCleared = false;
+    console.log(this.sceneRender?.renderer?.info)
+    if (levelIndex) {
+      this.levelIndex = levelIndex;
+    }
+    this.characterHpInfos = [];
+    this.enemyBuilders = [];
+    this.init();
+  }
+
   clear() {
-    this.sceneRender?.scene?.clear();
+    this.sceneRender?.clear();
     this.playerBuilder?.removeEventListener();
     this.enemyBuilders.forEach((enemy: EnemyBuilder) => {
-      enemy.characterBuilder?.clear();
-    })
+      enemy.clear();
+    });
+    this.playerBuilder = null;
+    this.enemyBuilders = [];
     if (this.itemBufferPool) {
       this.itemBufferPool.clear();
+      this.itemBufferPool = null;
     }
+    if(this.enemyBulletPool){
+      this.enemyBulletPool.clear();
+      this.enemyBulletPool = null;
+    }
+    if(this.playerBulletPool){
+      this.playerBulletPool.clear();
+      this.playerBulletPool = null;
+    }
+    if(this.mapBuilder){
+      this.mapBuilder.clear();
+      this.mapBuilder = null;
+    }
+
+    this.isCleared = true;
   }
 }

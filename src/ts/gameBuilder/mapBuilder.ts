@@ -3,6 +3,7 @@ import SceneRender from "../scene/sceneRender";
 import BaseThree from "../common/baseThree";
 import Map, { Enemies } from "../apis/map";
 import { Walls } from "../apis/map";
+import { Group, Mesh } from "three";
 
 export default class MapBuilder extends BaseThree {
   public sceneRender: SceneRender;
@@ -14,6 +15,8 @@ export default class MapBuilder extends BaseThree {
   public wallHeight: number = 10;
 
   public wallOpacity: number = 0.4;
+
+  public mapGroup:Group|null = null;
 
   public playerInitPos: THREE.Vector3 = new THREE.Vector3();
 
@@ -27,9 +30,13 @@ export default class MapBuilder extends BaseThree {
   }
 
   start(): void {
+    this.mapGroup = new Group();
     // 建造地板
     this.createGroup();
     this.createWalls();
+    if(this.mapGroup){
+      this.sceneRender.add(this.mapGroup)
+    }
     this.setPlayerInitPos();
     this.setEnemies();
   }
@@ -64,7 +71,8 @@ export default class MapBuilder extends BaseThree {
     var groud = new THREE.Mesh(geometry, material);
     // 地板需要面向天空
     groud.rotateX((-90 / 180) * Math.PI);
-    this.sceneRender.add(groud, false);
+    //this.sceneRender.add(groud, false);
+    this.mapGroup?.add(groud);
   }
 
   /**
@@ -100,7 +108,8 @@ export default class MapBuilder extends BaseThree {
         wallDate.position.y
       );
       wall.name = "walls";
-      this.sceneRender.add(wall);
+      //this.sceneRender.add(wall);
+      this.mapGroup?.add(wall);
     });
   }
 
@@ -120,7 +129,8 @@ export default class MapBuilder extends BaseThree {
     walls.position.z -= this.map.height / 2;
     walls.position.y += this.wallHeight / 2;
     walls.name = "walls";
-    this.sceneRender.add(walls);
+    //this.sceneRender.add(walls);
+    this.mapGroup?.add(walls);
 
     // 下边缘墙壁
     var geometry = new THREE.PlaneGeometry(this.map.width, this.wallHeight);
@@ -134,7 +144,8 @@ export default class MapBuilder extends BaseThree {
     walls.position.z += this.map.height / 2;
     walls.position.y += this.wallHeight / 2;
     walls.name = "walls";
-    this.sceneRender.add(walls);
+    //this.sceneRender.add(walls);
+    this.mapGroup?.add(walls);
 
     // 左边缘墙壁
     var geometry = new THREE.PlaneGeometry(this.map.height, this.wallHeight);
@@ -149,7 +160,8 @@ export default class MapBuilder extends BaseThree {
     walls.position.x -= this.map.width / 2;
     walls.position.y += this.wallHeight / 2;
     walls.name = "walls";
-    this.sceneRender.add(walls);
+    //this.sceneRender.add(walls);
+    this.mapGroup?.add(walls);
 
     // 右边缘墙壁
     var geometry = new THREE.PlaneGeometry(this.map.height, this.wallHeight);
@@ -164,7 +176,21 @@ export default class MapBuilder extends BaseThree {
     walls.position.x += this.map.width / 2;
     walls.position.y += this.wallHeight / 2;
     walls.name = "walls";
-    this.sceneRender.add(walls);
+    //this.sceneRender.add(walls);
+    this.mapGroup?.add(walls);
+  }
+
+  clear(){
+    if(this.mapGroup){
+      this.mapGroup.traverse(function (item) {
+        if (item instanceof Mesh) {
+          item.geometry.dispose(); // 删除几何体
+          item.material.dispose(); // 删除材质
+        }
+      });
+    }
+    this.mapGroup = null;
+    this.isCleared = true;
   }
   update(): void { }
 }

@@ -22,6 +22,8 @@
       class="gameWin"
       :level="gameLevel"
       v-show="gameWinShow"
+      @next="gemeWinNext"
+      @home="home"
     ></game-win>
   </div>
 </template>
@@ -36,6 +38,8 @@ import GameMenu from "@/components/GameMenu.vue";
 import GameWin from "@/components/GameWin.vue";
 import { Vector2 } from "three";
 import Confs from "@/ts/common/confs/confs";
+import router from "@/router";
+import VueRouter from "vue-router";
 
 @Component({
   components: {
@@ -53,7 +57,8 @@ export default class Game extends Vue {
 
   gameWinShow: boolean = false;
 
-  private onGameWinEventBind:(e:Event)=>void = this.onGameWinEvent.bind(this);
+  private onGameWinEventBind: (e: Event) => void =
+    this.onGameWinEvent.bind(this);
 
   mounted() {
     let level = Number(this.level);
@@ -79,6 +84,10 @@ export default class Game extends Vue {
     Confs.PAUSED = false;
     this.three?.clear();
     document.removeEventListener("gameWin", this.onGameWinEventBind);
+    this.three?.renderer?.dispose()
+    this.three?.renderer?.forceContextLoss()
+    
+
   }
 
   get characterHpInfos() {
@@ -144,6 +153,43 @@ export default class Game extends Vue {
       left = left / 2;
     }
     return left;
+  }
+
+  /**
+   * 点击下一关按钮时的响应函数
+   */
+  gemeWinNext() {
+    let level = Number(this.level);
+    if (!isNaN(level)) {
+      // 跳转到下一关页面
+      this.$router.push({
+        name: "Game",
+        params: { level: (level + 1).toString() },
+      });
+    }
+  }
+
+  /**
+   * 点击返回主界面时的响应函数
+   */
+  home() {
+    // 跳转到选择关卡页面
+    router.push({ name: "ChooseLevel" });
+  }
+
+  /**
+   * 界面重新加载
+   */
+  @Watch("level")
+  onWatchRouter(to: number, from: number) {
+    if (this.three) {
+      this.three.reload(to);
+    } else {
+      this.three = new ThreeJs(to);
+      document.addEventListener("gameWin", this.onGameWinEventBind);
+    }
+    Confs.PAUSED = false;
+    this.gameWinShow = false;
   }
 }
 </script>

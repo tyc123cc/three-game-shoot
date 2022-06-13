@@ -48,6 +48,8 @@ export default class ItemBufferPoll extends BaseThree {
     this.items.forEach(item => {
       item.clear();
     })
+    this.items = [];
+    this.isCleared = true;
   }
 
   /**

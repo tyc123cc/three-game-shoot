@@ -1,4 +1,4 @@
-import { BoxBufferGeometry, Mesh, MeshLambertMaterial, TextureLoader, Vector3 } from "three";
+import { BoxBufferGeometry, Material, Mesh, MeshLambertMaterial, Texture, TextureLoader, Vector3 } from "three";
 import BaseThree from "../common/baseThree";
 import Confs from "../common/confs/confs";
 import SceneRender from "../scene/sceneRender";
@@ -13,6 +13,11 @@ export default class Item extends BaseThree {
    * 纹理的地址
    */
   public textureUrl: string;
+
+  /**
+   * 纹理
+   */
+  texture:Texture|null = null;
 
   /**
    * 自旋转速度
@@ -73,6 +78,14 @@ export default class Item extends BaseThree {
 
   clear() {
     document.removeEventListener("getItem", this.getItemEvent);
+    this.mesh?.geometry.dispose();
+    this.texture?.dispose();
+    (this.mesh?.material as Material).dispose();
+    this.colliderMesh?.geometry.dispose();
+    (this.colliderMesh?.material as Material).dispose();
+    this.colliderMesh = null;
+    
+    this.isCleared = true;
   }
 
   /**
@@ -107,6 +120,7 @@ export default class Item extends BaseThree {
     let textureLoader = new TextureLoader();
     // 执行load方法，加载纹理贴图成功后，返回一个纹理对象Texture
     textureLoader.load(this.textureUrl, (texture) => {
+      this.texture = texture;
       let material = new MeshLambertMaterial({
         // 设置颜色纹理贴图：Texture对象作为材质map属性的属性值
         map: texture,//设置颜色贴图属性值

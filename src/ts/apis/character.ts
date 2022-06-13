@@ -7,6 +7,7 @@ import {
   Group,
   LoopOnce,
   LoopRepeat,
+  Mesh,
   Raycaster,
   Vector3,
 } from "three";
@@ -648,5 +649,18 @@ export default class Character extends BaseThree {
         animation.effectScope
       );
     }
+  }
+
+  clear(){
+    if(this.group){
+      this.group.traverse(function (item) {
+        if (item instanceof Mesh) {
+          item.geometry.dispose(); // 删除几何体
+          item.material.dispose(); // 删除材质
+        }
+      });
+    }
+    this.group = null;
+    this.isCleared = true;
   }
 }

@@ -65,14 +65,14 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * 添加事件监听器
    */
   addEventListener() {
-    this.documentMouseMoveEvent = this.onDocumentMouseMove.bind(this)
-    this.documentKeyDownEvent = this.onDocumentKeyDown.bind(this)
+    this.documentMouseMoveEvent = this.onDocumentMouseMove.bind(this);
+    this.documentKeyDownEvent = this.onDocumentKeyDown.bind(this);
     this.documentKeyUpEvent = this.onDocumentKeyUp.bind(this);
     this.documentMouseClickEvent = this.onDocumentMouseClick.bind(this);
     this.getItemEvent = this.getItem.bind(this);
 
     // 添加鼠标移动的事件，用来更新角色朝向
-    document.addEventListener("mousemove", this.documentMouseMoveEvent)
+    document.addEventListener("mousemove", this.documentMouseMoveEvent);
     // 添加键盘按下事件，用于角色移动
     document.addEventListener("keydown", this.documentKeyDownEvent);
     // 添加键盘抬起事件，用于停止角色移动
@@ -84,12 +84,12 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   }
 
   /**
- * 移除事件监听器
- */
+   * 移除事件监听器
+   */
   removeEventListener() {
     if (this.documentMouseMoveEvent) {
       // 移除鼠标移动的事件，用来更新角色朝向
-      document.removeEventListener("mousemove", this.documentMouseMoveEvent)
+      document.removeEventListener("mousemove", this.documentMouseMoveEvent);
     }
     if (this.documentKeyDownEvent) {
       // 移除键盘按下事件，用于角色移动
@@ -106,10 +106,9 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     if (this.getItemEvent) {
       // 添加自定义事件获得道具，用于获得道具后角色的状态变化
       document.removeEventListener("getItem", this.getItemEvent);
-
     }
 
-    this.characterBuilder?.clear();
+    this.clear();
   }
 
   update() {
@@ -186,8 +185,6 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       this.updateCameraPosition();
     }
   }
-
-
 
   /**
    * 根据当前角色朝向与前进方向的夹角来播放动画
@@ -350,7 +347,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * @param e
    */
   getItem(ev: Event) {
-    let event = ev as CustomEvent
+    let event = ev as CustomEvent;
     this.characterBuilder?.character?.cure(Confs.itemAddHP);
     // 获得道具，游戏进度加一
     store.commit(Confs.STORE_ADDPROCESS);

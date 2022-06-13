@@ -73,11 +73,11 @@ export default class Bullet extends BaseThree {
         const sendEvent = new CustomEvent("hit", {
           detail: {
             target,
-            power: this.power
+            power: this.power,
           },
         });
         // 发送事件
-        document.dispatchEvent(sendEvent)
+        document.dispatchEvent(sendEvent);
         // 将物体置为不可见
         this.group.visible = false;
         this.speed = 0;
@@ -185,5 +185,16 @@ export default class Bullet extends BaseThree {
     }
 
     return null;
+  }
+
+  clear() {
+    // 删除掉所有的模型组内的mesh
+    this.group.traverse(function (item) {
+      if (item instanceof THREE.Mesh) {
+        item.geometry.dispose(); // 删除几何体
+        item.material.dispose(); // 删除材质
+      }
+    });
+    this.isCleared = true;
   }
 }

@@ -95,4 +95,11 @@ export default class bulletBufferPool {
     // 发射子弹
     bullet.fire(pos, moveVec, speed);
   }
+
+  clear(){
+    for(let bullet of this.bullets){
+      bullet.clear();
+    }
+    this.bullets = [];
+  }
 }

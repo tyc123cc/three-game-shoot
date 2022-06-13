@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { Material } from "three";
 import AnimationInput from "../apis/animationInput";
 import Character from "../apis/character";
 import CharacterHpInfo from "../apis/characterHpInfo";
@@ -290,5 +291,16 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
         Confs.bulletSpeed
       );
     }
+  }
+
+  clear(){
+    this.characterBuilder?.clear();
+    if(this.collider){
+      this.collider.geometry.dispose();
+      (this.collider.material as Material).dispose();
+      this.collider = null;
+    }
+    this.characterBuilder = null;
+    this.isCleared = true;
   }
 }

@@ -131,8 +131,8 @@ export default class SceneRender extends BaseThree {
     }
     // 设置axesHelper
     // 辅助坐标系  参数250表示坐标系大小，可以根据场景大小去设置
-    var axisHelper = new THREE.AxesHelper(1000);
-    this.scene?.add(axisHelper);
+    // var axisHelper = new THREE.AxesHelper(1000);
+    // this.scene?.add(axisHelper);
   }
 
   // 设置环境光
@@ -140,6 +140,12 @@ export default class SceneRender extends BaseThree {
     if (this.scene) {
       this.scene.add(this.ambientLight);
     }
+  }
+
+  clear() {
+    this.renderer?.dispose();
+    this.scene?.clear();
+    this.collideMeshList = [];
   }
 
   // 渲染

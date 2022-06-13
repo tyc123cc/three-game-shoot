@@ -9,6 +9,11 @@ export default abstract class BaseThree {
   private clock: Clock = new Clock();
 
   /**
+   * 是否已被清理
+   */
+  public isCleared = false;
+
+  /**
    * 每帧时间
    */
   public deltaTime: number = this.clock.getDelta();
@@ -26,12 +31,15 @@ export default abstract class BaseThree {
   abstract start(): void;
 
   private ani() {
-    // 每帧调用
-    requestAnimationFrame(this.ani.bind(this));
+    if (!this.isCleared) {
+      // 每帧调用
+      requestAnimationFrame(this.ani.bind(this));
+    }
+
     // 更新每帧时间
     this.deltaTime = this.clock.getDelta();
     // 10帧以下不执行update
-    if (!Confs.PAUSED && this.deltaTime < 0.1) {
+    if (!this.isCleared && !Confs.PAUSED && this.deltaTime < 0.1) {
       // update主方法
       this.update();
     }
