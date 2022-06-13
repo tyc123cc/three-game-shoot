@@ -293,14 +293,14 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
     }
   }
 
-  clear(){
+  clear() {
+    super.clear()
     this.characterBuilder?.clear();
-    if(this.collider){
+    if (this.collider) {
       this.collider.geometry.dispose();
       (this.collider.material as Material).dispose();
       this.collider = null;
     }
     this.characterBuilder = null;
-    this.isCleared = true;
   }
 }

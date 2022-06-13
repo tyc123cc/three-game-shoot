@@ -8,10 +8,12 @@
     "x": -2.3,
     "y": 9.5
   },
-  "levelFiles":[
+  "levelFiles": [
     "map01",
     "map02",
-    "map03"
+    "map03",
+    "map03",
+    "map04"
   ],
   "bulletHeight": 7,
   "bulletSize": 0.4,

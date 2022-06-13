@@ -143,8 +143,18 @@ export default class SceneRender extends BaseThree {
   }
 
   clear() {
-    this.renderer?.dispose();
+    //super.clear();
     this.scene?.clear();
+    if (this.renderer) {
+      this.renderer.dispose();
+      // this.renderer.forceContextLoss();
+      // let gl = this.renderer.domElement.getContext("webgl");
+      // if (gl) {
+      //   gl.getExtension("WEBGL_lose_context")?.loseContext();
+      // }
+    }
+
+
     this.collideMeshList = [];
   }
 

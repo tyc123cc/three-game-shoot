@@ -7,8 +7,10 @@ import {
   Group,
   LoopOnce,
   LoopRepeat,
+  Material,
   Mesh,
   Raycaster,
+  Texture,
   Vector3,
 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
@@ -651,16 +653,21 @@ export default class Character extends BaseThree {
     }
   }
 
-  clear(){
-    if(this.group){
+  clear() {
+    super.clear();
+    if (this.group) {
       this.group.traverse(function (item) {
         if (item instanceof Mesh) {
           item.geometry.dispose(); // 删除几何体
+          for (let key in item.material) {
+            if (item.material[key] instanceof Texture) {
+              item.material[key].dispose(); // 释放纹理
+            }
+          }
           item.material.dispose(); // 删除材质
         }
       });
     }
     this.group = null;
-    this.isCleared = true;
   }
 }

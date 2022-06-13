@@ -1,4 +1,4 @@
-import { Vector3 } from "three";
+import { Texture, TextureLoader, Vector3 } from "three";
 import BaseThree from "../common/baseThree";
 import Confs from "../common/confs/confs";
 import SceneRender from "../scene/sceneRender";
@@ -25,6 +25,8 @@ export default class ItemBufferPoll extends BaseThree {
    */
   public textureUrl: string;
 
+  public texture: Texture | null = null;
+
 
   public items: Item[] = [];
 
@@ -41,28 +43,35 @@ export default class ItemBufferPoll extends BaseThree {
   }
 
   start() {
+
     this.initPool();
   }
 
   clear() {
+    super.clear()
     this.items.forEach(item => {
       item.clear();
     })
     this.items = [];
-    this.isCleared = true;
+    this.texture?.dispose();
   }
 
   /**
    * 为缓冲池添加道具
    */
   private initPool() {
-    for (let i in this.pollSize) {
-      let item = new Item("item" + i, this.itemSize, this.textureUrl, this.height, this.sceneRender);
-      item.rotateSpeed = Confs.itemRotateSpeed;
-      item.moveSpeed = Confs.itemMoveSpeed;
-      item.generateItem(false);
-      this.items.push(item);
+    let textureLoader = new TextureLoader();
+    textureLoader.load(this.textureUrl, (texture) => {
+      this.texture = texture;
+      for (let i = 0; i < this.pollSize; i++) {
+        let item = new Item("item" + i, this.itemSize, texture, this.height, this.sceneRender);
+        item.rotateSpeed = Confs.itemRotateSpeed;
+        item.moveSpeed = Confs.itemMoveSpeed;
+        item.generateItem(false);
+        this.items.push(item);
+      }
     }
+    )
   }
 
   /**
@@ -78,7 +87,7 @@ export default class ItemBufferPoll extends BaseThree {
     }
     if (!item) {
       // 缓冲池中无空闲道具
-      item = new Item("item" + this.items.length, this.itemSize, this.textureUrl, this.height, this.sceneRender);
+      item = new Item("item" + this.items.length, this.itemSize, this.texture as Texture, this.height, this.sceneRender);
       item.rotateSpeed = Confs.itemRotateSpeed;
       item.moveSpeed = Confs.itemMoveSpeed;
       item.generateItem(true, pos);

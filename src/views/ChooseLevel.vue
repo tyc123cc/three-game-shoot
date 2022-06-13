@@ -1,14 +1,11 @@
 <template >
   <div class="chooseLevel">
     <div class="buttonContainer">
-      <el-button
-        type="primary"
-        v-for="(level, index) in filleNames"
-        :key="level"
-        style="width: 100px"
-        @click="chooseLevel(index)"
-        >第 {{ index + 1 }} 关</el-button
-      >
+      <el-button type="primary"
+                 v-for="(level, index) in filleNames"
+                 :key="index"
+                 style="width: 100px"
+                 @click="chooseLevel(index)">第 {{ index + 1 }} 关</el-button>
     </div>
   </div>
 </template>
@@ -33,7 +30,7 @@ export default class ChooseLevel extends Vue {
    * 选择关卡
    */
   chooseLevel(index: string) {
-    router.push({name:"Game",params:{"level":index.toString()}})
+    router.push({ name: "Game", params: { level: index.toString() } });
   }
 }
 </script>

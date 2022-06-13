@@ -10,14 +10,9 @@ export default class Item extends BaseThree {
   public size: number;
 
   /**
-   * 纹理的地址
-   */
-  public textureUrl: string;
-
-  /**
    * 纹理
    */
-  texture:Texture|null = null;
+  public texture: Texture | null;
 
   /**
    * 自旋转速度
@@ -60,11 +55,11 @@ export default class Item extends BaseThree {
 
   getItemEvent: (e: Event) => void = this.getItem.bind(this)
 
-  constructor(name: string, size: number, textureUrl: string, height: number, sceneRender: SceneRender) {
+  constructor(name: string, size: number, texture: Texture, height: number, sceneRender: SceneRender) {
     super();
     this.name = name;
     this.size = size;
-    this.textureUrl = textureUrl;
+    this.texture = texture;
     this.height = height;
     this.minHeight = this.size / 2 + height / 2;
     this.maxHeight = this.size / 2 + height * 1.5;
@@ -77,15 +72,22 @@ export default class Item extends BaseThree {
   }
 
   clear() {
+    super.clear()
     document.removeEventListener("getItem", this.getItemEvent);
     this.mesh?.geometry.dispose();
-    this.texture?.dispose();
+    if (this.mesh) {
+      let material = this.mesh.material as Material;
+      for (let key in material) {
+        if ((material as any)[key] instanceof Texture) {
+          (material as any)[key].dispose(); // 释放纹理
+        }
+      }
+    }
+
     (this.mesh?.material as Material).dispose();
     this.colliderMesh?.geometry.dispose();
     (this.colliderMesh?.material as Material).dispose();
     this.colliderMesh = null;
-    
-    this.isCleared = true;
   }
 
   /**
@@ -117,35 +119,32 @@ export default class Item extends BaseThree {
    */
   generateItem(visible: boolean = true, pos?: Vector3) {
     let geometry = new BoxBufferGeometry(this.size, this.size, this.size);
-    let textureLoader = new TextureLoader();
     // 执行load方法，加载纹理贴图成功后，返回一个纹理对象Texture
-    textureLoader.load(this.textureUrl, (texture) => {
-      this.texture = texture;
-      let material = new MeshLambertMaterial({
-        // 设置颜色纹理贴图：Texture对象作为材质map属性的属性值
-        map: texture,//设置颜色贴图属性值
-      }); //材质对象Material
-      let mesh = new Mesh(geometry, material); //网格模型对象Mesh
-      mesh.name = this.name;
-      mesh.visible = visible;
-      if (pos) {
-        mesh.position.set(pos.x, pos.y, pos.z);
-      }
-      mesh.position.y = this.size / 2 + this.height;
-      this.mesh = mesh;
-      this.sceneRender.add(mesh, false); //网格模型添加到场景中
-      let colliderGeometry = new BoxBufferGeometry(this.size, this.size, this.size);
-      let collidermaterial = new MeshLambertMaterial(); //材质对象Material
-      this.colliderMesh = new Mesh(colliderGeometry, collidermaterial);
-      this.colliderMesh.name = this.name;
-      // 将碰撞体的坐标下沉，使其在初始化时不会被碰撞
-      this.colliderMesh.position.y = -100;
-      if (pos) {
-        this.colliderMesh.position.set(pos.x, 0, pos.z);
-      }
-      this.sceneRender.setCollider(this.colliderMesh);
+    let material = new MeshLambertMaterial({
+      // 设置颜色纹理贴图：Texture对象作为材质map属性的属性值
+      map: this.texture,//设置颜色贴图属性值
+    }); //材质对象Material
+    let mesh = new Mesh(geometry, material); //网格模型对象Mesh
+    mesh.name = this.name;
+    mesh.visible = visible;
+    if (pos) {
+      mesh.position.set(pos.x, pos.y, pos.z);
+    }
+    mesh.position.y = this.size / 2 + this.height;
+    this.mesh = mesh;
+    this.sceneRender.add(mesh, false); //网格模型添加到场景中
+    let colliderGeometry = new BoxBufferGeometry(this.size, this.size, this.size);
+    let collidermaterial = new MeshLambertMaterial(); //材质对象Material
+    this.colliderMesh = new Mesh(colliderGeometry, collidermaterial);
+    this.colliderMesh.name = this.name;
+    // 将碰撞体的坐标下沉，使其在初始化时不会被碰撞
+    this.colliderMesh.position.y = -100;
+    if (pos) {
+      this.colliderMesh.position.set(pos.x, 0, pos.z);
+    }
+    this.sceneRender.setCollider(this.colliderMesh);
 
-    })
+
   }
 
   setPosition(pos: Vector3) {

@@ -5,6 +5,8 @@ import Confs from "./confs/confs";
  * 公共方法
  */
 export default abstract class BaseThree {
+
+  private animationID: number = -1;
   // 创建一个时钟对象Clock
   private clock: Clock = new Clock();
 
@@ -33,7 +35,7 @@ export default abstract class BaseThree {
   private ani() {
     if (!this.isCleared) {
       // 每帧调用
-      requestAnimationFrame(this.ani.bind(this));
+      this.animationID = requestAnimationFrame(this.ani.bind(this));
     }
 
     // 更新每帧时间
@@ -43,6 +45,11 @@ export default abstract class BaseThree {
       // update主方法
       this.update();
     }
+  }
+
+  clear() {
+    cancelAnimationFrame(this.animationID) // 去除animationFrame
+    this.isCleared = true;
   }
   /**
    * 每帧都会调用该方法

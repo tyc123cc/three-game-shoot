@@ -1,6 +1,6 @@
 import BaseThree from "../common/baseThree";
 import * as THREE from "three";
-import { Group } from "three";
+import { Group, Texture } from "three";
 
 /**
  * 角色射击的子弹类
@@ -188,13 +188,18 @@ export default class Bullet extends BaseThree {
   }
 
   clear() {
+    super.clear()
     // 删除掉所有的模型组内的mesh
     this.group.traverse(function (item) {
       if (item instanceof THREE.Mesh) {
         item.geometry.dispose(); // 删除几何体
+        for (let key in item.material) {
+          if (item.material[key] instanceof Texture) {
+            item.material[key].dispose(); // 释放纹理
+          }
+        }
         item.material.dispose(); // 删除材质
       }
     });
-    this.isCleared = true;
   }
 }

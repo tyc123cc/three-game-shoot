@@ -1,30 +1,30 @@
 <template>
   <div id="threeCanvas">
     <game-menu :originPosY="originY"></game-menu>
-    <blood
-      v-for="character in characterHpInfos"
-      :key="character.name"
-      :current="character.hp"
-      :isShow="character.isShow"
-      :max="character.maxHp"
-      :posX="character.screenPos.x"
-      :posY="character.screenPos.y"
-    ></blood>
-    <rebirth-time-process
-      class="rebirthTime"
-      :nowRebirthTime="nowRebirthTime"
-      :rebirthTime="rebirthTime"
-      :originPosY="originY"
-      :originPosX="rebirthTimeX()"
-    ></rebirth-time-process>
+    <blood v-for="character in characterHpInfos"
+           :key="character.name"
+           :current="character.hp"
+           :isShow="character.isShow"
+           :max="character.maxHp"
+           :posX="character.screenPos.x"
+           :posY="character.screenPos.y"></blood>
+    <rebirth-time-process class="rebirthTime"
+                          :nowRebirthTime="nowRebirthTime"
+                          :rebirthTime="rebirthTime"
+                          :originPosY="originY"
+                          :originPosX="rebirthTimeX()"></rebirth-time-process>
     <game-process :originPosY="originY"></game-process>
-    <game-win
-      class="gameWin"
-      :level="gameLevel"
-      v-show="gameWinShow"
-      @next="gemeWinNext"
-      @home="home"
-    ></game-win>
+    <game-win class="gameWin"
+              :level="gameLevel"
+              v-show="gameWinShow"
+              @next="gemeWinNext"
+              @home="home"></game-win>
+    <game-over class="gameWin"
+               :level="gameLevel"
+               v-show="gameOverShow"
+               @reStart="reStart"
+               @home="home">
+    </game-over>
   </div>
 </template>
 
@@ -36,6 +36,7 @@ import RebirthTimeProcess from "@/components/RebirthTimeProcess.vue";
 import GameProcess from "@/components/GameProcess.vue";
 import GameMenu from "@/components/GameMenu.vue";
 import GameWin from "@/components/GameWin.vue";
+import GameOver from "@/components/GameOver.vue";
 import { Vector2 } from "three";
 import Confs from "@/ts/common/confs/confs";
 import router from "@/router";
@@ -48,6 +49,7 @@ import VueRouter from "vue-router";
     GameProcess,
     GameMenu,
     GameWin,
+    GameOver,
   },
 })
 export default class Game extends Vue {
@@ -56,9 +58,12 @@ export default class Game extends Vue {
   three: ThreeJs | null = null;
 
   gameWinShow: boolean = false;
+  gameOverShow: boolean = false;
 
   private onGameWinEventBind: (e: Event) => void =
     this.onGameWinEvent.bind(this);
+  private onGameOverEventBind: (e: Event) => void =
+    this.onGameOverEvent.bind(this);
 
   mounted() {
     let level = Number(this.level);
@@ -68,6 +73,7 @@ export default class Game extends Vue {
       // 刚加载页面时将暂停状态置为否
       Confs.PAUSED = false;
       document.addEventListener("gameWin", this.onGameWinEventBind);
+      document.addEventListener("gameOver", this.onGameOverEventBind);
       //let options = {fullscreen:true,text:"正在拼命加载"}
       //Loading.service(options);
     }
@@ -79,15 +85,19 @@ export default class Game extends Vue {
     this.gameWinShow = true;
   }
 
+  onGameOverEvent(e: Event) {
+    // 暂停游戏
+    Confs.PAUSED = true;
+    this.gameOverShow = true;
+  }
+
   beforeDestroy() {
     // 继续游戏
     Confs.PAUSED = false;
     this.three?.clear();
     document.removeEventListener("gameWin", this.onGameWinEventBind);
-    this.three?.renderer?.dispose()
-    this.three?.renderer?.forceContextLoss()
-    
-
+    this.three?.sceneRender?.renderer?.dispose();
+    this.three?.sceneRender?.renderer?.forceContextLoss();
   }
 
   get characterHpInfos() {
@@ -167,6 +177,16 @@ export default class Game extends Vue {
         params: { level: (level + 1).toString() },
       });
     }
+  }
+
+  /**
+   * 重新开始游戏
+   */
+  reStart() {
+    // 游戏继续
+    Confs.PAUSED = false;
+    this.three?.reload();
+    this.gameOverShow = false;
   }
 
   /**

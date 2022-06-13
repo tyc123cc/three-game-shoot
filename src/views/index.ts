@@ -25,7 +25,7 @@ export default class ThreeJs extends BaseThree {
   start(): void {
     // console.log('start')
   }
-  update(): void {}
+  update(): void { }
 
   /**
    * 关卡序号
@@ -36,6 +36,7 @@ export default class ThreeJs extends BaseThree {
   camera: THREE.PerspectiveCamera | null = null;
   renderer: THREE.WebGLRenderer | null = null;
   ambientLight: THREE.AmbientLight | null = null;
+  directLight: THREE.DirectionalLight | null = null;
   mesh: THREE.Mesh | null = null;
   controls: OrbitControls | null = null;
   mixer: THREE.AnimationMixer | null = null;
@@ -94,6 +95,11 @@ export default class ThreeJs extends BaseThree {
     if (!this.ambientLight) {
       this.ambientLight = new THREE.AmbientLight(0xaaaaaa); // 环境光
     }
+    if (!this.directLight) {
+      this.directLight = new THREE.DirectionalLight(0xffffff); // 方向光
+      this.directLight.position.set(10, 10, 10);
+    }
+
     if (!this.sceneRender) {
       this.sceneRender = new SceneRender(
         this.camera,
@@ -105,10 +111,9 @@ export default class ThreeJs extends BaseThree {
       // 加入环境光
       this.sceneRender.scene?.add(this.ambientLight);
     }
+    this.sceneRender.add(this.directLight, false);
+    console.log(this.sceneRender?.renderer?.info)
 
-    let light = new THREE.DirectionalLight(0xffffff);
-    light.position.set(10, 10, 10);
-    this.sceneRender.scene?.add(light);
 
     // 创建地图
     this.mapBuilder = new MapBuilder(
@@ -160,7 +165,7 @@ export default class ThreeJs extends BaseThree {
     if (this.playerBuilder.characterHpInfo) {
       this.characterHpInfos.push(this.playerBuilder.characterHpInfo);
     }
-    if(!this.itemBufferPool){
+    if (!this.itemBufferPool) {
       this.itemBufferPool = new ItemBufferPoll(
         2,
         Confs.itemSize,
@@ -169,7 +174,7 @@ export default class ThreeJs extends BaseThree {
         this.sceneRender
       );
     }
-    
+
 
     for (let enemy of this.mapBuilder.enemies) {
       this.enemyBuilders.push(
@@ -200,7 +205,6 @@ export default class ThreeJs extends BaseThree {
     this.clear();
     // 重新加载界面不清理该类
     this.isCleared = false;
-    console.log(this.sceneRender?.renderer?.info)
     if (levelIndex) {
       this.levelIndex = levelIndex;
     }
@@ -209,7 +213,11 @@ export default class ThreeJs extends BaseThree {
     this.init();
   }
 
+  /**
+   * 清理场景
+   */
   clear() {
+    super.clear()
     this.sceneRender?.clear();
     this.playerBuilder?.removeEventListener();
     this.enemyBuilders.forEach((enemy: EnemyBuilder) => {
@@ -221,19 +229,18 @@ export default class ThreeJs extends BaseThree {
       this.itemBufferPool.clear();
       this.itemBufferPool = null;
     }
-    if(this.enemyBulletPool){
+    if (this.enemyBulletPool) {
       this.enemyBulletPool.clear();
       this.enemyBulletPool = null;
     }
-    if(this.playerBulletPool){
+    if (this.playerBulletPool) {
       this.playerBulletPool.clear();
       this.playerBulletPool = null;
     }
-    if(this.mapBuilder){
+    if (this.mapBuilder) {
       this.mapBuilder.clear();
       this.mapBuilder = null;
     }
 
-    this.isCleared = true;
   }
 }

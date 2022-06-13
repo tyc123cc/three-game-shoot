@@ -67,10 +67,10 @@ export default class CharacterBuilder extends BaseThree {
   }
 
   clear() {
+    super.clear()
     document.removeEventListener("hit", this.hitEvent)
     this.character?.clear();
     this.character = null;
-    this.isCleared = true;
   }
 
 

@@ -3,12 +3,14 @@ import SceneRender from "../scene/sceneRender";
 import BaseThree from "../common/baseThree";
 import Map, { Enemies } from "../apis/map";
 import { Walls } from "../apis/map";
-import { Group, Mesh } from "three";
+import { Group, Material, Mesh, Texture } from "three";
 
 export default class MapBuilder extends BaseThree {
   public sceneRender: SceneRender;
 
   public map: Map;
+
+  public group: Mesh | null = null;
 
   public wallColor: number = 0x0099ff;
 
@@ -16,7 +18,7 @@ export default class MapBuilder extends BaseThree {
 
   public wallOpacity: number = 0.4;
 
-  public mapGroup:Group|null = null;
+  public mapGroup: Group | null = null;
 
   public playerInitPos: THREE.Vector3 = new THREE.Vector3();
 
@@ -34,7 +36,7 @@ export default class MapBuilder extends BaseThree {
     // 建造地板
     this.createGroup();
     this.createWalls();
-    if(this.mapGroup){
+    if (this.mapGroup) {
       this.sceneRender.add(this.mapGroup)
     }
     this.setPlayerInitPos();
@@ -69,10 +71,12 @@ export default class MapBuilder extends BaseThree {
       color: 0x555555 /*side: THREE.DoubleSide*/,
     });
     var groud = new THREE.Mesh(geometry, material);
+    groud.name = "groud"
     // 地板需要面向天空
     groud.rotateX((-90 / 180) * Math.PI);
-    //this.sceneRender.add(groud, false);
-    this.mapGroup?.add(groud);
+    this.sceneRender.add(groud, false);
+    this.group = groud;
+    //this.mapGroup?.add(groud);
   }
 
   /**
@@ -180,17 +184,24 @@ export default class MapBuilder extends BaseThree {
     this.mapGroup?.add(walls);
   }
 
-  clear(){
-    if(this.mapGroup){
+  clear() {
+    super.clear()
+    if (this.mapGroup) {
       this.mapGroup.traverse(function (item) {
         if (item instanceof Mesh) {
           item.geometry.dispose(); // 删除几何体
+          for (let key in item.material) {
+            if (item.material[key] instanceof Texture) {
+              item.material[key].dispose(); // 释放纹理
+            }
+          }
           item.material.dispose(); // 删除材质
         }
       });
     }
+    this.group?.geometry.dispose();
+    (this.group?.material as Material).dispose();
     this.mapGroup = null;
-    this.isCleared = true;
   }
   update(): void { }
 }

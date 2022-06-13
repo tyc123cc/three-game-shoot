@@ -1,18 +1,25 @@
 {
   "width": 100,
   "height": 50,
-  "targetProcess":1,
-  "life":3,
+  "targetProcess": 2,
+  "life": 3,
   "initPos": {
-    "x": 45,
+    "x": 20,
     "y": -20
   },
   "enemies": [
     {
       "name": "enemy1",
       "initPos": {
-        "x": 40,
+        "x": 30,
         "y": -20
+      }
+    },
+    {
+      "name": "enemy2",
+      "initPos": {
+        "x": -30,
+        "y": -17
       }
     }
   ],
