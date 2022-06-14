@@ -104,8 +104,8 @@ export default class Game extends Vue {
 
   @Watch("three.isLoaded")
   loaded(newVal: any, oldVal: any) {
-    if (typeof(newVal) == "boolean") {
-      this.loading = !newVal
+    if (typeof newVal == "boolean") {
+      this.loading = !newVal;
     }
   }
 
@@ -237,6 +237,7 @@ export default class Game extends Vue {
     } else {
       this.three = new ThreeJs(to);
       document.addEventListener("gameWin", this.onGameWinEventBind);
+      document.addEventListener("gameOver", this.onGameOverEventBind);
     }
     Confs.PAUSED = false;
     this.gameWinShow = false;
