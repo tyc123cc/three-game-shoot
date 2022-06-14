@@ -65,6 +65,16 @@ export default class ThreeJs extends BaseThree {
   // 敌人子弹缓冲池
   enemyBulletPool: bulletBufferPool | null = null;
 
+  /**
+   * 场景是否加载完毕
+   */
+  isLoaded:boolean = false;
+
+  // 目前已加载完毕的角色
+  loadedNum:number = 0;
+  // 总共需要加载的角色
+  totalLoadingNum:number = 0;
+
   constructor(index: number) {
     super();
     this.levelIndex = index;
@@ -120,7 +130,8 @@ export default class ThreeJs extends BaseThree {
       require("../assets/map/" + mapName + ".json"),
       this.sceneRender
     );
-
+    // 总共需要加载的角色：敌人数目+玩家
+    this.totalLoadingNum = this.mapBuilder.enemies.length + 1;
     // 初始化游戏进度
     store.commit(Confs.STORE_RESETPROCESS, {
       targetProcess: this.mapBuilder.map.targetProcess,
@@ -160,7 +171,13 @@ export default class ThreeJs extends BaseThree {
       this.sceneRender,
       this.camera,
       this.playerBulletPool,
-      this.mapBuilder.playerInitPos
+      this.mapBuilder.playerInitPos,
+      (object)=>{
+        this.loadedNum++;
+        if(this.loadedNum >= this.totalLoadingNum){
+          this.isLoaded = true;
+        }
+      }
     );
     if (this.playerBuilder.characterHpInfo) {
       this.characterHpInfos.push(this.playerBuilder.characterHpInfo);
@@ -186,7 +203,14 @@ export default class ThreeJs extends BaseThree {
           this.enemyBulletPool,
           this.mapBuilder,
           this.itemBufferPool,
-          new THREE.Vector3(enemy.initPos.x, 0, enemy.initPos.y)
+          enemy.naviDelayTime,
+          new THREE.Vector3(enemy.initPos.x, 0, enemy.initPos.y),
+          (object)=>{
+            this.loadedNum++;
+            if(this.loadedNum >= this.totalLoadingNum){
+              this.isLoaded = true;
+            }
+          }
         )
       );
     }
@@ -219,7 +243,7 @@ export default class ThreeJs extends BaseThree {
   clear() {
     super.clear()
     this.sceneRender?.clear();
-    this.playerBuilder?.removeEventListener();
+    this.playerBuilder?.clear();
     this.enemyBuilders.forEach((enemy: EnemyBuilder) => {
       enemy.clear();
     });

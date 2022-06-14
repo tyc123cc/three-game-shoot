@@ -1,29 +1,43 @@
 <template>
-  <div id="threeCanvas">
+  <div
+    id="threeCanvas"
+    v-loading="loading"
+    element-loading-text="拼命加载中..."
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 0.8)"
+  >
     <game-menu :originPosY="originY"></game-menu>
-    <blood v-for="character in characterHpInfos"
-           :key="character.name"
-           :current="character.hp"
-           :isShow="character.isShow"
-           :max="character.maxHp"
-           :posX="character.screenPos.x"
-           :posY="character.screenPos.y"></blood>
-    <rebirth-time-process class="rebirthTime"
-                          :nowRebirthTime="nowRebirthTime"
-                          :rebirthTime="rebirthTime"
-                          :originPosY="originY"
-                          :originPosX="rebirthTimeX()"></rebirth-time-process>
+    <blood
+      v-for="character in characterHpInfos"
+      :key="character.name"
+      :current="character.hp"
+      :isShow="character.isShow"
+      :max="character.maxHp"
+      :posX="character.screenPos.x"
+      :posY="character.screenPos.y"
+    ></blood>
+    <rebirth-time-process
+      class="rebirthTime"
+      :nowRebirthTime="nowRebirthTime"
+      :rebirthTime="rebirthTime"
+      :originPosY="originY"
+      :originPosX="rebirthTimeX()"
+    ></rebirth-time-process>
     <game-process :originPosY="originY"></game-process>
-    <game-win class="gameWin"
-              :level="gameLevel"
-              v-show="gameWinShow"
-              @next="gemeWinNext"
-              @home="home"></game-win>
-    <game-over class="gameWin"
-               :level="gameLevel"
-               v-show="gameOverShow"
-               @reStart="reStart"
-               @home="home">
+    <game-win
+      class="gameWin"
+      :level="gameLevel"
+      v-show="gameWinShow"
+      @next="gemeWinNext"
+      @home="home"
+    ></game-win>
+    <game-over
+      class="gameWin"
+      :level="gameLevel"
+      v-show="gameOverShow"
+      @reStart="reStart"
+      @home="home"
+    >
     </game-over>
   </div>
 </template>
@@ -37,10 +51,12 @@ import GameProcess from "@/components/GameProcess.vue";
 import GameMenu from "@/components/GameMenu.vue";
 import GameWin from "@/components/GameWin.vue";
 import GameOver from "@/components/GameOver.vue";
-import { Vector2 } from "three";
+import { Color, Vector2 } from "three";
 import Confs from "@/ts/common/confs/confs";
 import router from "@/router";
 import VueRouter from "vue-router";
+import { Loading } from "element-ui";
+import { ElLoadingComponent } from "element-ui/types/loading";
 
 @Component({
   components: {
@@ -60,6 +76,8 @@ export default class Game extends Vue {
   gameWinShow: boolean = false;
   gameOverShow: boolean = false;
 
+  loading: boolean = true;
+
   private onGameWinEventBind: (e: Event) => void =
     this.onGameWinEvent.bind(this);
   private onGameOverEventBind: (e: Event) => void =
@@ -74,8 +92,20 @@ export default class Game extends Vue {
       Confs.PAUSED = false;
       document.addEventListener("gameWin", this.onGameWinEventBind);
       document.addEventListener("gameOver", this.onGameOverEventBind);
-      //let options = {fullscreen:true,text:"正在拼命加载"}
-      //Loading.service(options);
+      // let options = {
+      //   fullscreen: true,
+      //   text: "正在拼命加载...",
+      //   spinner: "el-icon-loading",
+      //   background: "rgba(0,0,0,0.8)",
+      // };
+      // this.loadingInstance = Loading.service(options);
+    }
+  }
+
+  @Watch("three.isLoaded")
+  loaded(newVal: any, oldVal: any) {
+    if (typeof(newVal) == "boolean") {
+      this.loading = !newVal
     }
   }
 
@@ -233,3 +263,11 @@ export default class Game extends Vue {
   position: absolute;
 }
 </style>
+
+function rgba(arg0: number, arg1: number, arg2: number, arg3: number) {
+  throw new Error("Function not implemented.");
+}
+
+function rgba(arg0: number, arg1: number, arg2: number, arg3: number) {
+  throw new Error("Function not implemented.");
+}

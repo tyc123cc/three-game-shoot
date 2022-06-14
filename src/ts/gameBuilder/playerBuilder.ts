@@ -34,7 +34,8 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     sceneRender: SceneRender,
     camera: THREE.Camera,
     bulletPool: bulletBufferPool,
-    initPos?: THREE.Vector3
+    initPos?: THREE.Vector3,
+    onLoad?: (object: THREE.Group) => void
   ) {
     super(
       "player",
@@ -48,9 +49,15 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       camera,
       (object) => {
         this.player = this.characterBuilder;
+        if(onLoad){
+          onLoad(object);
+        }
       },
       bulletPool,
-      initPos
+      initPos,
+      (event:ProgressEvent<EventTarget>)=>{
+        
+      }
     );
     this.rebirthTime = Confs.playerRebirthTime;
     this.enable();
@@ -84,9 +91,10 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   }
 
   /**
-   * 移除事件监听器
+   * 移除事件监听器并清理模型
    */
-  removeEventListener() {
+  clear() {
+    super.clear();
     if (this.documentMouseMoveEvent) {
       // 移除鼠标移动的事件，用来更新角色朝向
       document.removeEventListener("mousemove", this.documentMouseMoveEvent);
@@ -108,7 +116,6 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       document.removeEventListener("getItem", this.getItemEvent);
     }
 
-    this.clear();
   }
 
   update() {

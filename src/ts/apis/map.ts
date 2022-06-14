@@ -23,6 +23,10 @@ export default class Map {
 export class Enemies{
   public name:string = "";
   public initPos:Vector2 = new Vector2(0,0);
+  /**
+   * 敌人寻路初始延迟时间，用来防止多个敌人同时进行复杂寻路导致的卡顿
+   */
+  public naviDelayTime:number = 0;
 
 }
 

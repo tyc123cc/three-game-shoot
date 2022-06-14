@@ -369,6 +369,11 @@ export default class CharacterBuilder extends BaseThree {
           }
           this.onAnimationSuccess(object);
           this.loadCharacter(animationIndex + 1);
+        },
+        (event: ProgressEvent<EventTarget>) =>{
+          if(this.onProgress){
+            this.onProgress(event);
+          }
         }
       );
       this.animations.push(animation);
@@ -382,6 +387,11 @@ export default class CharacterBuilder extends BaseThree {
           object.name = this.name;
           this.scene.add(object, false);
           this.onLoad(object);
+        },
+        (event: ProgressEvent<EventTarget>) =>{
+          if(this.onProgress){
+            this.onProgress(event);
+          }
         }
       );
       character.name = this.name;

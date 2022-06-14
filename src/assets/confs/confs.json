@@ -24,6 +24,7 @@
   "enemyRange": 20,
   "enemyShootCD": 1,
   "enemyRebirthTime": 10,
+  "enemyNaviTime":3,
   "playerRebirthTime": 5,
   "enemyBulletPower": 0,
   "playerBulletPower": 20,

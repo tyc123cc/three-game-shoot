@@ -117,6 +117,11 @@ export default class Character extends BaseThree {
    */
   public maxHp: number = 100;
 
+  /**
+   * 是否加载完毕
+   */
+  public loaded:boolean = false;
+
   constructor(
     url: string,
     animations: Array<Animation>,
@@ -136,6 +141,7 @@ export default class Character extends BaseThree {
       (object) => {
         this.group = object;
         this.mixer = new AnimationMixer(object.children[skinMeshIndex]);
+        this.loaded = true;
         onLoad(object);
       },
       onProgress,

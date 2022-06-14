@@ -49,6 +49,13 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
   bulletPool: bulletBufferPool;
 
   onLoad: (object: THREE.Group) => void;
+  private onProgress?: (event: ProgressEvent) => void;
+  private onError?: (event: ErrorEvent) => void;
+
+  /**
+   * 是否加载完毕
+   */
+  loaded:boolean = false;
 
   constructor(
     name: string,
@@ -62,7 +69,9 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
     camera: THREE.Camera,
     onLoad: (object: THREE.Group) => void,
     bulletPool: bulletBufferPool,
-    initPos?: THREE.Vector3
+    initPos?: THREE.Vector3,
+    onProgress?: (event: ProgressEvent) => void,
+    onError?: (event: ErrorEvent) => void
   ) {
     super();
     this.sceneRender = sceneRender;
@@ -79,11 +88,14 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
     if (initPos) {
       this.initPos = initPos;
     }
+    this.onProgress = onProgress;
+    this.onError = onError;
     //this.enable();
   }
 
   start() {
     this.createCharacter();
+
   }
 
   createCharacter() {
@@ -163,7 +175,9 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
         player.addCollider(mesh);
         this.characterBuilder = player;
         this.onLoad(object);
-      }
+        this.loaded = true;
+      },
+      this.onProgress
     );
 
     // 创建血条信息

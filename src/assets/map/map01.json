@@ -4,7 +4,7 @@
   "targetProcess": 2,
   "life": 3,
   "initPos": {
-    "x": 20,
+    "x": 45,
     "y": -20
   },
   "enemies": [
@@ -13,14 +13,24 @@
       "initPos": {
         "x": 30,
         "y": -20
-      }
+      },
+      "naviDelayTime":0
     },
     {
       "name": "enemy2",
       "initPos": {
         "x": -30,
         "y": -17
-      }
+      },
+      "naviDelayTime":0.5
+    },
+    {
+      "name": "enemy3",
+      "initPos": {
+        "x": -33,
+        "y": -17
+      },
+      "naviDelayTime":0.2
     }
   ],
   "walls": [

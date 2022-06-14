@@ -16,7 +16,6 @@ import MapBuilder from "./mapBuilder";
 import PlayerAndEnemyCommonBuilder from "./playerAndEnemyCommonBuilder";
 
 export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
-
   enemy: CharacterBuilder | null = null;
   collider: THREE.Mesh | null = null;
   mousePoint: THREE.Vector2 = new THREE.Vector2();
@@ -41,6 +40,22 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
   characterHpInfo: CharacterHpInfo | null = null;
 
   navigation: AStar | null = null;
+  /**
+   * 寻路路径
+   */
+  naviPath: THREE.Vector3[] = [];
+  /**
+   * 寻路路径索引
+   */
+  naviIndex: number = 0;
+  /**
+   * 寻路定时器返回的时间值，clear时需要
+   */
+  naviTimer: number = 0;
+  /**
+   * 寻路定时器开始延迟时间
+   */
+  naviDelayTime: number = 0;
 
   public itemBufferPool: ItemBufferPoll;
 
@@ -52,7 +67,9 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
     bulletPool: bulletBufferPool,
     mapBuilder: MapBuilder,
     itemBufferPool: ItemBufferPoll,
-    initPos?: THREE.Vector3
+    naviDelayTime: number,
+    initPos?: THREE.Vector3,
+    onLoad?: (object: THREE.Group) => void
   ) {
     super(
       name,
@@ -75,8 +92,11 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
           this.sceneRender.collideMeshList,
           this.name,
           target.name,
-          1
+          0.6
         );
+        if(onLoad){
+          onLoad(object);
+        }
       },
       bulletPool,
       initPos
@@ -86,11 +106,30 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
     this.target = target;
     this.rebirthTime = Confs.enemyRebirthTime;
     this.itemBufferPool = itemBufferPool;
+    this.naviDelayTime = naviDelayTime;
     this.enable();
   }
 
   start() {
     super.start();
+    setTimeout(() => {
+      // 构建定时器，定时创建线程去构建寻路路径
+      this.naviTimer = setInterval(() => {
+        this.buildNaviPath();
+      }, Confs.enemyNaviTime * 1000);
+    }, this.naviDelayTime * 1000);
+  }
+
+  /**
+   * 构建寻路路径
+   */
+  buildNaviPath() {
+    if (this.navigation) {
+      // 构建寻路路径
+      this.naviPath = this.navigation.builder();
+      // 寻路索引为0
+      this.naviIndex = 0;
+    }
   }
 
   /**
@@ -99,13 +138,18 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
   death(): void {
     if (this.characterBuilder?.character?.group) {
       // 敌人死亡后生成道具
-      this.itemBufferPool.generateItem(this.characterBuilder.character.group.position)
+      this.itemBufferPool.generateItem(
+        this.characterBuilder.character.group.position
+      );
     }
   }
 
   update() {
     super.update();
-    if (this.characterStatus == CharacterStatus.Alive && this.target.characterStatus == CharacterStatus.Alive) {
+    if (
+      this.characterStatus == CharacterStatus.Alive &&
+      this.target.characterStatus == CharacterStatus.Alive
+    ) {
       this.updateLookPoint();
       let isShoot = this.shoot();
       if (!isShoot) {
@@ -277,13 +321,16 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
             this.enemy.character.group.position
           ) < 0.2)
       ) {
-        let naviPath = this.navigation?.builder();
+        // 做局部变量，刻意产生脏读现象，避免开始和中间使用的数据不同情况
+        let [...naviPath] = this.naviPath;
+        let naviIndex = this.naviIndex;
         // 可能出现下一节点坐标与当前坐标过于接近，此时不更新角色朝向，避免出现闪顿现象
         if (
           naviPath.length > 0 &&
-          naviPath[0].distanceTo(this.enemy.character.group.position) >= 0.2
+          naviIndex < naviPath.length
+          // this.naviPath[naviIndex].distanceTo(this.enemy.character.group.position) >= 0.2
         ) {
-          this.enemy?.moveTo(naviPath[0], Confs.backSpeed);
+          this.enemy?.moveTo(naviPath[naviIndex], Confs.backSpeed);
           // 使用gsap做补间动画，使转向动作连贯
           let originPos = {
             x: this.lookPoint.x,
@@ -297,18 +344,26 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
           // 使用gsap平滑转向动作
           this.tweenTarget = gsap.to(originPos, {
             duration: 0.3,
-            x: naviPath[0].x,
-            y: naviPath[0].y,
-            z: naviPath[0].z,
+            x: naviPath[naviIndex].x,
+            y: naviPath[naviIndex].y,
+            z: naviPath[naviIndex].z,
             onUpdate: () => {
               this.characterBuilder?.lookAt(
                 new THREE.Vector3(originPos.x, originPos.y, originPos.z)
               );
             },
           });
-          this.lookPoint = naviPath[0];
+          this.lookPoint = this.naviPath[naviIndex];
+          // 寻路索引+1
+          this.naviIndex++;
         }
       }
     }
+  }
+
+  clear(): void {
+    super.clear();
+    // 清理定时器
+    clearInterval(this.naviTimer);
   }
 }

@@ -73,6 +73,11 @@ export default class ConfsVar {
   public enemyBulletPower: number = 0;
 
   /**
+   * 敌人寻路间隔时间
+   */
+  public enemyNaviTime: number = 0;
+
+  /**
    * 玩家子弹威力
    */
   public playerBulletPower: number = 0;

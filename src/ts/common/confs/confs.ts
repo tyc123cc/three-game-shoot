@@ -94,6 +94,11 @@ export default class Confs {
   public static enemyBulletPower: number;
 
   /**
+   * 敌人寻路间隔时间
+   */
+  public static enemyNaviTime:number;
+
+  /**
    * 玩家子弹威力
    */
   public static playerBulletPower: number;
@@ -147,5 +152,6 @@ export default class Confs {
     this.itemHeight = confVars.itemHeight;
     this.itemAddHP = confVars.itemAddHP;
     this.levelFiles = confVars.levelFiles;
+    this.enemyNaviTime = confVars.enemyNaviTime;
   }
 }
