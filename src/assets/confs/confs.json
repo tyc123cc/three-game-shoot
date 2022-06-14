@@ -8,6 +8,10 @@
     "x": -2.3,
     "y": 9.5
   },
+  "FPSHpInfoOffsetPos": {
+    "x": 0,
+    "y": 9.5
+  },
   "levelFiles": [
     "map01",
     "map02",
@@ -24,7 +28,7 @@
   "enemyRange": 20,
   "enemyShootCD": 1,
   "enemyRebirthTime": 10,
-  "enemyNaviTime":3,
+  "enemyNaviTime": 3,
   "playerRebirthTime": 5,
   "enemyBulletPower": 0,
   "playerBulletPower": 20,
@@ -32,5 +36,6 @@
   "itemRotateSpeed": 1,
   "itemMoveSpeed": 1,
   "itemHeight": 1,
-  "itemAddHP": 10
+  "itemAddHP": 10,
+  "FPSCameraHeight": 9
 }

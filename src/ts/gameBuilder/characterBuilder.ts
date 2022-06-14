@@ -103,8 +103,10 @@ export default class CharacterBuilder extends BaseThree {
           speed
         );
       } else {
+        let lookPointGroud = this.character.lookPoint.clone();
+        lookPointGroud.y = 0;
         // 角色前进 以自身坐标系为准 朝向目标点移动
-        this.moveTo(this.character.lookPoint, speed);
+        this.moveTo(lookPointGroud, speed);
       }
     }
   }
@@ -123,13 +125,15 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色后退 以自身坐标系为准 朝向目标点反方向移动
+        let lookPointGroud = this.character.lookPoint.clone();
+        lookPointGroud.y = 0;
         this.moveTo(
           this.character.group.position
             .clone()
             .add(
               this.character.group.position
                 .clone()
-                .sub(this.character.lookPoint)
+                .sub(lookPointGroud)
             ),
           speed
         );
@@ -151,8 +155,10 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色左移 以自身坐标系为准
+        let lookPointGroud = this.character.lookPoint.clone();
+        lookPointGroud.y = 0;
         let targetPos = ThreeMath.changeAngleFromYAxis(
-          this.character.lookPoint.clone().sub(this.character.group.position),
+          lookPointGroud.clone().sub(this.character.group.position),
           -Math.PI / 2
         );
         this.moveTo(
@@ -177,8 +183,10 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色右移动 以自身坐标系为准
+        let lookPointGroud = this.character.lookPoint.clone();
+        lookPointGroud.y = 0;
         let targetPos = ThreeMath.changeAngleFromYAxis(
-          this.character.lookPoint.clone().sub(this.character.group.position),
+          lookPointGroud.clone().sub(this.character.group.position),
           Math.PI / 2
         );
         this.moveTo(
@@ -203,8 +211,10 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色左前进 以自身坐标系为准
+        let lookPointGroud = this.character.lookPoint.clone();
+        lookPointGroud.y = 0;
         let targetPos = ThreeMath.changeAngleFromYAxis(
-          this.character.lookPoint.clone().sub(this.character.group.position),
+          lookPointGroud.clone().sub(this.character.group.position),
           -Math.PI / 4
         );
         this.moveTo(
@@ -229,8 +239,10 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色右前进 以自身坐标系为准
+        let lookPointGroud = this.character.lookPoint.clone();
+        lookPointGroud.y = 0;
         let targetPos = ThreeMath.changeAngleFromYAxis(
-          this.character.lookPoint.clone().sub(this.character.group.position),
+          lookPointGroud.clone().sub(this.character.group.position),
           Math.PI / 4
         );
         this.moveTo(
@@ -255,8 +267,10 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色左后退 以自身坐标系为准
+        let lookPointGroud = this.character.lookPoint.clone();
+        lookPointGroud.y = 0;
         let targetPos = ThreeMath.changeAngleFromYAxis(
-          this.character.group.position.clone().sub(this.character.lookPoint),
+          this.character.group.position.clone().sub(lookPointGroud),
           Math.PI / 4
         );
         this.moveTo(
@@ -281,8 +295,10 @@ export default class CharacterBuilder extends BaseThree {
         );
       } else {
         // 角色右后退 以自身坐标系为准
+        let lookPointGroud = this.character.lookPoint.clone();
+        lookPointGroud.y = 0;
         let targetPos = ThreeMath.changeAngleFromYAxis(
-          this.character.group.position.clone().sub(this.character.lookPoint),
+          this.character.group.position.clone().sub(lookPointGroud),
           -Math.PI / 4
         );
         this.moveTo(
@@ -370,8 +386,8 @@ export default class CharacterBuilder extends BaseThree {
           this.onAnimationSuccess(object);
           this.loadCharacter(animationIndex + 1);
         },
-        (event: ProgressEvent<EventTarget>) =>{
-          if(this.onProgress){
+        (event: ProgressEvent<EventTarget>) => {
+          if (this.onProgress) {
             this.onProgress(event);
           }
         }
@@ -388,8 +404,8 @@ export default class CharacterBuilder extends BaseThree {
           this.scene.add(object, false);
           this.onLoad(object);
         },
-        (event: ProgressEvent<EventTarget>) =>{
-          if(this.onProgress){
+        (event: ProgressEvent<EventTarget>) => {
+          if (this.onProgress) {
             this.onProgress(event);
           }
         }

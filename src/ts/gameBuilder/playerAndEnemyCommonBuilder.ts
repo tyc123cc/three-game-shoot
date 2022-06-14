@@ -3,7 +3,7 @@ import { Material } from "three";
 import AnimationInput from "../apis/animationInput";
 import Character from "../apis/character";
 import CharacterHpInfo from "../apis/characterHpInfo";
-import { AniEffectScope, CharacterStatus } from "../apis/enum";
+import { AniEffectScope, CameraMode, CharacterStatus } from "../apis/enum";
 import bulletBufferPool from "../bullet/bulletBufferPool";
 import BaseThree from "../common/baseThree";
 import Confs from "../common/confs/confs";
@@ -55,7 +55,7 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
   /**
    * 是否加载完毕
    */
-  loaded:boolean = false;
+  loaded: boolean = false;
 
   constructor(
     name: string,
@@ -258,8 +258,10 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
       let HpInfo = this.characterHpInfo;
       if (HpInfo) {
         HpInfo.screenPos = screenPos;
-        let tempV = character.group.position
-          .clone()
+        let characterPos = Confs.CAMERA_MODE == CameraMode.TPS ?
+          character.group.position.clone() :
+          new THREE.Vector3(character.group.position.x, Confs.FPSCameraHeight, character.group.position.z)
+        let tempV = characterPos
           .applyMatrix4(this.camera.matrixWorldInverse)
           .applyMatrix4(this.camera.projectionMatrix);
 

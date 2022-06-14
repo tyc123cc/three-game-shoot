@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { CameraMode } from "../apis/enum";
 import Confs from "../common/confs/confs";
 import SceneRender from "../scene/sceneRender";
 
@@ -16,8 +17,8 @@ export default class ThreeMath {
   ) {
     var p = vec.clone();
     // 设置偏移值
-    p.x += Confs.hpInfoOffsetPos.x;
-    p.y += Confs.hpInfoOffsetPos.y;
+    p.x += Confs.CAMERA_MODE == CameraMode.TPS ? Confs.hpInfoOffsetPos.x : Confs.FPSHpInfoOffsetPos.x;
+    p.y += Confs.CAMERA_MODE == CameraMode.TPS ? Confs.hpInfoOffsetPos.y : Confs.FPSHpInfoOffsetPos.y;
     var vector = p.project(camera);
     let width = 0,
       height = 0;
@@ -27,7 +28,10 @@ export default class ThreeMath {
     }
     vector.x = ((vector.x + 1) / 2) * width;
     vector.y = (-(vector.y - 1) / 2) * height;
-
+    if (Confs.CAMERA_MODE == CameraMode.FPS) {
+      // 第一人称视角下，直接将血条往左拉，值大小与血条控件长度有关
+      vector.x -= 70;
+    }
     return new THREE.Vector2(vector.x, vector.y);
   }
 

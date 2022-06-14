@@ -1,3 +1,4 @@
+import { CameraMode } from "@/ts/apis/enum";
 import ConfsVar from "./confsVar";
 
 export default class Confs {
@@ -16,6 +17,9 @@ export default class Confs {
    */
   public static readonly STORE_ADDPROCESS = "addProcess";
 
+  /**
+   * 是否点击了UI
+   */
   public static CLICKUI = false;
 
   /**
@@ -24,9 +28,14 @@ export default class Confs {
   public static PAUSED: boolean = false;
 
   /**
+   * 摄像机模式
+   */
+  public static CAMERA_MODE: CameraMode = CameraMode.TPS;
+
+  /**
    * 关卡文件名
    */
-  public static levelFiles:string[];
+  public static levelFiles: string[];
 
   /**
    * 摄像机偏移量
@@ -37,6 +46,11 @@ export default class Confs {
    * 血条偏移量
    */
   public static hpInfoOffsetPos: THREE.Vector3;
+
+  /**
+   * 第一人称视角下血条偏移值
+   */
+  public static FPSHpInfoOffsetPos: THREE.Vector3;
 
   /**
    * 子弹发射高度
@@ -96,7 +110,7 @@ export default class Confs {
   /**
    * 敌人寻路间隔时间
    */
-  public static enemyNaviTime:number;
+  public static enemyNaviTime: number;
 
   /**
    * 玩家子弹威力
@@ -129,6 +143,11 @@ export default class Confs {
   public static itemAddHP: number;
 
   /**
+   * 第一人称摄像机高度
+   */
+  public static FPSCameraHeight: number;
+
+  /**
    * 配置设置项
    */
   public static setting(confVars: ConfsVar) {
@@ -153,5 +172,7 @@ export default class Confs {
     this.itemAddHP = confVars.itemAddHP;
     this.levelFiles = confVars.levelFiles;
     this.enemyNaviTime = confVars.enemyNaviTime;
+    this.FPSCameraHeight = confVars.FPSCameraHeight;
+    this.FPSHpInfoOffsetPos = confVars.FPSHpInfoOffsetPos;
   }
 }

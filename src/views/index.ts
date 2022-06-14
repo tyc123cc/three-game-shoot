@@ -7,7 +7,7 @@ import MapBuilder from "@/ts/gameBuilder/mapBuilder";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import CharacterBuilder from "@/ts/gameBuilder/characterBuilder";
 import AnimationInput from "@/ts/apis/animationInput";
-import { AniEffectScope } from "@/ts/apis/enum";
+import { AniEffectScope, CameraMode } from "@/ts/apis/enum";
 import { Heap } from "@/ts/common/heap";
 import Bullet from "@/ts/bullet/bullet";
 import Character from "@/ts/apis/character";
@@ -93,6 +93,9 @@ export default class ThreeJs extends BaseThree {
       return;
     }
     let mapName = Confs.levelFiles[this.levelIndex];
+
+    // 默认第三人称视角
+    Confs.CAMERA_MODE = CameraMode.TPS;
 
     if (!this.camera) {
       this.camera = new THREE.PerspectiveCamera(

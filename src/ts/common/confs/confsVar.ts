@@ -18,6 +18,11 @@ export default class ConfsVar {
   public hpInfoOffsetPos: THREE.Vector3 = new THREE.Vector3();
 
   /**
+   * 第一人称视角下血条偏移值
+   */
+  public FPSHpInfoOffsetPos: THREE.Vector3 = new THREE.Vector3();
+
+  /**
    * 子弹发射高度
    */
   public bulletHeight: number = 0;
@@ -106,4 +111,9 @@ export default class ConfsVar {
    * 获得道具后的加血值
    */
   public itemAddHP: number = 0;
+
+  /**
+  * 第一人称摄像机高度
+  */
+  public FPSCameraHeight: number = 0;
 }

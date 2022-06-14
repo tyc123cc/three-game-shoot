@@ -63,3 +63,17 @@ export enum CharacterStatus {
    */
   Death
 }
+
+/**
+ * 摄像机模式
+ */
+export enum CameraMode {
+  /**
+   * 第一人称视角
+   */
+  FPS,
+  /**
+   * 第三人称视角
+   */
+  TPS
+}
