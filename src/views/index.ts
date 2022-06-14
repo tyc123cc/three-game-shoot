@@ -68,12 +68,12 @@ export default class ThreeJs extends BaseThree {
   /**
    * 场景是否加载完毕
    */
-  isLoaded:boolean = false;
+  isLoaded: boolean = false;
 
   // 目前已加载完毕的角色
-  loadedNum:number = 0;
+  loadedNum: number = 0;
   // 总共需要加载的角色
-  totalLoadingNum:number = 0;
+  totalLoadingNum: number = 0;
 
   constructor(index: number) {
     super();
@@ -172,9 +172,9 @@ export default class ThreeJs extends BaseThree {
       this.camera,
       this.playerBulletPool,
       this.mapBuilder.playerInitPos,
-      (object)=>{
+      (object) => {
         this.loadedNum++;
-        if(this.loadedNum >= this.totalLoadingNum){
+        if (this.loadedNum >= this.totalLoadingNum) {
           this.isLoaded = true;
         }
       }
@@ -205,9 +205,9 @@ export default class ThreeJs extends BaseThree {
           this.itemBufferPool,
           enemy.naviDelayTime,
           new THREE.Vector3(enemy.initPos.x, 0, enemy.initPos.y),
-          (object)=>{
+          (object) => {
             this.loadedNum++;
-            if(this.loadedNum >= this.totalLoadingNum){
+            if (this.loadedNum >= this.totalLoadingNum) {
               this.isLoaded = true;
             }
           }

@@ -17,12 +17,16 @@ export default class SceneRender extends BaseThree {
 
   public container: HTMLElement | Window | null = null;
 
+  private resizeEvent = this.onWindowsResize.bind(this);
+
   start(): void {
     // 第一步新建一个场景
     this.scene = new THREE.Scene();
     this.setRenderer();
     this.setLight();
+    window.addEventListener("resize", this.resizeEvent);
   }
+
   update(): void {
     this.render();
     // 设置画布的大小
@@ -34,6 +38,27 @@ export default class SceneRender extends BaseThree {
         );
       } else if (this.container instanceof Window) {
         this.renderer.setSize(
+          this.container.innerWidth,
+          this.container.innerHeight
+        );
+      }
+    }
+  }
+
+  onWindowsResize(e: Event) {
+    if (this.camera) {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      // 更新摄像机世界矩阵
+      this.camera.updateProjectionMatrix();
+
+      // 设置画布的大小
+      if (this.container instanceof HTMLElement) {
+        this.renderer?.setSize(
+          this.container.clientWidth,
+          this.container.clientHeight
+        );
+      } else if (this.container instanceof Window) {
+        this.renderer?.setSize(
           this.container.innerWidth,
           this.container.innerHeight
         );
@@ -154,7 +179,7 @@ export default class SceneRender extends BaseThree {
       // }
     }
 
-
+    document.removeEventListener("resize", this.resizeEvent);
     this.collideMeshList = [];
   }
 
