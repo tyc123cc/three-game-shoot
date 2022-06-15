@@ -51,8 +51,8 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       camera,
       (object) => {
         this.player = this.characterBuilder;
-        let mesh = this.setMapMesh();
-        this.player?.addMapMesh(mesh)
+        let group = this.setMapMesh();
+        this.player?.addMapMesh(group)
         if (onLoad) {
           onLoad(object);
         }
@@ -67,12 +67,22 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     this.enable();
   }
 
-  setMapMesh():THREE.Mesh{
-    let geometry = new SphereBufferGeometry(2,25,25);
+  setMapMesh(): THREE.Group {
+    let group = new THREE.Group();
+    let geometry = new SphereBufferGeometry(2, 25, 25);
     let material = new MeshBasicMaterial({
-      color:"green"
+      color: "#00ff00"
     })
-    return new Mesh(geometry,material)
+    let sphereMesh = new Mesh(geometry, material);
+    group.add(sphereMesh);
+
+    let coneGeometry = new THREE.ConeGeometry(2, 2, 32);
+    let coneMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    let cone = new THREE.Mesh(coneGeometry, coneMaterial);
+    cone.rotateX((90 / 180) * Math.PI);
+    cone.position.set(0, 0, 4);
+    group.add(cone)
+    return group;
   }
 
   start() {

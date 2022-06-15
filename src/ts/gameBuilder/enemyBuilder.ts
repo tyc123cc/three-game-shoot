@@ -94,7 +94,9 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
           target.name,
           0.6
         );
-        if(onLoad){
+        let group = this.setMapMesh();
+        this.enemy?.addMapMesh(group)
+        if (onLoad) {
           onLoad(object);
         }
       },
@@ -118,6 +120,24 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
         this.buildNaviPath();
       }, Confs.enemyNaviTime * 1000);
     }, this.naviDelayTime * 1000);
+  }
+
+  setMapMesh(): THREE.Group {
+    let group = new THREE.Group();
+    let geometry = new THREE.SphereBufferGeometry(2, 32, 32);
+    let material = new THREE.MeshBasicMaterial({
+      color: "#ff0000"
+    })
+    let sphereMesh = new THREE.Mesh(geometry, material);
+    group.add(sphereMesh);
+
+    let coneGeometry = new THREE.ConeGeometry(2, 2, 32, 32);
+    let coneMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    let cone = new THREE.Mesh(coneGeometry, coneMaterial);
+    cone.rotateX((90 / 180) * Math.PI);
+    cone.position.set(0, 0, 4);
+    group.add(cone)
+    return group;
   }
 
   /**

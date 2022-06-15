@@ -113,7 +113,7 @@ export default class Character extends BaseThree {
   /**
    * 角色在小地图上显示的模型
    */
-  public mapMesh:Mesh|null = null;
+  public mapMesh: Group | null = null;
 
   /**
    * 当前血量
@@ -128,7 +128,7 @@ export default class Character extends BaseThree {
   /**
    * 是否加载完毕
    */
-  public loaded:boolean = false;
+  public loaded: boolean = false;
 
   constructor(
     url: string,
@@ -171,6 +171,7 @@ export default class Character extends BaseThree {
 
   public lookAt(pos: THREE.Vector3) {
     this.group?.lookAt(pos)
+    this.mapMesh?.lookAt(pos);
     this.lookPoint = pos;
   }
 
@@ -231,7 +232,7 @@ export default class Character extends BaseThree {
         this.collider.position.copy(this.group.position);
         // console.log(this.collider.position)
       }
-      if(this.mapMesh){
+      if (this.mapMesh) {
         this.mapMesh.position.copy(this.group.position)
       }
     }
@@ -685,10 +686,18 @@ export default class Character extends BaseThree {
         }
       });
     }
-    if(this.mapMesh){
-      this.mapMesh.geometry.dispose();
-      (this.mapMesh.material as Material).dispose();
-      this.mapMesh = null;
+    if (this.mapMesh) {
+      this.mapMesh.traverse(function (item) {
+        if (item instanceof Mesh) {
+          item.geometry.dispose(); // 删除几何体
+          for (let key in item.material) {
+            if (item.material[key] instanceof Texture) {
+              item.material[key].dispose(); // 释放纹理
+            }
+          }
+          item.material.dispose(); // 删除材质
+        }
+      });
     }
     this.group = null;
   }

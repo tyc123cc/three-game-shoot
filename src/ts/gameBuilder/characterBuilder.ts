@@ -335,13 +335,16 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-  public addMapMesh(mesh: THREE.Mesh) {
+  public addMapMesh(group: THREE.Group) {
     if (this.character?.group) {
-      mesh.position.copy(this.character.group?.position);
+      group.position.copy(this.character.group?.position);
       // 使其只能被小地图摄像机渲染
-      mesh.layers.set(2);
-      this.character.mapMesh = mesh;
-      this.scene.add(mesh, false);
+      group.layers.set(2);
+      group.traverse((item) => {
+        item.layers.set(2);
+      })
+      this.character.mapMesh = group;
+      this.scene.add(group, false);
     }
   }
 
@@ -369,7 +372,7 @@ export default class CharacterBuilder extends BaseThree {
     this.character?.play(aniName);
   }
 
-  update(): void {}
+  update(): void { }
 
   loadCharacter(animationIndex: number) {
     if (animationIndex < this.animationsInput.length) {
@@ -418,7 +421,7 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-  onAnimationSuccess(object: Group) {}
+  onAnimationSuccess(object: Group) { }
 
-  onCharacterSuccess(object: Group) {}
+  onCharacterSuccess(object: Group) { }
 }
