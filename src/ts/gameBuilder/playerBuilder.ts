@@ -1,5 +1,6 @@
 import store from "@/store";
 import * as THREE from "three";
+import { BoxBufferGeometry, Mesh, MeshBasicMaterial, SphereBufferGeometry } from "three";
 import Character from "../apis/character";
 import CharacterHpInfo from "../apis/characterHpInfo";
 import { AniEffectScope, CameraMode, CharacterStatus } from "../apis/enum";
@@ -50,6 +51,8 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       camera,
       (object) => {
         this.player = this.characterBuilder;
+        let mesh = this.setMapMesh();
+        this.player?.addMapMesh(mesh)
         if (onLoad) {
           onLoad(object);
         }
@@ -62,6 +65,14 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     );
     this.rebirthTime = Confs.playerRebirthTime;
     this.enable();
+  }
+
+  setMapMesh():THREE.Mesh{
+    let geometry = new SphereBufferGeometry(2,25,25);
+    let material = new MeshBasicMaterial({
+      color:"green"
+    })
+    return new Mesh(geometry,material)
   }
 
   start() {

@@ -125,6 +125,8 @@ export default class Game extends Vue {
     // 继续游戏
     Confs.PAUSED = false;
     this.three?.clear();
+    this.three?.camera?.clear();
+    this.three?.ambientLight?.dispose();
     document.removeEventListener("gameWin", this.onGameWinEventBind);
     this.three?.sceneRender?.renderer?.dispose();
     this.three?.sceneRender?.renderer?.forceContextLoss();

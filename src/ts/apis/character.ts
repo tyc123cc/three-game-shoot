@@ -9,7 +9,10 @@ import {
   LoopRepeat,
   Material,
   Mesh,
+  MeshBasicMaterial,
+  Points,
   Raycaster,
+  SphereGeometry,
   Texture,
   Vector3,
 } from "three";
@@ -106,6 +109,11 @@ export default class Character extends BaseThree {
   public collider: THREE.Mesh | null = null;
 
   public colliderMeshList: THREE.Object3D[] = [];
+
+  /**
+   * 角色在小地图上显示的模型
+   */
+  public mapMesh:Mesh|null = null;
 
   /**
    * 当前血量
@@ -222,6 +230,9 @@ export default class Character extends BaseThree {
       if (this.collider) {
         this.collider.position.copy(this.group.position);
         // console.log(this.collider.position)
+      }
+      if(this.mapMesh){
+        this.mapMesh.position.copy(this.group.position)
       }
     }
   }
@@ -673,6 +684,11 @@ export default class Character extends BaseThree {
           item.material.dispose(); // 删除材质
         }
       });
+    }
+    if(this.mapMesh){
+      this.mapMesh.geometry.dispose();
+      (this.mapMesh.material as Material).dispose();
+      this.mapMesh = null;
     }
     this.group = null;
   }

@@ -107,9 +107,13 @@ export default class ThreeJs extends BaseThree {
     }
     if (!this.ambientLight) {
       this.ambientLight = new THREE.AmbientLight(0xaaaaaa); // 环境光
+      // 环境光所有层均可见
+      this.ambientLight.layers.enableAll();
     }
     if (!this.directLight) {
       this.directLight = new THREE.DirectionalLight(0xffffff); // 方向光
+      // 方向光所有层均可见
+      this.directLight.layers.enableAll();
       this.directLight.position.set(10, 10, 10);
     }
 
@@ -140,6 +144,9 @@ export default class ThreeJs extends BaseThree {
       targetProcess: this.mapBuilder.map.targetProcess,
       maxLife: this.mapBuilder.map.life,
     });
+
+    // 设置小地图
+    this.sceneRender.setMapCamera(this.mapBuilder.map)
 
     // 初始化摄像机位置
     this.camera.position.set(
@@ -252,6 +259,10 @@ export default class ThreeJs extends BaseThree {
     });
     this.playerBuilder = null;
     this.enemyBuilders = [];
+    if(this.directLight){
+      this.directLight.dispose();
+      this.directLight = null;
+    }
     if (this.itemBufferPool) {
       this.itemBufferPool.clear();
       this.itemBufferPool = null;

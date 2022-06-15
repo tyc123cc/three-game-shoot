@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import BaseThree from "@/ts/common/baseThree";
+import { Layers, OrthographicCamera, Vector3 } from "three";
+import Map from "@/ts/apis/map"
 
 export default class SceneRender extends BaseThree {
   public scene: THREE.Scene | null = null;
@@ -9,6 +11,10 @@ export default class SceneRender extends BaseThree {
   public ambientLight: THREE.AmbientLight = new THREE.AmbientLight(0x000000);
   public controls: OrbitControls | null = null;
   public collideMeshList: THREE.Object3D[] = [];
+
+  public mapCamera: OrthographicCamera | null = null;
+  public mapCameraS = 100; //三维场景显示范围控制系数，系数越大，显示的范围越大
+  public mapCameraHeight = 300;
 
   /**
    * 是否允许使用control
@@ -22,9 +28,54 @@ export default class SceneRender extends BaseThree {
   start(): void {
     // 第一步新建一个场景
     this.scene = new THREE.Scene();
+    this.scene.layers.enableAll();
     this.setRenderer();
     this.setLight();
     window.addEventListener("resize", this.resizeEvent);
+  }
+
+  setMapCamera(map:Map) {
+    let containerWidth = 0,
+      containerHeight = 0;
+    if (this.container instanceof HTMLElement) {
+      (containerWidth = this.container.clientWidth),
+        (containerHeight = this.container.clientHeight);
+    } else if (this.container instanceof Window) {
+      (containerWidth = this.container.innerWidth),
+        (containerHeight = this.container.innerHeight);
+    }
+    /**
+     * 相机设置
+     */
+    var k = containerWidth / containerHeight; //窗口宽高比
+
+    //创建相机对象
+    this.mapCamera = new THREE.OrthographicCamera(
+      -map.width / 2,
+      map.width / 2,
+      map.height / 2,
+      -map.height / 2,
+      1,
+      1000
+    );
+
+    this.mapCamera.position.set(0, 300, 0); //设置相机位置
+    this.mapCamera.lookAt(this.scene ? this.scene?.position : new Vector3()); //设置相机方向(指向的场景对象)
+     //this.mapCamera.layers.disableAll();
+    // 使地图摄像机只能看到第2层模型
+    this.mapCamera.layers.set(2);
+
+    // 将小地图放到右下角
+    this.mapCamera.setViewOffset(
+      map.width * 2,
+      map.height * 2,
+      - containerWidth + map.width * 2 + 40,
+      - containerHeight + map.height * 2 + 40,
+      containerWidth,
+      containerHeight
+    );
+    this.mapCamera.updateProjectionMatrix();
+    this.add(this.mapCamera, false);
   }
 
   update(): void {
@@ -50,19 +101,36 @@ export default class SceneRender extends BaseThree {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       // 更新摄像机世界矩阵
       this.camera.updateProjectionMatrix();
-
+      let containerWidth = 0,
+        containerHeight = 0;
       // 设置画布的大小
       if (this.container instanceof HTMLElement) {
         this.renderer?.setSize(
           this.container.clientWidth,
           this.container.clientHeight
         );
+        containerWidth = this.container.clientWidth;
+        containerHeight = this.container.clientHeight;
       } else if (this.container instanceof Window) {
         this.renderer?.setSize(
           this.container.innerWidth,
           this.container.innerHeight
         );
+        containerWidth = this.container.innerWidth;
+        containerHeight = this.container.innerHeight;
       }
+      let fullWidth = this.mapCamera?.view?this.mapCamera.view.fullWidth:0;
+      let fullHeight = this.mapCamera?.view?this.mapCamera.view.fullHeight:0;
+      // 将小地图放到右下角
+      this.mapCamera?.setViewOffset(
+        fullWidth,
+        fullHeight,
+        - containerWidth + fullWidth + 40,
+        - containerHeight + fullHeight + 40,
+        containerWidth,
+        containerHeight
+      );
+      this.mapCamera?.updateProjectionMatrix();
     }
   }
 
@@ -127,7 +195,8 @@ export default class SceneRender extends BaseThree {
 
   // 设置渲染器
   setRenderer(): void {
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({});
+    this.renderer.autoClear = false;
     // 设置画布的大小
     if (this.container instanceof HTMLElement) {
       this.renderer.setSize(
@@ -178,15 +247,18 @@ export default class SceneRender extends BaseThree {
       //   gl.getExtension("WEBGL_lose_context")?.loseContext();
       // }
     }
-
+    this.mapCamera?.clear();
+    this.mapCamera = null;
     document.removeEventListener("resize", this.resizeEvent);
     this.collideMeshList = [];
   }
 
   // 渲染
   render(): void {
-    if (this.renderer && this.scene && this.camera) {
+    if (this.renderer && this.scene && this.camera && this.mapCamera) {
+      this.renderer.clear();
       this.renderer.render(this.scene, this.camera);
+      this.renderer.render(this.scene, this.mapCamera);
     }
   }
 }

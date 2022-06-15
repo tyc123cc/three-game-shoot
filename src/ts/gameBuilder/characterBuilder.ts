@@ -31,7 +31,7 @@ export default class CharacterBuilder extends BaseThree {
 
   public name: string;
 
-  hitEvent: ((e: Event) => void) = this.hitCharacter.bind(this);
+  hitEvent: (e: Event) => void = this.hitCharacter.bind(this);
 
   private onLoad: (object: Group) => void;
   private onProgress?: (event: ProgressEvent) => void;
@@ -61,27 +61,24 @@ export default class CharacterBuilder extends BaseThree {
 
   start(): void {
     this.loadCharacter(0);
-    document.addEventListener("hit",
-      this.hitEvent
-    );
+    document.addEventListener("hit", this.hitEvent);
   }
 
   clear() {
-    super.clear()
-    document.removeEventListener("hit", this.hitEvent)
+    super.clear();
+    document.removeEventListener("hit", this.hitEvent);
     this.character?.clear();
     this.character = null;
   }
 
-
   /**
    * 接收子弹击中物体信息
-   * @param e 
+   * @param e
    */
   hitCharacter(e: Event) {
     let ev = e as CustomEvent;
     // 如果被击中物体为当前角色，则扣除生命值
-    if (ev.detail.target == this.name + 'collider') {
+    if (ev.detail.target == this.name + "collider") {
       this.character?.damage(ev.detail.power);
     }
   }
@@ -130,11 +127,7 @@ export default class CharacterBuilder extends BaseThree {
         this.moveTo(
           this.character.group.position
             .clone()
-            .add(
-              this.character.group.position
-                .clone()
-                .sub(lookPointGroud)
-            ),
+            .add(this.character.group.position.clone().sub(lookPointGroud)),
           speed
         );
       }
@@ -319,13 +312,14 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-
-
   public moveTo(pos: THREE.Vector3, speed: number) {
     if (this.character) {
       let collideObjs: THREE.Object3D[] = [];
       collideObjs = this.scene.collideMeshList.filter((obj) => {
-        return obj.id != this.character?.group?.id && obj.name != this.name + "collider";
+        return (
+          obj.id != this.character?.group?.id &&
+          obj.name != this.name + "collider"
+        );
       });
       this.character.colliderMeshList = collideObjs;
       this.character.moveTo(pos, speed);
@@ -341,10 +335,19 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
+  public addMapMesh(mesh: THREE.Mesh) {
+    if (this.character?.group) {
+      mesh.position.copy(this.character.group?.position);
+      // 使其只能被小地图摄像机渲染
+      mesh.layers.set(2);
+      this.character.mapMesh = mesh;
+      this.scene.add(mesh, false);
+    }
+  }
 
   public removeCollider() {
     if (this.character) {
-      this.scene.removeCollider(this.character.collider)
+      this.scene.removeCollider(this.character.collider);
       this.character.collider = null;
     }
   }
@@ -354,7 +357,7 @@ export default class CharacterBuilder extends BaseThree {
    */
   public resetHP() {
     if (this.character) {
-      this.character.hp = this.character.maxHp
+      this.character.hp = this.character.maxHp;
     }
   }
 
@@ -363,10 +366,10 @@ export default class CharacterBuilder extends BaseThree {
    * @param aniName 动画名称
    */
   play(aniName: string) {
-    this.character?.play(aniName)
+    this.character?.play(aniName);
   }
 
-  update(): void { }
+  update(): void {}
 
   loadCharacter(animationIndex: number) {
     if (animationIndex < this.animationsInput.length) {
@@ -415,7 +418,7 @@ export default class CharacterBuilder extends BaseThree {
     }
   }
 
-  onAnimationSuccess(object: Group) { }
+  onAnimationSuccess(object: Group) {}
 
-  onCharacterSuccess(object: Group) { }
+  onCharacterSuccess(object: Group) {}
 }
