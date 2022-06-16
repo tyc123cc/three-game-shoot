@@ -113,12 +113,17 @@ export default class ConfsVar {
   public itemAddHP: number = 0;
 
   /**
-  * 第一人称摄像机高度
-  */
+   * 第一人称摄像机高度
+   */
   public FPSCameraHeight: number = 0;
+
+  /**
+   * 第一人称摄像机灵敏度
+   */
+  public FPSCameraSensitivity: number = 0;
 
   /**
    * 天空盒图片路径
    */
-   public skyboxPath:string[] = [];
+  public skyboxPath: string[] = [];
 }

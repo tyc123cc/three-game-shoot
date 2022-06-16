@@ -19,7 +19,7 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
   sceneRender: SceneRender;
   collider: THREE.Mesh | null = null;
   camera: THREE.Camera;
-  mousePoint: THREE.Vector2 = new THREE.Vector2();
+
   name: string;
   initPos: THREE.Vector3 = new THREE.Vector3;
   rebirthTime: number = 5;

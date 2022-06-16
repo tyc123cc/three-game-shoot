@@ -148,9 +148,14 @@ export default class Confs {
   public static FPSCameraHeight: number;
 
   /**
+   * 第一人称摄像机灵敏度
+   */
+  public static FPSCameraSensitivity: number;
+
+  /**
    * 天空盒图片路径
    */
-  public static skyboxPath:string[];
+  public static skyboxPath: string[];
 
   /**
    * 配置设置项
@@ -180,5 +185,6 @@ export default class Confs {
     this.FPSCameraHeight = confVars.FPSCameraHeight;
     this.FPSHpInfoOffsetPos = confVars.FPSHpInfoOffsetPos;
     this.skyboxPath = confVars.skyboxPath;
+    this.FPSCameraSensitivity = confVars.FPSCameraSensitivity;
   }
 }

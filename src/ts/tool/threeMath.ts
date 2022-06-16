@@ -35,6 +35,15 @@ export default class ThreeMath {
     return new THREE.Vector2(vector.x, vector.y);
   }
 
+  public static eularToVector3(eular:THREE.Euler):THREE.Vector3{
+
+    let x = -Math.sin(eular.y) * Math.cos(eular.x);
+    let y = Math.sin(eular.x);
+    let z = -Math.cos(eular.y) * Math.cos(eular.x);
+
+    return new THREE.Vector3(x,y,z).normalize();
+  }
+
   /**
    * 计算线段与平面的交点
    * @param planeVector 平面的法向量

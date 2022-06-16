@@ -38,18 +38,28 @@ export default class SceneRender extends BaseThree {
   }
 
   setSkybox() {
+    if(this.skyboxTexutre){
+      // 先释放之前的天空盒纹理
+      this.skyboxTexutre.dispose();
+      this.skyboxTexutre = null;
+    }
     // 天空盒一定需要6张图片
     if(Confs.skyboxPath && Confs.skyboxPath.length == 6){
       let urls = [
+        /**右边 */
         "../" + Confs.skyboxPath[0],
+        /**左边 */
         "../" + Confs.skyboxPath[1],
+        /**上面 */
         "../" + Confs.skyboxPath[2],
+        /**下面 */
         "../" + Confs.skyboxPath[3],
+        /**前面 */
         "../" + Confs.skyboxPath[4],
+        /**后面 */
         "../" + Confs.skyboxPath[5],
       ];
       this.skyboxTexutre = new THREE.CubeTextureLoader().load(urls);
-      console.log(this.skyboxTexutre)
       if(this.scene){
         this.scene.background = this.skyboxTexutre; //作为背景贴图
       }

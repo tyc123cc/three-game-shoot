@@ -30,7 +30,7 @@
   "enemyRebirthTime": 10,
   "enemyNaviTime": 3,
   "playerRebirthTime": 5,
-  "enemyBulletPower": 0,
+  "enemyBulletPower": 10,
   "playerBulletPower": 20,
   "itemSize": 3,
   "itemRotateSpeed": 1,
@@ -38,6 +38,7 @@
   "itemHeight": 1,
   "itemAddHP": 10,
   "FPSCameraHeight": 9,
+  "FPSCameraSensitivity":0.5,
   "skyboxPath":[
     "img/skybox_6.png",
     "img/skybox_3.png",

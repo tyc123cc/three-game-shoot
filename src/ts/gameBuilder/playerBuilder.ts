@@ -1,6 +1,11 @@
 import store from "@/store";
 import * as THREE from "three";
-import { BoxBufferGeometry, Mesh, MeshBasicMaterial, SphereBufferGeometry } from "three";
+import {
+  BoxBufferGeometry,
+  Mesh,
+  MeshBasicMaterial,
+  SphereBufferGeometry,
+} from "three";
 import Character from "../apis/character";
 import CharacterHpInfo from "../apis/characterHpInfo";
 import { AniEffectScope, CameraMode, CharacterStatus } from "../apis/enum";
@@ -19,7 +24,6 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   onDownKeyDown: boolean = false;
   onLeftKeyDown: boolean = false;
   onRightKeyDown: boolean = false;
-
 
   /**
    * 玩家的血量信息
@@ -52,16 +56,14 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       (object) => {
         this.player = this.characterBuilder;
         let group = this.setMapMesh();
-        this.player?.addMapMesh(group)
+        this.player?.addMapMesh(group);
         if (onLoad) {
           onLoad(object);
         }
       },
       bulletPool,
       initPos,
-      (event: ProgressEvent<EventTarget>) => {
-
-      }
+      (event: ProgressEvent<EventTarget>) => {}
     );
     this.rebirthTime = Confs.playerRebirthTime;
     this.enable();
@@ -71,8 +73,8 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     let group = new THREE.Group();
     let geometry = new SphereBufferGeometry(2, 25, 25);
     let material = new MeshBasicMaterial({
-      color: "#00ff00"
-    })
+      color: "#00ff00",
+    });
     let sphereMesh = new Mesh(geometry, material);
     group.add(sphereMesh);
 
@@ -81,7 +83,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     let cone = new THREE.Mesh(coneGeometry, coneMaterial);
     cone.rotateX((90 / 180) * Math.PI);
     cone.position.set(0, 0, 4);
-    group.add(cone)
+    group.add(cone);
     return group;
   }
 
@@ -137,14 +139,25 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       // 添加自定义事件获得道具，用于获得道具后角色的状态变化
       document.removeEventListener("getItem", this.getItemEvent);
     }
-
   }
 
   update() {
     super.update();
     if (this.characterStatus == CharacterStatus.Alive) {
       this.updateLookPoint();
-      this.updatePlayerStatus();
+      this.updatePlayerStatus(); 
+      // 在第一人称摄像机下更新血条位置
+      this.updateHpInfoInFPSCamera();
+    }
+  }
+
+  /**
+   * 在第一人称摄像机下更新血条位置
+   */
+  updateHpInfoInFPSCamera(){
+    if(Confs.CAMERA_MODE == CameraMode.FPS && this.characterHpInfo){
+      this.characterHpInfo.isShow = true;
+      this.characterHpInfo.screenPos = new THREE.Vector2(0,0)
     }
   }
 
@@ -163,66 +176,83 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     if (this.player?.character?.group) {
       if (this.onLeftKeyDown && this.onUpKeyDown) {
         // 左前进
-        let angle = this.getIncludeAngle(Confs.CAMERA_MODE == CameraMode.TPS ?
-          new THREE.Vector3(-1, 0, -1) :
-          new THREE.Vector3(this.player.character.group.position.x - 1, 0, this.player.character.group.position.z - 1));
-        let speed = this.playAnimation(angle);
+        let speed = 0;
+        if (Confs.CAMERA_MODE == CameraMode.TPS) {
+          let angle = this.getIncludeAngle(new THREE.Vector3(-1, 0, -1));
+          speed = this.playAnimation(angle);
+        } else {
+          speed = this.playAnimation(45);
+        }
         this.player?.moveLeftAdvance(speed);
       } else if (this.onRightKeyDown && this.onUpKeyDown) {
         // 右前进
-        // 左前进
-        let angle = this.getIncludeAngle(Confs.CAMERA_MODE == CameraMode.TPS ?
-          new THREE.Vector3(1, 0, -1) :
-          new THREE.Vector3(this.player.character.group.position.x + 1, 0, this.player.character.group.position.z - 1));
-        let speed = this.playAnimation(angle);
+        let speed = 0;
+        if (Confs.CAMERA_MODE == CameraMode.TPS) {
+          let angle = this.getIncludeAngle(new THREE.Vector3(1, 0, -1));
+          speed = this.playAnimation(angle);
+        } else {
+          speed = this.playAnimation(45);
+        }
         this.player?.moveRightAdvance(speed);
       } else if (this.onRightKeyDown && this.onDownKeyDown) {
         /// 右后退
-        // 左前进
-        let angle = this.getIncludeAngle(Confs.CAMERA_MODE == CameraMode.TPS ?
-          new THREE.Vector3(1, 0, 1) :
-          new THREE.Vector3(this.player.character.group.position.x + 1, 0, this.player.character.group.position.z + 1));
-        let speed = this.playAnimation(angle);
+        let speed = 0;
+        if (Confs.CAMERA_MODE == CameraMode.TPS) {
+          let angle = this.getIncludeAngle(new THREE.Vector3(1, 0, 1));
+          speed = this.playAnimation(angle);
+        } else {
+          speed = this.playAnimation(135);
+        }
         this.player?.moveRightBack(speed);
       } else if (this.onLeftKeyDown && this.onDownKeyDown) {
         // 左后退
-        // 左前进
-        let angle = this.getIncludeAngle(Confs.CAMERA_MODE == CameraMode.TPS ?
-          new THREE.Vector3(-1, 0, 1) :
-          new THREE.Vector3(this.player.character.group.position.x - 1, 0, this.player.character.group.position.z + 1));
-        let speed = this.playAnimation(angle);
+        let speed = 0;
+        if (Confs.CAMERA_MODE == CameraMode.TPS) {
+          let angle = this.getIncludeAngle(new THREE.Vector3(-1, 0, 1));
+          speed = this.playAnimation(angle);
+        } else {
+          speed = this.playAnimation(135);
+        }
         this.player?.moveLeftBack(speed);
       } else if (this.onUpKeyDown) {
         // 前进
-        // 左前进
-        let angle = this.getIncludeAngle(Confs.CAMERA_MODE == CameraMode.TPS ?
-          new THREE.Vector3(0, 0, -1) :
-          new THREE.Vector3(this.player.character.group.position.x, 0, this.player.character.group.position.z - 1));
-        let speed = this.playAnimation(angle);
+        let speed = 0;
+        if (Confs.CAMERA_MODE == CameraMode.TPS) {
+          let angle = this.getIncludeAngle(new THREE.Vector3(0, 0, -1));
+          speed = this.playAnimation(angle);
+        } else {
+          speed = this.playAnimation(0);
+        }
         this.player?.moveAdvance(speed);
       } else if (this.onDownKeyDown) {
         // 后退
-        // 左前进
-        let angle = this.getIncludeAngle(Confs.CAMERA_MODE == CameraMode.TPS ?
-          new THREE.Vector3(0, 0, 1) :
-          new THREE.Vector3(this.player.character.group.position.x + 1, 0, this.player.character.group.position.z));
-        let speed = this.playAnimation(angle);
+        let speed = 0;
+        if (Confs.CAMERA_MODE == CameraMode.TPS) {
+          let angle = this.getIncludeAngle(new THREE.Vector3(0, 0, 1));
+          speed = this.playAnimation(angle);
+        } else {
+          speed = this.playAnimation(180);
+        }
         this.player?.moveBack(speed);
       } else if (this.onLeftKeyDown) {
         // 左移
-        // 左前进
-        let angle = this.getIncludeAngle(Confs.CAMERA_MODE == CameraMode.TPS ?
-          new THREE.Vector3(-1, 0, 0) :
-          new THREE.Vector3(this.player.character.group.position.x - 1, 0, this.player.character.group.position.z));
-        let speed = this.playAnimation(angle);
+        let speed = 0;
+        if (Confs.CAMERA_MODE == CameraMode.TPS) {
+          let angle = this.getIncludeAngle(new THREE.Vector3(-1, 0, 0));
+          speed = this.playAnimation(angle);
+        } else {
+          speed = this.playAnimation(90);
+        }
         this.player?.moveLeft(speed);
       } else if (this.onRightKeyDown) {
         // 右移
-        // 左前进
-        let angle = this.getIncludeAngle(Confs.CAMERA_MODE == CameraMode.TPS ?
-          new THREE.Vector3(1, 0, 0) :
-          new THREE.Vector3(this.player.character.group.position.x + 1, 0, this.player.character.group.position.z));
-        let speed = this.playAnimation(angle);
+        let speed = 0;
+        if (Confs.CAMERA_MODE == CameraMode.TPS) {
+          let angle = this.getIncludeAngle(new THREE.Vector3(1, 0, 0));
+          speed = this.playAnimation(angle);
+        } else {
+          speed = this.playAnimation(90);
+        }
         this.player?.moveRight(speed);
       } else {
         // 待机
@@ -292,8 +322,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
           this.player.character.group.position.z + Confs.cameraOffsetPos.z
         );
         this.camera?.lookAt(this.player.character.group.position);
-      }
-      else if (Confs.CAMERA_MODE == CameraMode.FPS) {
+      } else if (Confs.CAMERA_MODE == CameraMode.FPS) {
         // 第一人称视角的摄像机跟随角色移动
         // 将摄像机位置变更为玩家位置
         this.camera?.position.set(
@@ -302,7 +331,6 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
           this.player.character.group.position.z
         );
       }
-
     }
   }
 
@@ -312,17 +340,40 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   updateLookPoint() {
     if (Confs.CAMERA_MODE == CameraMode.TPS) {
       this.updateLookPointByTPS();
-    }
-    else if (Confs.CAMERA_MODE == CameraMode.FPS) {
+    } else if (Confs.CAMERA_MODE == CameraMode.FPS) {
       this.updateLookPointByFPS();
     }
-
   }
 
   /**
    * 第一人称视角下更新视角
    */
   updateLookPointByFPS() {
+    if (this.player?.character?.group) {
+
+      // 更新角色朝向
+      let flag = -1;
+      if (
+        this.player.character.lookPoint &&
+        this.player.character.lookPoint.z -
+          this.player.character.group.position.z <
+          0
+      ) {
+        flag = 1;
+      }
+      // 将摄像机的欧拉角转变为方向向量
+      let lookOffsetPos = ThreeMath.eularToVector3(this.camera.rotation);
+      if (this.player?.character?.group) {
+        let position = this.player.character.group.position;
+        this.player?.lookAt(
+          new THREE.Vector3(
+            position.x + flag * lookOffsetPos.x,
+            0,
+            position.z + lookOffsetPos.z
+          )
+        );
+      }
+    }
   }
 
   /**
@@ -356,6 +407,18 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     if (this.camera && this.player) {
       // 记录鼠标位置
       this.mousePoint.set(event.clientX, event.clientY);
+      // 第一人称视角下更新摄像机位置
+      if (Confs.CAMERA_MODE == CameraMode.FPS && this.characterStatus == CharacterStatus.Alive) {
+        this.camera.rotateOnWorldAxis(
+          new THREE.Vector3(0, 1, 0),
+          -event.movementX * this.deltaTime * Confs.FPSCameraSensitivity
+        );
+        this.camera.rotateOnAxis(
+          new THREE.Vector3(1, 0, 0),
+          -event.movementY * this.deltaTime * Confs.FPSCameraSensitivity
+        );
+
+      }
     }
   }
 
@@ -445,11 +508,20 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
         );
         // 第一人称视角下，隐藏玩家角色模型
         this.player.character.group.visible = false;
-        this.camera.lookAt(new THREE.Vector3(this.player.character.lookPoint.x, Confs.FPSCameraHeight, this.player.character.lookPoint.z))
+        if (this.sceneRender.renderer) {
+          // 第一人称视角下隐藏鼠标
+          this.sceneRender.renderer.domElement.style.cursor = "none";
+        }
+        this.camera.lookAt(
+          new THREE.Vector3(
+            this.player.character.lookPoint.x,
+            Confs.FPSCameraHeight,
+            this.player.character.lookPoint.z
+          )
+        );
         // 第一人称视角下，角色移动以自身坐标系为准
         this.player.moveInWorld = false;
-      }
-      else if (Confs.CAMERA_MODE == CameraMode.FPS) {
+      } else if (Confs.CAMERA_MODE == CameraMode.FPS) {
         // 切换到第三人称视角模式
         Confs.CAMERA_MODE = CameraMode.TPS;
         // 第三人称视角下，显示玩家角色模型
@@ -457,6 +529,10 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
         this.updateCameraPosition();
         // 第三人称视角下，角色移动以世界坐标系为准
         this.player.moveInWorld = true;
+        if (this.sceneRender.renderer) {
+          // 第三人称视角下显示鼠标
+          this.sceneRender.renderer.domElement.style.cursor = "auto";
+        }
       }
     }
   }
