@@ -92,7 +92,7 @@ export default class EnemyBuilder extends PlayerAndEnemyCommonBuilder {
           this.sceneRender.collideMeshList,
           this.name,
           target.name,
-          0.6
+          0.8
         );
         let group = this.setMapMesh();
         this.enemy?.addMapMesh(group)

@@ -63,7 +63,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       },
       bulletPool,
       initPos,
-      (event: ProgressEvent<EventTarget>) => {}
+      (event: ProgressEvent<EventTarget>) => { }
     );
     this.rebirthTime = Confs.playerRebirthTime;
     this.enable();
@@ -145,7 +145,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
     super.update();
     if (this.characterStatus == CharacterStatus.Alive) {
       this.updateLookPoint();
-      this.updatePlayerStatus(); 
+      this.updatePlayerStatus();
       // 在第一人称摄像机下更新血条位置
       this.updateHpInfoInFPSCamera();
     }
@@ -154,10 +154,10 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   /**
    * 在第一人称摄像机下更新血条位置
    */
-  updateHpInfoInFPSCamera(){
-    if(Confs.CAMERA_MODE == CameraMode.FPS && this.characterHpInfo){
+  updateHpInfoInFPSCamera() {
+    if (Confs.CAMERA_MODE == CameraMode.FPS && this.characterHpInfo) {
       this.characterHpInfo.isShow = true;
-      this.characterHpInfo.screenPos = new THREE.Vector2(0,0)
+      this.characterHpInfo.screenPos = new THREE.Vector2(0, 0)
     }
   }
 
@@ -351,23 +351,13 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   updateLookPointByFPS() {
     if (this.player?.character?.group) {
 
-      // 更新角色朝向
-      let flag = -1;
-      if (
-        this.player.character.lookPoint &&
-        this.player.character.lookPoint.z -
-          this.player.character.group.position.z <
-          0
-      ) {
-        flag = 1;
-      }
-      // 将摄像机的欧拉角转变为方向向量
-      let lookOffsetPos = ThreeMath.eularToVector3(this.camera.rotation);
+      // 获得摄像机在世界坐标系下的方向向量
+      let lookOffsetPos = this.camera.getWorldDirection(new THREE.Vector3()).normalize();
       if (this.player?.character?.group) {
         let position = this.player.character.group.position;
         this.player?.lookAt(
           new THREE.Vector3(
-            position.x + flag * lookOffsetPos.x,
+            position.x + lookOffsetPos.x,
             0,
             position.z + lookOffsetPos.z
           )
@@ -404,20 +394,32 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   }
 
   onDocumentMouseMove(event: MouseEvent) {
-    if (this.camera && this.player) {
+    if (this.camera && this.player?.character?.group) {
       // 记录鼠标位置
       this.mousePoint.set(event.clientX, event.clientY);
       // 第一人称视角下更新摄像机位置
       if (Confs.CAMERA_MODE == CameraMode.FPS && this.characterStatus == CharacterStatus.Alive) {
+        // Y轴偏移是在世界坐标系下
         this.camera.rotateOnWorldAxis(
           new THREE.Vector3(0, 1, 0),
           -event.movementX * this.deltaTime * Confs.FPSCameraSensitivity
         );
+        let lastRotation = this.camera.rotation.clone();
+        // X轴偏移是在本地坐标系下
         this.camera.rotateOnAxis(
           new THREE.Vector3(1, 0, 0),
           -event.movementY * this.deltaTime * Confs.FPSCameraSensitivity
         );
 
+        // 获得摄像机在世界坐标下的朝向
+        let direct = this.camera.getWorldDirection(new THREE.Vector3()).normalize();
+        // 基准向量，为角色直视时的方向向量
+        let baseVec = new THREE.Vector3(direct.x, 0, direct.z);
+        let angle = ThreeMath.getTdAngle(direct, baseVec) / Math.PI * 180;
+        // 限制摄像机的X轴转向角度
+        if (angle > 30) {
+          this.camera.rotation.copy(lastRotation);
+        }
       }
     }
   }
@@ -467,6 +469,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    * @param event
    */
   onDocumentKeyUp(ev: KeyboardEvent) {
+    // console.log(11)
     if (ev.key == "d") {
       // 松开d
       this.onRightKeyDown = false;

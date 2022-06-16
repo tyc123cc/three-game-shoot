@@ -35,14 +35,22 @@ export default class ThreeMath {
     return new THREE.Vector2(vector.x, vector.y);
   }
 
-  public static eularToVector3(eular:THREE.Euler):THREE.Vector3{
+  /**
+   * 欧拉角转方向向量
+   * @param eular 欧拉角
+   * @returns 方向向量
+   */
+  public static eularToVector3(eular: THREE.Euler): THREE.Vector3 {
 
     let x = -Math.sin(eular.y) * Math.cos(eular.x);
     let y = Math.sin(eular.x);
     let z = -Math.cos(eular.y) * Math.cos(eular.x);
 
-    return new THREE.Vector3(x,y,z).normalize();
+    return new THREE.Vector3(x, y, z).normalize();
   }
+
+
+
 
   /**
    * 计算线段与平面的交点
@@ -109,6 +117,28 @@ export default class ThreeMath {
       return new THREE.Vector3(value * cos3, vec.y, value * sin3);
     }
     return vec;
+  }
+
+  /**
+     * 获取三维向量的夹角.
+     *
+     * @param center 夹角中心点
+     * @param start  起始点
+     * @param end    结束点
+     * @return 返回夹角
+     */
+  public static getTdAngle(vec1: THREE.Vector3, vec2: THREE.Vector3): number {
+
+    // 向量的点乘
+    let vectorDot = vec1.clone().dot(vec2);
+    // 向量1的模
+    let vectorMold1 = vec1.length();
+    // 向量2的模
+    let vectorMold2 = vec2.length();
+    // 向量的夹角[0, PI]，当夹角为锐角时，cosθ>0；当夹角为钝角时,cosθ<0
+    let cosAngle = vectorDot / (vectorMold1 * vectorMold2);
+    let radian = Math.acos(cosAngle);
+    return radian;
   }
 
   /**
