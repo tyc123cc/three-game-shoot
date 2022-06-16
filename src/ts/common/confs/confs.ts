@@ -148,6 +148,11 @@ export default class Confs {
   public static FPSCameraHeight: number;
 
   /**
+   * 天空盒图片路径
+   */
+  public static skyboxPath:string[];
+
+  /**
    * 配置设置项
    */
   public static setting(confVars: ConfsVar) {
@@ -174,5 +179,6 @@ export default class Confs {
     this.enemyNaviTime = confVars.enemyNaviTime;
     this.FPSCameraHeight = confVars.FPSCameraHeight;
     this.FPSHpInfoOffsetPos = confVars.FPSHpInfoOffsetPos;
+    this.skyboxPath = confVars.skyboxPath;
   }
 }

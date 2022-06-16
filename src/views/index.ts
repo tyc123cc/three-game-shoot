@@ -131,6 +131,8 @@ export default class ThreeJs extends BaseThree {
     this.sceneRender.add(this.directLight, false);
     console.log(this.sceneRender?.renderer?.info)
 
+    // 设置天空盒
+    this.sceneRender.setSkybox();
 
     // 创建地图
     this.mapBuilder = new MapBuilder(

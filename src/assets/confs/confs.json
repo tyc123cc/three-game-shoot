@@ -37,5 +37,13 @@
   "itemMoveSpeed": 1,
   "itemHeight": 1,
   "itemAddHP": 10,
-  "FPSCameraHeight": 9
+  "FPSCameraHeight": 9,
+  "skyboxPath":[
+    "img/skybox_6.png",
+    "img/skybox_3.png",
+    "img/skybox_2.png",
+    "img/skybox_1.png",
+    "img/skybox_5.png",
+    "img/skybox_4.png"
+  ]
 }

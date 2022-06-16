@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import BaseThree from "@/ts/common/baseThree";
-import { Layers, OrthographicCamera, Vector3 } from "three";
-import Map from "@/ts/apis/map"
+import { CubeTexture, Layers, OrthographicCamera, Vector3 } from "three";
+import Map from "@/ts/apis/map";
+import Confs from "../common/confs/confs";
 
 export default class SceneRender extends BaseThree {
   public scene: THREE.Scene | null = null;
@@ -23,6 +24,8 @@ export default class SceneRender extends BaseThree {
 
   public container: HTMLElement | Window | null = null;
 
+  private skyboxTexutre:CubeTexture|null = null;
+
   private resizeEvent = this.onWindowsResize.bind(this);
 
   start(): void {
@@ -34,7 +37,27 @@ export default class SceneRender extends BaseThree {
     window.addEventListener("resize", this.resizeEvent);
   }
 
-  setMapCamera(map:Map) {
+  setSkybox() {
+    // 天空盒一定需要6张图片
+    if(Confs.skyboxPath && Confs.skyboxPath.length == 6){
+      let urls = [
+        "../" + Confs.skyboxPath[0],
+        "../" + Confs.skyboxPath[1],
+        "../" + Confs.skyboxPath[2],
+        "../" + Confs.skyboxPath[3],
+        "../" + Confs.skyboxPath[4],
+        "../" + Confs.skyboxPath[5],
+      ];
+      this.skyboxTexutre = new THREE.CubeTextureLoader().load(urls);
+      console.log(this.skyboxTexutre)
+      if(this.scene){
+        this.scene.background = this.skyboxTexutre; //作为背景贴图
+      }
+    }
+   
+  }
+
+  setMapCamera(map: Map) {
     let containerWidth = 0,
       containerHeight = 0;
     if (this.container instanceof HTMLElement) {
@@ -61,7 +84,7 @@ export default class SceneRender extends BaseThree {
 
     this.mapCamera.position.set(0, 300, 0); //设置相机位置
     this.mapCamera.lookAt(this.scene ? this.scene?.position : new Vector3()); //设置相机方向(指向的场景对象)
-     //this.mapCamera.layers.disableAll();
+    //this.mapCamera.layers.disableAll();
     // 使地图摄像机只能看到第2层模型
     this.mapCamera.layers.set(2);
 
@@ -69,8 +92,8 @@ export default class SceneRender extends BaseThree {
     this.mapCamera.setViewOffset(
       map.width * 2,
       map.height * 2,
-      - containerWidth + map.width * 2 + 40,
-      - containerHeight + map.height * 2 + 40,
+      -containerWidth + map.width * 2 + 40,
+      -containerHeight + map.height * 2 + 40,
       containerWidth,
       containerHeight
     );
@@ -119,14 +142,16 @@ export default class SceneRender extends BaseThree {
         containerWidth = this.container.innerWidth;
         containerHeight = this.container.innerHeight;
       }
-      let fullWidth = this.mapCamera?.view?this.mapCamera.view.fullWidth:0;
-      let fullHeight = this.mapCamera?.view?this.mapCamera.view.fullHeight:0;
+      let fullWidth = this.mapCamera?.view ? this.mapCamera.view.fullWidth : 0;
+      let fullHeight = this.mapCamera?.view
+        ? this.mapCamera.view.fullHeight
+        : 0;
       // 将小地图放到右下角
       this.mapCamera?.setViewOffset(
         fullWidth,
         fullHeight,
-        - containerWidth + fullWidth + 40,
-        - containerHeight + fullHeight + 40,
+        -containerWidth + fullWidth + 40,
+        -containerHeight + fullHeight + 40,
         containerWidth,
         containerHeight
       );
@@ -249,6 +274,10 @@ export default class SceneRender extends BaseThree {
     }
     this.mapCamera?.clear();
     this.mapCamera = null;
+    if(this.skyboxTexutre){
+      this.skyboxTexutre.dispose();
+      this.skyboxTexutre = null;
+    }
     document.removeEventListener("resize", this.resizeEvent);
     this.collideMeshList = [];
   }
