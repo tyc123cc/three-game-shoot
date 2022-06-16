@@ -93,7 +93,7 @@ export default class ThreeJs extends BaseThree {
       return;
     }
     let mapName = Confs.levelFiles[this.levelIndex];
-
+    this.isLoaded = false;
     // 默认第三人称视角
     Confs.CAMERA_MODE = CameraMode.TPS;
 
@@ -261,7 +261,7 @@ export default class ThreeJs extends BaseThree {
     });
     this.playerBuilder = null;
     this.enemyBuilders = [];
-    if(this.directLight){
+    if (this.directLight) {
       this.directLight.dispose();
       this.directLight = null;
     }

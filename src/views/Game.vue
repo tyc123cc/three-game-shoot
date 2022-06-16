@@ -1,43 +1,33 @@
 <template>
-  <div
-    id="threeCanvas"
-    v-loading="loading"
-    element-loading-text="拼命加载中..."
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(0, 0, 0, 0.8)"
-  >
+  <div id="threeCanvas"
+       v-loading="loading"
+       element-loading-text="拼命加载中..."
+       element-loading-spinner="el-icon-loading"
+       element-loading-background="rgba(0, 0, 0, 0.8)">
     <game-menu :originPosY="originY"></game-menu>
-    <blood
-      v-for="character in characterHpInfos"
-      :key="character.name"
-      :current="character.hp"
-      :isShow="character.isShow"
-      :max="character.maxHp"
-      :posX="character.screenPos.x"
-      :posY="character.screenPos.y"
-    ></blood>
-    <rebirth-time-process
-      class="rebirthTime"
-      :nowRebirthTime="nowRebirthTime"
-      :rebirthTime="rebirthTime"
-      :originPosY="originY"
-      :originPosX="rebirthTimeX()"
-    ></rebirth-time-process>
+    <blood v-for="character in characterHpInfos"
+           :key="character.name"
+           :current="character.hp"
+           :isShow="character.isShow"
+           :max="character.maxHp"
+           :posX="character.screenPos.x"
+           :posY="character.screenPos.y"></blood>
+    <rebirth-time-process class="rebirthTime"
+                          :nowRebirthTime="nowRebirthTime"
+                          :rebirthTime="rebirthTime"
+                          :originPosY="originY"
+                          :originPosX="rebirthTimeX()"></rebirth-time-process>
     <game-process :originPosY="originY"></game-process>
-    <game-win
-      class="gameWin"
-      :level="gameLevel"
-      v-show="gameWinShow"
-      @next="gemeWinNext"
-      @home="home"
-    ></game-win>
-    <game-over
-      class="gameWin"
-      :level="gameLevel"
-      v-show="gameOverShow"
-      @reStart="reStart"
-      @home="home"
-    >
+    <game-win class="gameWin"
+              :level="gameLevel"
+              v-show="gameWinShow"
+              @next="gemeWinNext"
+              @home="home"></game-win>
+    <game-over class="gameWin"
+               :level="gameLevel"
+               v-show="gameOverShow"
+               @reStart="reStart"
+               @home="home">
     </game-over>
   </div>
 </template>
