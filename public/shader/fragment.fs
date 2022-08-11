@@ -25,10 +25,10 @@ void main(){
     // 地图偏移量所占屏幕比例
     vec2 mapOffsetSizeScale=vec2(min(mapOffsetSize.x/screenSize.x,1.),min(mapOffsetSize.y/screenSize.y,1.));
     // 地图的边界（边界大小-1~1）
-    float left=1.-mapOffsetSizeScale.x-mapSizeScale.x*2.;
-    float right=1.-mapOffsetSizeScale.x;
-    float top=-1.+mapOffsetSizeScale.y+mapSizeScale.y*2.;
-    float bottom=-1.+mapOffsetSizeScale.y;
+    float left=1.-(mapOffsetSizeScale.x+mapSizeScale.x)*2.;
+    float right=1.-mapOffsetSizeScale.x*2.;
+    float top=-1.+(mapOffsetSizeScale.y+mapSizeScale.y)*2.;
+    float bottom=-1.+mapOffsetSizeScale.y*2.;
     //  float top=1.;
     // float bottom=-1;
     bool inMap=mPosition.x>left&&mPosition.x<right&&mPosition.y<top&&mPosition.y>bottom;

@@ -131,7 +131,7 @@ export default class SceneRender extends BaseThree {
           
           // 初始化shader
           shader.uniforms.mapSize.value = new THREE.Vector2(map.width * 2,map.height * 2);
-          shader.uniforms.mapOffsetSize.value = new THREE.Vector2(80,80);
+          shader.uniforms.mapOffsetSize.value = new THREE.Vector2(40,40);
           shader.uniforms.screenSize.value = new THREE.Vector2(containerWidth,containerHeight)
 
           // 主场景pass
