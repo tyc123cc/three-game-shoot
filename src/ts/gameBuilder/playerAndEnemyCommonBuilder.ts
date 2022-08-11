@@ -191,8 +191,9 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
 
   /**
    * 角色复活
+   * @returns 是否刚刚复活
    */
-  rebirth() {
+  rebirth():boolean {
     // 如果角色是死亡状态，进行复活倒计时
     if (this.characterStatus == CharacterStatus.Death) {
       this.nowRebirthTime += this.deltaTime;
@@ -209,8 +210,10 @@ export default abstract class PlayerAndEnemyCommonBuilder extends BaseThree {
         if (this.collider) {
           this.characterBuilder?.addCollider(this.collider)
         }
+        return true;
       }
     }
+    return false;
   }
 
   resetPosition() {

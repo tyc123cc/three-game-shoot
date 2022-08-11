@@ -1,9 +1,20 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import BaseThree from "@/ts/common/baseThree";
-import { CubeTexture, Layers, OrthographicCamera, Vector3 } from "three";
+import { Color, CubeTexture, Layers, OrthographicCamera, Vector3 } from "three";
 import Map from "@/ts/apis/map";
 import Confs from "../common/confs/confs";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { FilmPass } from "three/examples/jsm/postprocessing/FilmPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+import {
+  ClearMaskPass,
+  MaskPass,
+} from "three/examples/jsm/postprocessing/MaskPass";
+import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
+
+import Shaders from "../common/confs/shaders";
 
 export default class SceneRender extends BaseThree {
   public scene: THREE.Scene | null = null;
@@ -12,6 +23,10 @@ export default class SceneRender extends BaseThree {
   public ambientLight: THREE.AmbientLight = new THREE.AmbientLight(0x000000);
   public controls: OrbitControls | null = null;
   public collideMeshList: THREE.Object3D[] = [];
+  public composer: EffectComposer | null = null;
+  public composerMap: EffectComposer | null = null;
+  public renderPass: RenderPass | null = null;
+  public deathShader:ShaderPass|null = null;
 
   public mapCamera: OrthographicCamera | null = null;
   public mapCameraS = 100; //三维场景显示范围控制系数，系数越大，显示的范围越大
@@ -24,7 +39,7 @@ export default class SceneRender extends BaseThree {
 
   public container: HTMLElement | Window | null = null;
 
-  private skyboxTexutre:CubeTexture|null = null;
+  private skyboxTexutre: CubeTexture | null = null;
 
   private resizeEvent = this.onWindowsResize.bind(this);
 
@@ -38,13 +53,13 @@ export default class SceneRender extends BaseThree {
   }
 
   setSkybox() {
-    if(this.skyboxTexutre){
+    if (this.skyboxTexutre) {
       // 先释放之前的天空盒纹理
       this.skyboxTexutre.dispose();
       this.skyboxTexutre = null;
     }
     // 天空盒一定需要6张图片
-    if(Confs.skyboxPath && Confs.skyboxPath.length == 6){
+    if (Confs.skyboxPath && Confs.skyboxPath.length == 6) {
       let urls = [
         /**右边 */
         "../" + Confs.skyboxPath[0],
@@ -60,11 +75,10 @@ export default class SceneRender extends BaseThree {
         "../" + Confs.skyboxPath[5],
       ];
       this.skyboxTexutre = new THREE.CubeTextureLoader().load(urls);
-      if(this.scene){
+      if (this.scene) {
         this.scene.background = this.skyboxTexutre; //作为背景贴图
       }
     }
-   
   }
 
   setMapCamera(map: Map) {
@@ -109,6 +123,68 @@ export default class SceneRender extends BaseThree {
     );
     this.mapCamera.updateProjectionMatrix();
     this.add(this.mapCamera, false);
+    if (this.scene && this.renderer && this.camera) {
+      // 设置混合器，后处理需要
+
+      Shaders.Death_Shader().then((shader) => {
+        if (this.scene && this.mapCamera && this.camera) {
+          
+          // 初始化shader
+          shader.uniforms.mapSize.value = new THREE.Vector2(map.width * 2,map.height * 2);
+          shader.uniforms.mapOffsetSize.value = new THREE.Vector2(80,80);
+          shader.uniforms.screenSize.value = new THREE.Vector2(containerWidth,containerHeight)
+
+          // 主场景pass
+          this.renderPass = new RenderPass(this.scene, this.camera);
+          // 作为背景的RenderPass clear必须为true
+          this.renderPass.clear = true;
+          this.renderPass.renderToScreen = true;
+          // 主场景遮罩
+          let mask = new MaskPass(this.scene, this.camera);
+          // 小地图的遮罩
+          let maskMap = new MaskPass(this.scene, this.mapCamera);
+          // 小地图的RenderPass
+          let renderPassMap = new RenderPass(this.scene, this.mapCamera);
+          // 最终渲染效果的pass
+          let effectCopy = new ShaderPass(CopyShader);
+          effectCopy.renderToScreen = true;
+          // 作为前置的场景pass clear必须为false
+          renderPassMap.clear = false;
+          renderPassMap.renderToScreen = true;
+
+          this.deathShader = new ShaderPass(shader);
+ 
+          // 主场景作为背景
+          this.composer?.addPass(this.renderPass);
+          // 主场景遮罩
+          this.composer?.addPass(mask);
+          // this.composer?.addPass(new FilmPass());
+          // 地图renderPass
+          this.composer?.addPass(renderPassMap);
+          // 地图遮罩
+          this.composer?.addPass(maskMap);
+           //this.composer?.addPass(new FilmPass());
+           this.composer?.addPass(new ClearMaskPass());
+          // // 获得主场景和地图场景的混合效果
+           this.composer?.addPass(effectCopy);   
+          this.composer?.addPass(this.deathShader)
+            
+        }
+      });
+
+    }
+  }
+
+
+  /**
+   * 将场景渲染为黑白或彩色场景
+   * @param isBlackAndWhite 是否渲染为黑白场景
+   */
+  public renderToBlackAndWhite(isBlackAndWhite:boolean){
+    if(this.deathShader){
+      // 修改shader变量
+      this.deathShader.uniforms["death"].value = isBlackAndWhite;
+    }
   }
 
   update(): void {
@@ -166,6 +242,9 @@ export default class SceneRender extends BaseThree {
         containerHeight
       );
       this.mapCamera?.updateProjectionMatrix();
+      if(this.deathShader){
+        this.deathShader.uniforms["screenSize"].value= new THREE.Vector2(containerWidth,containerHeight);
+      }
     }
   }
 
@@ -258,6 +337,16 @@ export default class SceneRender extends BaseThree {
       // this.controls.target.set(0, 100, 0);
       this.controls.update();
     }
+    if (this.scene && this.camera) {
+      // 设置混合器，后处理需要
+      this.composer = new EffectComposer(this.renderer);
+
+      this.composer.renderToScreen = true;
+      this.composer.renderTarget1.stencilBuffer = true;
+      this.composer.renderTarget2.stencilBuffer = true;
+
+    }
+
     // 设置axesHelper
     // 辅助坐标系  参数250表示坐标系大小，可以根据场景大小去设置
     // var axisHelper = new THREE.AxesHelper(1000);
@@ -284,20 +373,33 @@ export default class SceneRender extends BaseThree {
     }
     this.mapCamera?.clear();
     this.mapCamera = null;
-    if(this.skyboxTexutre){
+    if (this.skyboxTexutre) {
       this.skyboxTexutre.dispose();
       this.skyboxTexutre = null;
     }
     document.removeEventListener("resize", this.resizeEvent);
     this.collideMeshList = [];
+    // 清空pass
+    if(this.composer){
+      this.composer.passes = [];
+    }
   }
 
   // 渲染
   render(): void {
     if (this.renderer && this.scene && this.camera && this.mapCamera) {
-      this.renderer.clear();
-      this.renderer.render(this.scene, this.camera);
-      this.renderer.render(this.scene, this.mapCamera);
+      //this.renderer.autoClear = false;
+      //this.renderer.clear();
+      //this.composerMap?.render();
+      //this.mapCamera.visible = false;
+
+      this.composer?.render(this.deltaTime);
+
+      //this.mapCamera.visible = true;
+      //this.composerMap?.render();
+
+      //this.renderer.render(this.scene, this.camera);
+      // this.renderer.render(this.scene, this.mapCamera);
     }
   }
 }

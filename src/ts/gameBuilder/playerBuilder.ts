@@ -11,6 +11,7 @@ import CharacterHpInfo from "../apis/characterHpInfo";
 import { AniEffectScope, CameraMode, CharacterStatus } from "../apis/enum";
 import bulletBufferPool from "../bullet/bulletBufferPool";
 import Confs from "../common/confs/confs";
+import Shaders from "../common/confs/shaders";
 import SceneRender from "../scene/sceneRender";
 import ThreeMath from "../tool/threeMath";
 import CharacterBuilder from "./characterBuilder";
@@ -63,7 +64,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       },
       bulletPool,
       initPos,
-      (event: ProgressEvent<EventTarget>) => { }
+      (event: ProgressEvent<EventTarget>) => {}
     );
     this.rebirthTime = Confs.playerRebirthTime;
     this.enable();
@@ -157,7 +158,7 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   updateHpInfoInFPSCamera() {
     if (Confs.CAMERA_MODE == CameraMode.FPS && this.characterHpInfo) {
       this.characterHpInfo.isShow = true;
-      this.characterHpInfo.screenPos = new THREE.Vector2(0, 0)
+      this.characterHpInfo.screenPos = new THREE.Vector2(0, 0);
     }
   }
 
@@ -167,6 +168,20 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
   death(): void {
     // 玩家死亡，生命减一
     store.commit(Confs.STORE_DEATH);
+    // 场景变为黑白
+    this.sceneRender.renderToBlackAndWhite(true);
+  }
+
+  /**
+   * 角色复活函数，如果主角复活，则将画面变回彩色
+   */
+  rebirth(): boolean {
+    let isRebirth: boolean = super.rebirth();
+    if (isRebirth) {
+      // 如果是刚刚复活的状态，将场景渲染为彩色
+      this.sceneRender.renderToBlackAndWhite(false);
+    }
+    return isRebirth;
   }
 
   /**
@@ -350,9 +365,10 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
    */
   updateLookPointByFPS() {
     if (this.player?.character?.group) {
-
       // 获得摄像机在世界坐标系下的方向向量
-      let lookOffsetPos = this.camera.getWorldDirection(new THREE.Vector3()).normalize();
+      let lookOffsetPos = this.camera
+        .getWorldDirection(new THREE.Vector3())
+        .normalize();
       if (this.player?.character?.group) {
         let position = this.player.character.group.position;
         this.player?.lookAt(
@@ -398,7 +414,10 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
       // 记录鼠标位置
       this.mousePoint.set(event.clientX, event.clientY);
       // 第一人称视角下更新摄像机位置
-      if (Confs.CAMERA_MODE == CameraMode.FPS && this.characterStatus == CharacterStatus.Alive) {
+      if (
+        Confs.CAMERA_MODE == CameraMode.FPS &&
+        this.characterStatus == CharacterStatus.Alive
+      ) {
         // Y轴偏移是在世界坐标系下
         this.camera.rotateOnWorldAxis(
           new THREE.Vector3(0, 1, 0),
@@ -412,10 +431,12 @@ export default class PlayerBuilder extends PlayerAndEnemyCommonBuilder {
         );
 
         // 获得摄像机在世界坐标下的朝向
-        let direct = this.camera.getWorldDirection(new THREE.Vector3()).normalize();
+        let direct = this.camera
+          .getWorldDirection(new THREE.Vector3())
+          .normalize();
         // 基准向量，为角色直视时的方向向量
         let baseVec = new THREE.Vector3(direct.x, 0, direct.z);
-        let angle = ThreeMath.getTdAngle(direct, baseVec) / Math.PI * 180;
+        let angle = (ThreeMath.getTdAngle(direct, baseVec) / Math.PI) * 180;
         // 限制摄像机的X轴转向角度
         if (angle > 30) {
           this.camera.rotation.copy(lastRotation);
