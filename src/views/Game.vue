@@ -256,11 +256,3 @@ export default class Game extends Vue {
   position: absolute;
 }
 </style>
-
-function rgba(arg0: number, arg1: number, arg2: number, arg3: number) {
-  throw new Error("Function not implemented.");
-}
-
-function rgba(arg0: number, arg1: number, arg2: number, arg3: number) {
-  throw new Error("Function not implemented.");
-}

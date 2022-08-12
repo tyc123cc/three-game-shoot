@@ -30,7 +30,7 @@
   "enemyRebirthTime": 10,
   "enemyNaviTime": 3,
   "playerRebirthTime": 5,
-  "enemyBulletPower": 10,
+  "enemyBulletPower": 100,
   "playerBulletPower": 20,
   "itemSize": 3,
   "itemRotateSpeed": 1,

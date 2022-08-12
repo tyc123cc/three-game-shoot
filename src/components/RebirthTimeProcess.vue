@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="process">
     <div v-show="isShow" id="pro" :style="style()">
       <!-- 内置图形：
       rect(矩形)    
@@ -45,7 +45,8 @@
 </template>
 <script lang="ts">
 import { ElProgress } from "node_modules/_element-ui@2.15.8@element-ui/types/progress";
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import gsap from "gsap";
 
 @Component
 export default class RebirthTimeProcess extends Vue {
@@ -72,6 +73,18 @@ export default class RebirthTimeProcess extends Vue {
       return false;
     }
     return true;
+  }
+
+  /**
+   * 复活进度条需要显示
+   */
+  @Watch("isShow")
+  onWatchisShow(to: boolean, from: boolean) {
+    if(to){
+      // to为true，显示复活进度条，做个从上而下的动画
+      // 将svg图像先移到最上面，使用户看不见图像，再做动画向中间运动
+      gsap.fromTo("svg",{y:-120,duration:1},{y:0,duration:1})
+    }
   }
 
   /**
@@ -117,6 +130,7 @@ export default class RebirthTimeProcess extends Vue {
   margin: auto;
   position: absolute;
   user-select: none;
+  overflow:hidden;
 }
 
 .text {
